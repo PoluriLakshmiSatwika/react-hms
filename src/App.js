@@ -1,24 +1,29 @@
-import logo from './logo.svg';
-import './App.css';
+// App.js
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import RoleSelectionPage from './components/login/RoleSelectionPage';
+import AdminLoginPage from './components/login/AdminLoginPage';
+import DoctorLoginPage from './components/login/DoctorLoginPage';
+import ForgotPasswordPage from './components/login/ForgotPasswordPage';
+import ResetPasswordPage from './components/login/ResetPasswordPage';
+
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        {/* Login Routes */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/login" element={<RoleSelectionPage />} />
+        <Route path="/login/select" element={<RoleSelectionPage />} />
+        <Route path="/login/admin" element={<AdminLoginPage />} />
+        <Route path="/login/doctor" element={<DoctorLoginPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        
+        {/* Other routes... */}
+      </Routes>
+    </BrowserRouter>
   );
 }
 
