@@ -16,12 +16,13 @@ import AdminRegister from "./pages/Register/AdminRegister";
 import DoctorRegister from "./pages/Register/DoctorRegister";
 import NurseRegister from "./pages/Register/NurseRegister";
 import PatientRegister from "./pages/Register/PatientRegister";
-import AdminLogin from "./pages/Login/AdminLogin";
+
 import DoctorLogin from "./pages/Login/DoctorLogin";
 import NurseLogin from "./pages/Login/NurseLogin";
 import PatientLogin from "./pages/Login/PatientLogin";
 import RoleLoginSelection from "./pages/Login/RoleLoginSelection";
-
+import AdminLogin from './pages/Login/AdminLogin';
+import ForgotPasswordPage from './pages/Login/ForgotPasswordPage';
 function App() {
   return (
     <Router>
@@ -58,6 +59,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        
         <Route
           path="/dashboard/doctor"
           element={
@@ -82,6 +84,9 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />  {/* Add this */}
+        {/* Add other routes below */}
 
       </Routes>
       <Footer />
