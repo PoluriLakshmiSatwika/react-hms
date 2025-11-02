@@ -68,7 +68,13 @@ export default function AboutPage() {
 
         .about-container {
           min-height: 100vh;
-          background: linear-gradient(to bottom, #e0f2fe, #ffffff);
+          background-image: 
+            linear-gradient(to bottom, rgba(224, 242, 254, 0.65), rgba(255, 255, 255, 0.70)),
+            url('https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?w=1920&q=80');
+          background-size: cover;
+          background-position: center;
+          background-attachment: fixed;
+          background-repeat: no-repeat;
           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
@@ -114,7 +120,7 @@ export default function AboutPage() {
         }
 
         .mission-card, .vision-card {
-          background: white;
+          background: rgba(255, 255, 255, 0.85);
           padding: 40px;
           border-radius: 16px;
           box-shadow: 0 10px 30px rgba(0,0,0,0.1);
@@ -208,7 +214,7 @@ export default function AboutPage() {
         }
 
         .feature-card {
-          background: white;
+          background: rgba(255, 255, 255, 0.85);
           padding: 32px;
           border-radius: 16px;
           box-shadow: 0 4px 20px rgba(0,0,0,0.08);
@@ -258,7 +264,7 @@ export default function AboutPage() {
         }
 
         .specialization-item {
-          background: white;
+          background: rgba(255, 255, 255, 0.85);
           padding: 24px;
           border-radius: 12px;
           text-align: center;
@@ -288,7 +294,7 @@ export default function AboutPage() {
 
         .values-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          grid-template-columns: repeat(auto-fit, minmin(220px, 1fr));
           gap: 32px;
           margin-top: 48px;
         }
@@ -296,7 +302,7 @@ export default function AboutPage() {
         .value-item {
           text-align: center;
           padding: 32px 24px;
-          background: white;
+          background: rgba(255, 255, 255, 0.85);
           border-radius: 16px;
           box-shadow: 0 4px 15px rgba(0,0,0,0.08);
           transition: all 0.3s ease;
@@ -446,6 +452,20 @@ export default function AboutPage() {
           </div>
         </div>
 
+        {/* Specializations Section */}
+        <div className="specializations-section">
+          <div className="specializations-content">
+            <h2 className="section-title">Our Services</h2>
+            <div className="specializations-grid">
+              {specializations.map((spec, index) => (
+                <div key={index} className="specialization-item">
+                  <p className="specialization-text">{spec}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {/* Statistics Section */}
         <div className="stats-section">
           <div className="stats-content">
@@ -475,20 +495,6 @@ export default function AboutPage() {
           </div>
         </div>
 
-        {/* Specializations Section */}
-        <div className="specializations-section">
-          <div className="specializations-content">
-            <h2 className="section-title">Our Specializations</h2>
-            <div className="specializations-grid">
-              {specializations.map((spec, index) => (
-                <div key={index} className="specialization-item">
-                  <p className="specialization-text">{spec}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
         {/* Values Section */}
         <div className="values-section">
           <h2 className="section-title">Our Core Values</h2>
@@ -512,20 +518,6 @@ export default function AboutPage() {
               <div className="value-emoji">🌟</div>
               <h3 className="value-title">Innovation</h3>
               <p className="value-description">We embrace new technologies</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Call to Action */}
-        <div className="cta-section">
-          <div className="cta-content">
-            <h2 className="cta-title">Ready to Experience Quality Healthcare?</h2>
-            <p className="cta-description">
-              Join thousands of satisfied patients who trust us with their health
-            </p>
-            <div className="cta-buttons">
-              <button className="btn-primary">Register Now</button>
-              <button className="btn-secondary">Contact Us</button>
             </div>
           </div>
         </div>
