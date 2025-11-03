@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
+
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
@@ -26,13 +26,14 @@ import ForgotPasswordPage from './pages/Login/ForgotPasswordPage';
 function App() {
   return (
     <Router>
-      <Navbar />
+      
       <Routes>
 
         {/* Public Pages */}
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/patient-register" element={<PatientRegister />} />
 
         {/* ✅ NEW: Login Role Selection Page */}
         <Route path="/login" element={<RoleLoginSelection />} />
