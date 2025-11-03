@@ -1,0 +1,117 @@
+.doctor-dashboard {
+  max-width: 1000px;
+  margin: 60px auto;
+  padding: 30px;
+  background: #f9fcff;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 100, 200, 0.1);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.doctor-dashboard h2 {
+  text-align: center;
+  color: #004aad;
+  margin-bottom: 30px;
+  font-size: 26px;
+}
+
+.filter-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.filter-section label {
+  font-weight: 600;
+  color: #333;
+}
+
+.filter-section select {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid #007bff;
+  background-color: white;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filter-section select:hover {
+  background-color: #e6f0ff;
+}
+
+.appointments-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.appointment-card {
+  background: white;
+  border: 1px solid #dce7f7;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 80, 160, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.appointment-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 14px rgba(0, 80, 160, 0.15);
+}
+
+.appointment-card h3 {
+  color: #004aad;
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.appointment-card p {
+  margin: 6px 0;
+  color: #444;
+  font-size: 15px;
+}
+
+.nurse-list {
+  margin-top: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.assign-btn {
+  background: linear-gradient(135deg, #007bff, #0056d6);
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.assign-btn:hover {
+  background: linear-gradient(135deg, #0056d6, #003c9e);
+  transform: scale(1.05);
+}
+
+@media (max-width: 600px) {
+  .doctor-dashboard {
+    margin: 30px 15px;
+    padding: 20px;
+  }
+
+  .doctor-dashboard h2 {
+    font-size: 22px;
+  }
+
+  .appointment-card h3 {
+    font-size: 18px;
+  }
+
+  .assign-btn {
+    width: 100%;
+  }
+}

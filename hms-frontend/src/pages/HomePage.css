@@ -53,10 +53,11 @@
 }
 
 .btn.secondary {
-  background-color: transparent;
+  background-color: #007bff;
   color: white;
-  border: 2px solid white;
+
 }
+
 
 
 .logo {
@@ -142,8 +143,8 @@
 /* Secondary button style */
 .btn.secondary {
   background-color: white;
-  color: #007bff;
-  border: 2px solid #007bff;
+  color: white;
+  border: none;
 }
 
 /* Hover effects */

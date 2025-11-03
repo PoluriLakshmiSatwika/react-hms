@@ -41,7 +41,8 @@ const AdminLogin = () => {
     
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
-      navigate('/admin/dashboard');
+      navigate("/dashboard/admin");
+
     } catch (error) {
       setErrors({ submit: 'Admin login failed. Please check your credentials.' });
     } finally {
@@ -140,9 +141,7 @@ const AdminLogin = () => {
         </form>
 
         <div className="login-footer">
-          <p>
-            Not an admin? <Link to="/login/select">Select different role</Link>
-          </p>
+          
           <p>
             <Link to="/">← Back to Home</Link>
           </p>

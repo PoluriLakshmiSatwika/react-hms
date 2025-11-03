@@ -39,7 +39,7 @@ const DoctorLogin = () => {
     
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
-      navigate('/doctor/dashboard');
+      navigate('/dashboard/doctor');
     } catch (error) {
       setErrors({ submit: 'Doctor login failed. Please check your credentials.' });
     } finally {
@@ -138,9 +138,7 @@ const DoctorLogin = () => {
         </form>
 
         <div className="login-footer">
-          <p>
-            Not a doctor? <Link to="/login/select">Select different role</Link>
-          </p>
+          
           <p>
             <Link to="/">← Back to Home</Link>
           </p>
