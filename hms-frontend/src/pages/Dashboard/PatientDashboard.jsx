@@ -104,4 +104,106 @@ const PatientDashboard = () => {
   );
 };
 
+/* ------------------------ 💅 STYLES ------------------------ */
+const dashboardContainer = {
+  maxWidth: "900px",
+  margin: "40px auto",
+  padding: "25px",
+  borderRadius: "12px",
+  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+  backgroundColor: "white",
+};
+
+const mainTitle = {
+  textAlign: "center",
+  color: "#004aad",
+  fontSize: "28px",
+  marginBottom: "10px",
+};
+
+const buttonGroup = {
+  textAlign: "center",
+  marginBottom: "25px",
+};
+
+const navButton = {
+  border: "none",
+  padding: "10px 18px",
+  margin: "0 6px",
+  borderRadius: "6px",
+  cursor: "pointer",
+  fontWeight: "500",
+  transition: "0.3s",
+};
+
+const sectionContainer = {
+  padding: "15px",
+  border: "1px solid #ddd",
+  borderRadius: "10px",
+  backgroundColor: "#f9f9ff",
+};
+
+const sectionTitle = {
+  color: "#004aad",
+  fontSize: "20px",
+  textAlign: "center",
+  marginBottom: "15px",
+};
+
+const tableStyle = {
+  width: "100%",
+  borderCollapse: "collapse",
+  marginTop: "10px",
+};
+
+const thStyle = {
+  border: "1px solid #ccc",
+  padding: "10px",
+  textAlign: "left",
+  backgroundColor: "#e9f0ff",
+  color: "#004aad",
+};
+
+const tdStyle = {
+  border: "1px solid #ccc",
+  padding: "10px",
+  textAlign: "left",
+};
+
+const tableHeader = {
+  backgroundColor: "#e9f0ff",
+};
+
+const tableRow = {
+  backgroundColor: "#fff",
+};
+
+const labelStyle = {
+  display: "block",
+  fontWeight: "bold",
+  marginBottom: "6px",
+};
+
+const inputStyle = {
+  width: "100%",
+  padding: "8px",
+  marginBottom: "12px",
+  borderRadius: "6px",
+  border: "1px solid #ccc",
+};
+
+const formRow = {
+  marginBottom: "12px",
+};
+
+const buttonPrimary = {
+  backgroundColor: "#004aad",
+  color: "white",
+  padding: "10px 16px",
+  border: "none",
+  borderRadius: "6px",
+  cursor: "pointer",
+  marginTop: "5px",
+};
+
 export default PatientDashboard;
