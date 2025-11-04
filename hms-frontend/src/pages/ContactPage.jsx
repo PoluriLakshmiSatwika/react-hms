@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Phone, MapPin, Clock, Send, MessageSquare, User, FileText } from 'lucide-react';
+import { Mail, Phone, MapPin,Send, MessageSquare, User, FileText } from 'lucide-react';
 import HomeContainer from '../components/HomeContainer';
 
 export default function ContactPage() {
@@ -466,16 +466,7 @@ export default function ContactPage() {
             </div>
           </div>
 
-          {/* Map Section */}
-          <div className="map-section">
-            <h2 className="map-title">Find Us Here</h2>
-            <div className="map-container">
-              <div className="map-placeholder">
-                <MapPin size={48} style={{ marginRight: '12px' }} />
-                Map Integration: Add Google Maps iframe here
-              </div>
-            </div>
-          </div>
+          
         </div>
       </div>
     </HomeContainer>

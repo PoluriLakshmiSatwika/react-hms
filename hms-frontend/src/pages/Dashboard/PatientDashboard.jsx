@@ -3,16 +3,32 @@ import "./PatientDashboard.css";
 
 const PatientDashboard = () => {
   const [activeTab, setActiveTab] = useState("book");
-  const [appointments] = useState([]);
-  const [payments] = useState([]);
-  const [remainingBookings] = useState(0);
 
-  const handleBookAppointment = () => {
-    alert("Appointment booking feature coming soon!");
+  // Mock Data (replace with backend later)
+  const [appointments] = useState([
+    { date: "2025-11-10", time: "10:00 AM", doctor: "Dr. Smith" },
+  ]);
+
+  const [payments] = useState([
+    { date: "2025-11-01", amount: "₹500", method: "UPI" },
+  ]);
+
+  const [remainingBookings] = useState(2);
+
+  const [doctors] = useState([
+    { name: "Dr. Ramesh Rao", specialization: "Cardiologist", shift: "9:00 AM - 1:00 PM", fee: "₹600" },
+    { name: "Dr. Neha Sharma", specialization: "Dermatologist", shift: "2:00 PM - 6:00 PM", fee: "₹400" },
+    { name: "Dr. Arjun Patel", specialization: "Orthopedic", shift: "10:00 AM - 2:00 PM", fee: "₹550" },
+    { name: "Dr. Priya Menon", specialization: "Gynecologist", shift: "4:00 PM - 8:00 PM", fee: "₹700" },
+  ]);
+
+  const handleBookAppointment = (doctor) => {
+    alert(`Booking appointment with ${doctor.name}...`);
   };
 
   return (
     <div className="patient-dashboard">
+      {/* ===== Header ===== */}
       <header className="dashboard-header">
         <h1>Patient Dashboard</h1>
         <button
@@ -23,6 +39,7 @@ const PatientDashboard = () => {
         </button>
       </header>
 
+      {/* ===== Navigation ===== */}
       <nav className="dashboard-nav">
         <button
           className={activeTab === "book" ? "active" : ""}
@@ -50,46 +67,105 @@ const PatientDashboard = () => {
         </button>
       </nav>
 
+      {/* ===== Dashboard Content ===== */}
       <main className="dashboard-content">
+        {/* === Book Appointment Tab === */}
         {activeTab === "book" && (
           <section className="tab-section">
             <h2>Book Appointment</h2>
-            <button onClick={handleBookAppointment} className="action-btn">
-              + Book New Appointment
-            </button>
+            <p>Select a doctor to book your appointment.</p>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Doctor</th>
+                  <th>Specialization</th>
+                  <th>Shift</th>
+                  <th>OP Fee</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {doctors.map((doc, i) => (
+                  <tr key={i}>
+                    <td>{doc.name}</td>
+                    <td>{doc.specialization}</td>
+                    <td>{doc.shift}</td>
+                    <td>{doc.fee}</td>
+                    <td>
+                      <button
+                        className="action-btn"
+                        onClick={() => handleBookAppointment(doc)}
+                      >
+                        Book Now
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </section>
         )}
 
+        {/* === Upcoming Appointments === */}
         {activeTab === "upcoming" && (
           <section className="tab-section">
             <h2>Upcoming Appointments</h2>
             {appointments.length === 0 ? (
               <p>No upcoming appointments yet.</p>
             ) : (
-              <ul>
-                {appointments.map((a, i) => (
-                  <li key={i}>{a}</li>
-                ))}
-              </ul>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Doctor</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {appointments.map((a, i) => (
+                    <tr key={i}>
+                      <td>{a.date}</td>
+                      <td>{a.time}</td>
+                      <td>{a.doctor}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             )}
           </section>
         )}
 
+        {/* === Payment History === */}
         {activeTab === "payments" && (
           <section className="tab-section">
             <h2>Payment History</h2>
             {payments.length === 0 ? (
               <p>No payment history available.</p>
             ) : (
-              <ul>
-                {payments.map((p, i) => (
-                  <li key={i}>{p}</li>
-                ))}
-              </ul>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {payments.map((p, i) => (
+                    <tr key={i}>
+                      <td>{p.date}</td>
+                      <td>{p.amount}</td>
+                      <td>{p.method}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             )}
           </section>
         )}
 
+        {/* === Remaining Bookings === */}
         {activeTab === "remaining" && (
           <section className="tab-section">
             <h2>Remaining Valid Bookings</h2>
@@ -102,108 +178,6 @@ const PatientDashboard = () => {
       </main>
     </div>
   );
-};
-
-/* ------------------------ 💅 STYLES ------------------------ */
-const dashboardContainer = {
-  maxWidth: "900px",
-  margin: "40px auto",
-  padding: "25px",
-  borderRadius: "12px",
-  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-  backgroundColor: "white",
-};
-
-const mainTitle = {
-  textAlign: "center",
-  color: "#004aad",
-  fontSize: "28px",
-  marginBottom: "10px",
-};
-
-const buttonGroup = {
-  textAlign: "center",
-  marginBottom: "25px",
-};
-
-const navButton = {
-  border: "none",
-  padding: "10px 18px",
-  margin: "0 6px",
-  borderRadius: "6px",
-  cursor: "pointer",
-  fontWeight: "500",
-  transition: "0.3s",
-};
-
-const sectionContainer = {
-  padding: "15px",
-  border: "1px solid #ddd",
-  borderRadius: "10px",
-  backgroundColor: "#f9f9ff",
-};
-
-const sectionTitle = {
-  color: "#004aad",
-  fontSize: "20px",
-  textAlign: "center",
-  marginBottom: "15px",
-};
-
-const tableStyle = {
-  width: "100%",
-  borderCollapse: "collapse",
-  marginTop: "10px",
-};
-
-const thStyle = {
-  border: "1px solid #ccc",
-  padding: "10px",
-  textAlign: "left",
-  backgroundColor: "#e9f0ff",
-  color: "#004aad",
-};
-
-const tdStyle = {
-  border: "1px solid #ccc",
-  padding: "10px",
-  textAlign: "left",
-};
-
-const tableHeader = {
-  backgroundColor: "#e9f0ff",
-};
-
-const tableRow = {
-  backgroundColor: "#fff",
-};
-
-const labelStyle = {
-  display: "block",
-  fontWeight: "bold",
-  marginBottom: "6px",
-};
-
-const inputStyle = {
-  width: "100%",
-  padding: "8px",
-  marginBottom: "12px",
-  borderRadius: "6px",
-  border: "1px solid #ccc",
-};
-
-const formRow = {
-  marginBottom: "12px",
-};
-
-const buttonPrimary = {
-  backgroundColor: "#004aad",
-  color: "white",
-  padding: "10px 16px",
-  border: "none",
-  borderRadius: "6px",
-  cursor: "pointer",
-  marginTop: "5px",
 };
 
 export default PatientDashboard;
