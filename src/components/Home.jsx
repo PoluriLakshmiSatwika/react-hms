@@ -1,10 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
 import hospitalBg from "../assets/hospital-bg.jpeg";
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    alert("Logged out successfully");
+  };
 
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
@@ -13,10 +19,9 @@ const HomePage = () => {
     }
   };
 
-  // Services data
   const services = [
     "Cardiology",
-    "Orthopedics", 
+    "Orthopedics",
     "Pediatrics",
     "Neurology",
     "Oncology",
@@ -26,30 +31,48 @@ const HomePage = () => {
     "Gastroenterology",
     "Urology",
     "Ophthalmology",
-    "Psychiatry"
+    "Psychiatry",
   ];
 
-  // Achievements data
   const achievements = [
     { number: "50+", title: "Expert Doctors" },
     { number: "10,000+", title: "Happy Patients" },
     { number: "24/7", title: "Emergency Services" },
-    { number: "15+", title: "Medical Departments" }
+    { number: "15+", title: "Medical Departments" },
   ];
 
   return (
     <div className="home-container">
-      {/* Header / Navbar */}
+      {/* Navbar */}
       <header className="navbar">
         <div className="logo">HMS🏥</div>
+
         <nav className="nav-links">
-          <a href="#home" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
+          <a
+            href="#home"
+            onClick={(e) => {
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+          >
             Home
           </a>
-          <a href="#about" onClick={(e) => { e.preventDefault(); scrollToSection("about"); }}>
+          <a
+            href="#about"
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToSection("about");
+            }}
+          >
             About Us
           </a>
-          <a href="#contact" onClick={(e) => { e.preventDefault(); scrollToSection("contact"); }}>
+          <a
+            href="#contact"
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToSection("contact");
+            }}
+          >
             Contact Us
           </a>
         </nav>
@@ -60,13 +83,23 @@ const HomePage = () => {
         >
           Book an Appointment
         </button>
-        <button
-          className="auth-link symbol-link"
-          onClick={() => navigate("/auth")}
-          title="Register / Login"
-        >
-          👤
-        </button>
+
+        {/* Profile / Auth Button */}
+        <div className="profile-dropdown">
+          {!isLoggedIn ? (
+            <button
+              className="auth-link symbol-link"
+              onClick={() => navigate("/auth")}
+              title="Register / Login"
+            >
+              👤
+            </button>
+          ) : (
+            <button className="logout-btn" onClick={handleLogout}>
+              Logout
+            </button>
+          )}
+        </div>
       </header>
 
       {/* Hero Section */}
@@ -79,29 +112,24 @@ const HomePage = () => {
           <h1>Welcome to our Hospital</h1>
           <p>Your Health, Our Priority</p>
           <p className="hero-description">
-            Hospitals complement and amplify the effectiveness
-            of many other parts of the health system, providing continuous
-            availability of services for acute and complex conditions. 
-            They concentrate scarce resources within well-planned referral networks to respond efficiently to population health needs.
+            Hospitals complement and amplify the effectiveness of many other
+            parts of the health system, providing continuous availability of
+            services for acute and complex conditions.
           </p>
         </div>
       </section>
 
-      {/* About Section - Now includes Services and Achievements */}
+      {/* About + Services + Achievements */}
       <section id="about" className="about-section">
         <div className="about-container">
-          {/* About Content */}
           <div className="about-content">
             <h4>About Our Hospital</h4>
             <p>
-              Our hospital is a state-of-the-art healthcare facility dedicated to providing 
-              comprehensive medical services to our community. With a team of highly skilled 
-              professionals and cutting-edge technology, we ensure the highest standards of 
-              patient care and medical excellence.
+              Our hospital is a state-of-the-art healthcare facility dedicated
+              to providing comprehensive medical services to our community.
             </p>
           </div>
 
-          {/* Services Section */}
           <div className="services-subsection">
             <h4>Our Services</h4>
             <div className="services-grid">
@@ -113,7 +141,6 @@ const HomePage = () => {
             </div>
           </div>
 
-          {/* Achievements Section */}
           <div className="achievements-subsection">
             <h4>Our Achievements</h4>
             <div className="achievements-grid">
@@ -136,19 +163,35 @@ const HomePage = () => {
             <div className="contact-info">
               <div className="contact-item">
                 <h4>📍 Address</h4>
-                <p>123 Healthcare Street<br />Medical City, MC 12345</p>
+                <p>
+                  123 Healthcare Street
+                  <br />
+                  Medical City, MC 12345
+                </p>
               </div>
               <div className="contact-item">
                 <h4>📞 Phone</h4>
-                <p>Emergency: +1 (555) 123-4567<br />General: +1 (555) 123-4568</p>
+                <p>
+                  Emergency: +1 (555) 123-4567
+                  <br />
+                  General: +1 (555) 123-4568
+                </p>
               </div>
               <div className="contact-item">
                 <h4>📧 Email</h4>
-                <p>info@hmshospital.com<br />emergency@hmshospital.com</p>
+                <p>
+                  info@hmshospital.com
+                  <br />
+                  emergency@hmshospital.com
+                </p>
               </div>
               <div className="contact-item">
                 <h4>🕒 Hours</h4>
-                <p>24/7 Emergency Services<br />OPD: 8:00 AM - 8:00 PM</p>
+                <p>
+                  24/7 Emergency Services
+                  <br />
+                  OPD: 8:00 AM - 8:00 PM
+                </p>
               </div>
             </div>
           </div>
