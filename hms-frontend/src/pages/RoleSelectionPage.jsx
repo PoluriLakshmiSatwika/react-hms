@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import HomeContainer from "../components/HomeContainer";
+//import HomeContainer from "../components/HomeContainer";
 import "./Login/RoleLoginSelection.css";
 
 const RoleSelectionPage = () => {
@@ -44,7 +44,7 @@ const RoleSelectionPage = () => {
   };
 
   return (
-    <HomeContainer>
+    //<HomeContainer>
       <div className="role-selection-container">
         <div className="role-selection-card">
           <div className="selection-section">
@@ -89,7 +89,7 @@ const RoleSelectionPage = () => {
           </div>
         </div>
       </div>
-    </HomeContainer>
+    //</HomeContainer>
   );
 };
 

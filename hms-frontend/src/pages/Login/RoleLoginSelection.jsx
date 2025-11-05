@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./RoleLoginSelection.css";
-import HomeContainer from "../../components/HomeContainer";
+//import HomeContainer from "../../components/HomeContainer";
 
 const RoleLoginSelection = () => {
   const navigate = useNavigate();
@@ -44,7 +44,7 @@ const RoleLoginSelection = () => {
   };
 
   return (
-    <HomeContainer>
+    //<HomeContainer>
       <div className="role-selection-container">
         <div className="role-selection-card">
           {/* ✅ Removed MediCare Hospital header section */}
@@ -91,7 +91,7 @@ const RoleLoginSelection = () => {
           </div>
         </div>
       </div>
-    </HomeContainer>
+    //</HomeContainer>
   );
 };
 
