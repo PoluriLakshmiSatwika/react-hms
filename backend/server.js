@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import authRoutes from "./routes/authRoutes.js";
+import appointmentRoutes from "./routes/appointmentRoutes.js";
+
 
 dotenv.config();
 
@@ -17,6 +19,7 @@ mongoose.connect(process.env.MONGO_URI)
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/appointments", appointmentRoutes);
 
 // Server
 const PORT = process.env.PORT || 5000;
