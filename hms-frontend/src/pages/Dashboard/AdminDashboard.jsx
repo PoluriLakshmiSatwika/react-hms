@@ -1,121 +1,99 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ Import navigation hook
+import React, { useEffect, useState } from "react";
 import "./AdminDashboard.css";
 
 const AdminDashboard = () => {
-  const navigate = useNavigate(); // ✅ Initialize navigation
+  const [pendingStaff, setPendingStaff] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const [pendingStaff, setPendingStaff] = useState([
-    {
-      id: 1,
-      name: "Dr. Ramesh Kumar",
-      email: "ramesh@example.com",
-      phone: "9876543210",
-      department: "Cardiology",
-      certificate: "/uploads/dr_ramesh_certificate.pdf",
-      type: "Doctor",
-    },
-    {
-      id: 2,
-      name: "Nurse Priya Sharma",
-      email: "priya@example.com",
-      phone: "9123456789",
-      department: "Emergency",
-      certificate: "/uploads/priya_id.jpg",
-      type: "Nurse",
-    },
-  ]);
+  useEffect(() => {
+    const fetchPendingStaff = async () => {
+      try {
+        const res = await fetch("http://localhost:8000/api/admin/pending-staff");
+        const data = await res.json();
+        setPendingStaff(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Error fetching pending staff:", error);
+        setPendingStaff([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPendingStaff();
+  }, []);
 
-  const handleApprove = (id) => {
-    alert(`✅ Approved staff ID ${id} — moved to main staff database.`);
-    setPendingStaff((prev) => prev.filter((staff) => staff.id !== id));
+  const handleApprove = async (id) => {
+    const res = await fetch(`http://localhost:8000/api/admin/approve/${id}`, {
+      method: "POST",
+    });
+    const data = await res.json();
+    alert(data.message);
+    setPendingStaff((prev) => prev.filter((staff) => staff._id !== id));
   };
 
-  const handleReject = (id) => {
-    alert(`❌ Rejected staff ID ${id}.`);
-    setPendingStaff((prev) => prev.filter((staff) => staff.id !== id));
+  const handleReject = async (id) => {
+    const res = await fetch(`http://localhost:8000/api/admin/reject/${id}`, {
+      method: "POST",
+    });
+    const data = await res.json();
+    alert(data.message);
+    setPendingStaff((prev) => prev.filter((staff) => staff._id !== id));
   };
 
-  // ✅ Logout function (redirects to role login)
-  const handleLogout = () => {
-    alert("You have been logged out successfully.");
-    navigate("/login"); // ✅ Redirects to Role Login page
-  };
+  if (loading) {
+    return <p style={{ textAlign: "center", marginTop: "20px" }}>Loading pending staff...</p>;
+  }
 
   return (
-    <div className="admin-dashboard">
-      {/* ✅ Header with Logout Button */}
-      <header className="dashboard-header">
-        <h2>🧑‍💼 Admin Dashboard - Pending Staff Registrations</h2>
-        <button onClick={handleLogout} className="logout-btn">
-          Logout
-        </button>
-      </header>
-
-      <table className="staff-table">
-        <thead>
-          <tr>
-            <th>Full Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Department</th>
-            <th>ID / Certificate</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {pendingStaff.length > 0 ? (
-            pendingStaff.map((staff) => (
-              <tr key={staff.id}>
-                <td>{staff.name}</td>
+    <div className="admin-dashboard-container">
+      <h2>Pending Staff</h2>
+      {pendingStaff.length === 0 ? (
+        <p style={{ textAlign: "center", marginTop: "20px" }}>No pending staff at the moment.</p>
+      ) : (
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Department</th>
+              <th>Shift / Specialization</th>
+              <th>ID Proof</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pendingStaff.map((staff) => (
+              <tr key={staff._id}>
+                <td>{staff.fullName}</td>
                 <td>{staff.email}</td>
-                <td>{staff.phone}</td>
+                <td>{staff.role}</td>
                 <td>{staff.department}</td>
+                <td>{staff.role === "nurse" ? staff.shiftTiming : staff.specialization}</td>
                 <td>
-                  {staff.certificate.endsWith(".pdf") ? (
+                  {staff.uploadId ? (
                     <a
-                      href={staff.certificate}
+                      href={`http://localhost:8000/${staff.uploadId}`}
                       target="_blank"
-                      rel="noreferrer"
-                      className="view-link"
+                      rel="noopener noreferrer"
                     >
-                      View PDF
+                      View ID
                     </a>
                   ) : (
-                    <img
-                      src={staff.certificate}
-                      alt="certificate"
-                      className="certificate-preview"
-                    />
+                    "No file"
                   )}
                 </td>
                 <td>
-                  <button
-                    className="approve-btn"
-                    onClick={() => handleApprove(staff.id)}
-                  >
-                    ✅ Approve
-                  </button>
-                  <button
-                    className="reject-btn"
-                    onClick={() => handleReject(staff.id)}
-                  >
-                    ❌ Reject
-                  </button>
+                  <button onClick={() => handleApprove(staff._id)}>Approve</button>
+                  <button onClick={() => handleReject(staff._id)}>Reject</button>
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="6" className="no-records">
-                No pending registrations 🎉
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 };
+
 
 export default AdminDashboard;

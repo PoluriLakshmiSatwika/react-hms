@@ -1,74 +1,51 @@
 .admin-dashboard {
-  padding: 40px;
-  font-family: 'Segoe UI', sans-serif;
-  background: #f8fafc;
-  min-height: 100vh;
+  padding: 20px;
+  text-align: center;
 }
 
-.admin-dashboard h2 {
-  margin-bottom: 24px;
-  color: #1e3a8a;
-  font-size: 1.8rem;
+.tabs {
+  margin-bottom: 20px;
 }
 
-.staff-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.staff-table th,
-.staff-table td {
-  padding: 14px 16px;
-  border-bottom: 1px solid #e5e7eb;
-  text-align: left;
-}
-
-.staff-table th {
-  background: #1e40af;
-  color: white;
-}
-
-.certificate-preview {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-}
-
-.view-link {
-  color: #2563eb;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.approve-btn,
-.reject-btn {
+.tabs button {
+  margin: 5px;
   padding: 8px 14px;
   border: none;
-  border-radius: 6px;
+  background: #eee;
   cursor: pointer;
-  margin-right: 8px;
-  font-weight: 600;
+  border-radius: 5px;
 }
 
-.approve-btn {
-  background: #22c55e;
+.tabs button.active {
+  background: #007bff;
   color: white;
 }
 
-.reject-btn {
-  background: #ef4444;
+table {
+  margin: 0 auto;
+  width: 90%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+button {
+  margin: 5px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:first-of-type {
+  background: #28a745;
   color: white;
 }
 
-.no-records {
-  text-align: center;
-  color: #6b7280;
-  padding: 20px;
-  font-style: italic;
+button:last-of-type {
+  background: #dc3545;
+  color: white;
 }

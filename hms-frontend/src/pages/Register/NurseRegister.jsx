@@ -1,6 +1,6 @@
 import "./NurseRegistration.css";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ Import navigate hook
+import { useNavigate } from "react-router-dom";
 import {
   FaUser,
   FaEnvelope,
@@ -8,75 +8,100 @@ import {
   FaBuilding,
   FaKey,
   FaClock,
+  FaIdCard,
 } from "react-icons/fa";
 
 const NurseRegistrationForm = () => {
-  const navigate = useNavigate(); // ✅ Initialize navigate
+  const navigate = useNavigate();
   const [form, setForm] = useState({
-    name: "",
+    fullName: "",
     email: "",
     phone: "",
     department: "",
-    shift: "",
+    shiftTiming: "",
     password: "",
+    uploadId: null,
   });
   const [errors, setErrors] = useState({});
   const [showConfirm, setShowConfirm] = useState(false);
 
-  function validate(fields = form) {
+  const validate = () => {
     let temp = {};
-    temp.name = fields.name ? "" : "Name is required.";
-    temp.email = fields.email
-      ? /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(fields.email)
+    temp.fullName = form.fullName ? "" : "Name is required.";
+    temp.email = form.email
+      ? /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email)
         ? ""
         : "Invalid email."
       : "Email required.";
-    temp.phone = fields.phone
-      ? /^\d{10}$/.test(fields.phone)
+    temp.phone = form.phone
+      ? /^\d{10}$/.test(form.phone)
         ? ""
         : "Phone must be 10 digits."
       : "Phone required.";
-    temp.department = fields.department ? "" : "Department required.";
-    temp.shift = fields.shift ? "" : "Shift timing required.";
-    temp.password = fields.password
-      ? fields.password.length >= 6
+    temp.department = form.department ? "" : "Department required.";
+    temp.shiftTiming = form.shiftTiming ? "" : "Shift timing required.";
+    temp.password = form.password
+      ? form.password.length >= 6
         ? ""
         : "Password must be 6+ characters."
       : "Password required.";
+    temp.uploadId = form.uploadId ? "" : "ID proof required.";
 
     setErrors(temp);
     return Object.values(temp).every((val) => val === "");
-  }
+  };
 
-  function handleChange(e) {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  }
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: files ? files[0] : value,
+    }));
 
-  function handleSubmit(e) {
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (validate()) setShowConfirm(true);
-  }
+  };
 
-  function handleConfirm() {
-    setShowConfirm(false);
-    alert("Nurse registered successfully!");
-    navigate("/dashboard/nurse");
-  }
+  const handleConfirm = async () => {
+    const formData = new FormData();
+    Object.keys(form).forEach((key) => formData.append(key, form[key]));
+
+    try {
+      const response = await fetch("http://localhost:8000/api/nurse/register", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Registration failed");
+
+      alert(data.message);
+      setShowConfirm(false);
+      navigate("/home");
+    } catch (error) {
+      alert("Error: " + error.message);
+    }
+  };
 
   return (
     <div className="nurse-register-container">
       <h2 className="form-title">Nurse Registration</h2>
       <form className="nurse-form" onSubmit={handleSubmit}>
+
         <div className="input-group">
           <FaUser className="form-icon" />
           <input
-            name="name"
+            name="fullName"
             placeholder="Full Name"
-            value={form.name}
+            value={form.fullName}
             onChange={handleChange}
           />
         </div>
-        <div className="errorMsg">{errors.name}</div>
+        <div className="errorMsg">{errors.fullName}</div>
 
         <div className="input-group">
           <FaEnvelope className="form-icon" />
@@ -115,13 +140,13 @@ const NurseRegistrationForm = () => {
         <div className="input-group">
           <FaClock className="form-icon" />
           <input
-            name="shift"
+            name="shiftTiming"
             placeholder="Shift Timing"
-            value={form.shift}
+            value={form.shiftTiming}
             onChange={handleChange}
           />
         </div>
-        <div className="errorMsg">{errors.shift}</div>
+        <div className="errorMsg">{errors.shiftTiming}</div>
 
         <div className="input-group">
           <FaKey className="form-icon" />
@@ -134,6 +159,16 @@ const NurseRegistrationForm = () => {
           />
         </div>
         <div className="errorMsg">{errors.password}</div>
+
+        <div className="input-group">
+          <FaIdCard className="form-icon" />
+          <input
+            type="file"
+            name="uploadId"
+            onChange={handleChange}
+          />
+        </div>
+        <div className="errorMsg">{errors.uploadId}</div>
 
         <button type="submit" className="btn">Register</button>
 
