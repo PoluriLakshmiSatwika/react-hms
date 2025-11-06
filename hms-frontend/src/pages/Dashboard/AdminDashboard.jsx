@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./AdminDashboard.css";
 
 const AdminDashboard = () => {
@@ -6,6 +7,7 @@ const AdminDashboard = () => {
   const [nurses, setNurses] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   // ✅ Set page title
   useEffect(() => {
@@ -69,13 +71,23 @@ const AdminDashboard = () => {
     }
   };
 
+  // ✅ Logout function
+  const handleLogout = () => {
+    localStorage.clear(); // clear tokens/session data if any
+    alert("Logged out successfully!");
+    navigate("/"); // redirect to homepage
+  };
+
   if (loading) {
     return <p style={{ textAlign: "center", marginTop: "20px" }}>Loading dashboard data...</p>;
   }
 
   return (
     <div className="admin-dashboard-container">
-      <h2>Admin Dashboard</h2>
+      <div className="dashboard-header">
+        <h2>Admin Dashboard</h2>
+        <button className="logout-btn" onClick={handleLogout}>Logout</button>
+      </div>
 
       {/* ✅ Pending Staff Section */}
       <section>
@@ -117,8 +129,12 @@ const AdminDashboard = () => {
                     )}
                   </td>
                   <td>
-                    <button onClick={() => handleApprove(staff._id)}>Approve</button>
-                    <button onClick={() => handleReject(staff._id)}>Reject</button>
+                    <button className="approve-btn" onClick={() => handleApprove(staff._id)}>
+                      Approve
+                    </button>
+                    <button className="reject-btn" onClick={() => handleReject(staff._id)}>
+                      Reject
+                    </button>
                   </td>
                 </tr>
               ))}

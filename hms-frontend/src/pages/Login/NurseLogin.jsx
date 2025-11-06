@@ -1,29 +1,28 @@
-// NurseLoginPage.jsx
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import './NurseLoginPage.css';
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import "./NurseLoginPage.css";
 
 const NurseLoginPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    rememberMe: false
+    email: "",
+    password: "",
+    rememberMe: false,
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.email) {
-      newErrors.email = 'Nurse email is required';
+      newErrors.email = "Nurse email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
+      newErrors.email = "Email is invalid";
     }
-    
+
     if (!formData.password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = "Password is required";
     }
 
     setErrors(newErrors);
@@ -32,16 +31,38 @@ const NurseLoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     setIsLoading(true);
-    
+    setErrors({});
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      navigate('/dashboard/nurse');
+      const res = await fetch("http://localhost:8000/api/nurse/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        // Optionally store token or user info in localStorage/sessionStorage
+        localStorage.setItem("nurseToken", data.token);
+        localStorage.setItem("nurseName", data.nurse.name);
+
+        navigate("/dashboard/nurse"); // Redirect on success
+      } else {
+        setErrors({ submit: data.message || "Invalid credentials." });
+      }
     } catch (error) {
-      setErrors({ submit: 'Nurse login failed. Please check your credentials.' });
+      console.error("Login error:", error);
+      setErrors({
+        submit: "Unable to connect to server. Please try again later.",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -49,13 +70,13 @@ const NurseLoginPage = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
-    
+
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
@@ -63,9 +84,7 @@ const NurseLoginPage = () => {
     <div className="nurse-login-container">
       <div className="nurse-login-card">
         <div className="login-header">
-          <div className="role-icon nurse-icon">
-            👩‍⚕️
-          </div>
+          <div className="role-icon nurse-icon">👩‍⚕️</div>
           <div className="header-text">
             <h1>Nurse Login</h1>
             <p>Access nursing dashboard and assignments</p>
@@ -81,10 +100,12 @@ const NurseLoginPage = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className={errors.email ? 'error' : ''}
+              className={errors.email ? "error" : ""}
               placeholder="Enter nurse email"
             />
-            {errors.email && <span className="error-message">{errors.email}</span>}
+            {errors.email && (
+              <span className="error-message">{errors.email}</span>
+            )}
           </div>
 
           <div className="form-group">
@@ -95,10 +116,12 @@ const NurseLoginPage = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className={errors.password ? 'error' : ''}
+              className={errors.password ? "error" : ""}
               placeholder="Enter your password"
             />
-            {errors.password && <span className="error-message">{errors.password}</span>}
+            {errors.password && (
+              <span className="error-message">{errors.password}</span>
+            )}
           </div>
 
           <div className="form-options">
@@ -121,8 +144,8 @@ const NurseLoginPage = () => {
             <div className="submit-error">{errors.submit}</div>
           )}
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="login-button nurse-button"
             disabled={isLoading}
           >
@@ -132,13 +155,12 @@ const NurseLoginPage = () => {
                 Signing In...
               </>
             ) : (
-              'Nurse Sign In'
+              "Nurse Sign In"
             )}
           </button>
         </form>
 
         <div className="login-footer">
-         
           <p>
             <Link to="/">← Back to Home</Link>
           </p>
