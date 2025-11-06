@@ -6,6 +6,7 @@ const pendingStaffSchema = new mongoose.Schema({
   phone: { type: String, required: true },
   role: { type: String, required: true },
   department: { type: String },
+  specialty: { type: String },
   shiftTiming: { type: String },
   password: { type: String, required: true },
   uploadId: { type: String }, // stores uploaded ID path

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ Import navigate hook
+import { useNavigate } from "react-router-dom";
 import {
   FaUser,
   FaEnvelope,
@@ -7,6 +7,7 @@ import {
   FaBuilding,
   FaKey,
   FaStethoscope,
+  FaIdCard
 } from "react-icons/fa";
 import "./DoctorRegistration.css";
 
@@ -19,6 +20,7 @@ const DoctorRegistrationForm = () => {
     specialty: "",
     department: "",
     password: "",
+    uploadId: null, // ✅ New field
   });
   const [errors, setErrors] = useState({});
   const [showConfirm, setShowConfirm] = useState(false);
@@ -43,25 +45,47 @@ const DoctorRegistrationForm = () => {
         ? ""
         : "Password must be 6+ characters."
       : "Password required.";
+    temp.uploadId = fields.uploadId ? "" : "Upload ID is required."; // ✅ Validation for file
 
     setErrors(temp);
     return Object.values(temp).every((val) => val === "");
   }
 
-  function handleChange(e) {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  }
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: files ? files[0] : value, // ✅ Handles file input
+    }));
 
-  function handleSubmit(e) {
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (validate()) setShowConfirm(true);
-  }
+  };
 
-  function handleConfirm() {
-    setShowConfirm(false);
-    alert("Doctor registered successfully!");
-    navigate("/dashboard/doctor");
-  }
+  const handleConfirm = async () => {
+    const formData = new FormData();
+    Object.keys(form).forEach((key) => formData.append(key, form[key]));
+
+    try {
+      const response = await fetch("http://localhost:8000/api/doctor/register", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Registration failed");
+
+      alert(data.message);
+      setShowConfirm(false);
+      navigate("/");
+    } catch (error) {
+      alert("Error: " + error.message);
+    }
+  };
 
   return (
     <div className="doctor-register-container">
@@ -134,6 +158,18 @@ const DoctorRegistrationForm = () => {
           />
         </div>
         <div className="errorMsg">{errors.password}</div>
+
+        {/* ✅ Upload ID Field */}
+        <div className="input-group">
+          <FaIdCard className="form-icon" />
+          <input
+            type="file"
+            name="uploadId"
+            accept=".jpg,.jpeg,.png,.pdf"
+            onChange={handleChange}
+          />
+        </div>
+        <div className="errorMsg">{errors.uploadId}</div>
 
         <button type="submit" className="btn">Register</button>
 

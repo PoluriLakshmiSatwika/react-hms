@@ -7,13 +7,14 @@ import Doctor from "../models/Doctor.js";
 import nodemailer from "nodemailer";
 import PendingStaff from "../models/PendingStaff.js";
 const router = express.Router();
-import {
+/*import {
   getPendingStaff,
   approveStaff,
   rejectStaff,
   getAcceptedStaff,
   getRejectedStaff,
   getAllNurses,
+  getAllDoctors
 } from "../controllers/adminController.js";
 
 
@@ -24,6 +25,7 @@ router.post("/reject/:id", rejectStaff);
 router.get("/accepted-staff", getAcceptedStaff);
 router.get("/rejected-staff", getRejectedStaff);
 router.get("/nurses", getAllNurses);
+router.get("/doctors", getAllDoctors);*/
 
 // ✅ Register Admin
 router.post("/register", async (req, res) => {
@@ -77,6 +79,8 @@ router.post("/login", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
+
 // ✅ 1. Get all pending staff
 router.get("/pending-staff", async (req, res) => {
   try {
@@ -106,17 +110,22 @@ router.post("/approve/:id", async (req, res) => {
         password: pendingStaff.password,
         uploadId: pendingStaff.uploadId,
       });
-    } else if (pendingStaff.role === "doctor") {
-      newStaff = new Doctor({
-        fullName: pendingStaff.fullName,
-        email: pendingStaff.email,
-        phone: pendingStaff.phone,
-        department: pendingStaff.department,
-        specialization: pendingStaff.specialization || "",
-        password: pendingStaff.password,
-        uploadId: pendingStaff.uploadId,
-      });
-    }
+    } 
+    else if (pendingStaff.role === "doctor") {
+  newStaff = new Doctor({
+    fullName: pendingStaff.fullName,
+    email: pendingStaff.email,
+    phone: pendingStaff.phone,
+    department: pendingStaff.department,
+    // ✅ Fixed line: ensure specialty is always provided
+    specialty:
+      pendingStaff.specialty ||
+      pendingStaff.specialization ||
+      "General", // fallback if missing
+    password: pendingStaff.password,
+    uploadId: pendingStaff.uploadId,
+  });
+}
 
     await newStaff.save();
     await PendingStaff.findByIdAndDelete(req.params.id);

@@ -7,7 +7,7 @@ import authRoutes from "./routes/authRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import patientRoutes from "./routes/patientRoutes.js";
 import nurseRoutes from "./routes/nurseRoutes.js";
-
+import doctorRoutes from "./routes/doctorRoutes.js";
 // ✅ explicitly load .env from current directory
 dotenv.config({ path: './.env' });
 import path from "path";
@@ -40,6 +40,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/patient", patientRoutes);
 app.use("/api/nurse", nurseRoutes);
+app.use("/api/doctor", doctorRoutes);
 app.use("/uploads", express.static("uploads"));
 
 

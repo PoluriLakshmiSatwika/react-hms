@@ -172,34 +172,35 @@ const AdminDashboard = () => {
         )}
       </section>
 
-      {/* ✅ Approved Doctors Section */}
-      <section>
-        <h3>Approved Doctors</h3>
-        {doctors.length === 0 ? (
-          <p>No doctors found.</p>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Department</th>
-                <th>Specialization</th>
-              </tr>
-            </thead>
-            <tbody>
-              {doctors.map((doc) => (
-                <tr key={doc._id}>
-                  <td>{doc.fullName}</td>
-                  <td>{doc.email}</td>
-                  <td>{doc.department}</td>
-                  <td>{doc.specialization}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </section>
+{/* ✅ Approved Doctors Section */}
+<section>
+  <h3>Approved Doctors</h3>
+  {doctors.length === 0 ? (
+    <p>No doctors found.</p>
+  ) : (
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Department</th>
+          <th>Specialty</th>
+        </tr>
+      </thead>
+      <tbody>
+        {doctors.map((doc) => (
+          <tr key={doc._id}>
+            <td>{doc.fullName}</td>
+            <td>{doc.email}</td>
+            <td>{doc.department}</td>
+            <td>{doc.specialty}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )}
+</section>
+
     </div>
   );
 };

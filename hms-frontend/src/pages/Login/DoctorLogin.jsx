@@ -1,29 +1,28 @@
-// DoctorLogin.jsx
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import './DoctorLogin.css';
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import "./DoctorLogin.css";
 
 const DoctorLogin = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    rememberMe: false
+    email: "",
+    password: "",
+    rememberMe: false,
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.email) {
-      newErrors.email = 'Doctor email is required';
+      newErrors.email = "Doctor email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
+      newErrors.email = "Email is invalid";
     }
-    
+
     if (!formData.password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = "Password is required";
     }
 
     setErrors(newErrors);
@@ -32,16 +31,39 @@ const DoctorLogin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     setIsLoading(true);
-    
+    setErrors({});
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      navigate('/dashboard/doctor');
+      // ✅ Use formData values
+      const res = await fetch("http://localhost:8000/api/doctor/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        // Optionally store token or user info
+        localStorage.setItem("doctorName", data.fullName);
+        localStorage.setItem("doctorId", data.doctorId);
+
+        navigate("/dashboard/doctor"); // Redirect on success
+      } else {
+        setErrors({ submit: data.message || "Invalid credentials." });
+      }
     } catch (error) {
-      setErrors({ submit: 'Doctor login failed. Please check your credentials.' });
+      console.error("Login error:", error);
+      setErrors({
+        submit: "Unable to connect to server. Please try again later.",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -49,13 +71,13 @@ const DoctorLogin = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
-    
+
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
@@ -63,12 +85,10 @@ const DoctorLogin = () => {
     <div className="doctor-login-container">
       <div className="doctor-login-card">
         <div className="login-header">
-          <div className="role-icon doctor-icon">
-            👨‍⚕️
-          </div>
+          <div className="role-icon doctor-icon">👩‍⚕️</div>
           <div className="header-text">
             <h1>Doctor Login</h1>
-            <p>Access medical dashboard and appointments</p>
+            <p>Access Doctor dashboard and assignments</p>
           </div>
         </div>
 
@@ -81,10 +101,12 @@ const DoctorLogin = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className={errors.email ? 'error' : ''}
+              className={errors.email ? "error" : ""}
               placeholder="Enter doctor email"
             />
-            {errors.email && <span className="error-message">{errors.email}</span>}
+            {errors.email && (
+              <span className="error-message">{errors.email}</span>
+            )}
           </div>
 
           <div className="form-group">
@@ -95,10 +117,12 @@ const DoctorLogin = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className={errors.password ? 'error' : ''}
+              className={errors.password ? "error" : ""}
               placeholder="Enter your password"
             />
-            {errors.password && <span className="error-message">{errors.password}</span>}
+            {errors.password && (
+              <span className="error-message">{errors.password}</span>
+            )}
           </div>
 
           <div className="form-options">
@@ -121,8 +145,8 @@ const DoctorLogin = () => {
             <div className="submit-error">{errors.submit}</div>
           )}
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="login-button doctor-button"
             disabled={isLoading}
           >
@@ -132,13 +156,12 @@ const DoctorLogin = () => {
                 Signing In...
               </>
             ) : (
-              'Doctor Sign In'
+              "Doctor Sign In"
             )}
           </button>
         </form>
 
         <div className="login-footer">
-          
           <p>
             <Link to="/">← Back to Home</Link>
           </p>

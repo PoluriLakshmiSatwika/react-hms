@@ -48,6 +48,14 @@ export const getAllNurses = async (req, res) => {
     res.status(500).json({ message: "Error fetching nurses" });
   }
 };
+export const getAllDoctors = async (req, res) => {
+  try {
+    const doctors = await Doctor.find();
+    res.status(200).json(doctors);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
 
 export const approveStaff = async (req, res) => {
   try {

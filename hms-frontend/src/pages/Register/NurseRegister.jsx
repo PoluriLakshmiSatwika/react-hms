@@ -81,7 +81,7 @@ const NurseRegistrationForm = () => {
 
       alert(data.message);
       setShowConfirm(false);
-      navigate("/home");
+      navigate("/");
     } catch (error) {
       alert("Error: " + error.message);
     }
