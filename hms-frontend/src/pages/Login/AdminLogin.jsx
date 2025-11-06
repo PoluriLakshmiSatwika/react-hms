@@ -13,52 +13,72 @@ const AdminLogin = () => {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
+  // ✅ Form validation
   const validateForm = () => {
     const newErrors = {};
-    
     if (!formData.email) {
       newErrors.email = 'Admin email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email is invalid';
     }
-    
+
     if (!formData.password) {
       newErrors.password = 'Password is required';
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!validateForm()) return;
-
-    setIsLoading(true);
-    
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      navigate("/dashboard/admin");
-
-    } catch (error) {
-      setErrors({ submit: 'Admin login failed. Please check your credentials.' });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+  // ✅ Handle form change
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
-    
+
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  // ✅ Handle submit
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    setIsLoading(true);
+    setErrors({}); // clear previous errors
+
+    try {
+      const res = await fetch("http://localhost:8000/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        // ✅ Successful login
+        alert("✅ " + data.message);
+        navigate("/dashboard/admin");
+      } else {
+        // ❌ Invalid login
+        setErrors({ submit: data.message });
+      }
+
+    } catch (error) {
+      console.error("Login error:", error);
+      setErrors({ submit: "Server error. Try again later." });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -66,9 +86,7 @@ const AdminLogin = () => {
     <div className="admin-login-container">
       <div className="admin-login-card">
         <div className="login-header">
-          <div className="role-icon admin-icon">
-            👨‍💼
-          </div>
+          <div className="role-icon admin-icon">👨‍💼</div>
           <div className="header-text">
             <h1>Admin Login</h1>
             <p>Access hospital management system</p>
@@ -76,6 +94,7 @@ const AdminLogin = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">
+          {/* Email */}
           <div className="form-group">
             <label htmlFor="email">Admin Email</label>
             <input
@@ -90,6 +109,7 @@ const AdminLogin = () => {
             {errors.email && <span className="error-message">{errors.email}</span>}
           </div>
 
+          {/* Password */}
           <div className="form-group">
             <label htmlFor="password">Password</label>
             <input
@@ -104,6 +124,7 @@ const AdminLogin = () => {
             {errors.password && <span className="error-message">{errors.password}</span>}
           </div>
 
+          {/* Remember me / forgot */}
           <div className="form-options">
             <label className="checkbox-label">
               <input
@@ -115,15 +136,17 @@ const AdminLogin = () => {
               <span className="checkmark"></span>
               Remember me
             </label>
-            <a href="/forgot-password" className="forgot-password">
+            <Link to="/forgot-password" className="forgot-password">
               Forgot Password?
-            </a>
+            </Link>
           </div>
 
+          {/* Submit error */}
           {errors.submit && (
             <div className="submit-error">{errors.submit}</div>
           )}
 
+          {/* Submit button */}
           <button 
             type="submit" 
             className="login-button admin-button"
@@ -141,10 +164,7 @@ const AdminLogin = () => {
         </form>
 
         <div className="login-footer">
-          
-          <p>
-            <Link to="/">← Back to Home</Link>
-          </p>
+          <p><Link to="/">← Back to Home</Link></p>
         </div>
       </div>
     </div>

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 //import HomeContainer from "../components/HomeContainer";
 import "./Login/RoleLoginSelection.css";
-
+import { Link } from "react-router-dom";
 const RoleSelectionPage = () => {
   const navigate = useNavigate();
   const [selectedRole, setSelectedRole] = useState("");
@@ -80,12 +80,8 @@ const RoleSelectionPage = () => {
           </div>
 
           <div className="footer-links">
-            <p>
-              Already have an account? <a href="/login">Login here</a>
-            </p>
-            <p>
-              <a href="/">← Back to Home</a>
-            </p>
+            <p>Already have an account? <Link to="/login">Login here</Link></p>
+           <p><Link to="/">← Back to Home</Link></p>
           </div>
         </div>
       </div>

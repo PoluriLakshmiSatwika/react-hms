@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./RoleLoginSelection.css";
+import { Link } from "react-router-dom";
+
 //import HomeContainer from "../../components/HomeContainer";
 
 const RoleLoginSelection = () => {
@@ -82,13 +84,10 @@ const RoleLoginSelection = () => {
           </div>
 
           <div className="footer-links">
-            <p>
-              Don’t have an account? <a href="/register">Register here</a>
-            </p>
-            <p>
-              <a href="/">← Back to Home</a>
-            </p>
+           <p>Don’t have an account? <Link to="/register">Register here</Link></p>
+           <p><Link to="/">← Back to Home</Link></p>
           </div>
+
         </div>
       </div>
     //</HomeContainer>

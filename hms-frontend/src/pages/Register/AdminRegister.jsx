@@ -23,7 +23,7 @@ const AdminRegister = () => {
   });
 
   const [errors, setErrors] = useState({});
-  const [showConfirm, setShowConfirm] = useState(false);
+ 
 
   // ✅ Validation
   function validate(fields = form) {
@@ -54,8 +54,32 @@ const AdminRegister = () => {
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
+  async function handleSubmit(e) {
+  e.preventDefault();
+  if (!validate()) return;
 
-  function handleSubmit(e) {
+  try {
+    const res = await fetch("http://localhost:8000/api/admin/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      alert("✅ " + data.message);
+      navigate("/dashboard/admin"); // redirect on success
+    } else {
+      alert("❌ " + data.message);
+    }
+  } catch (error) {
+    console.error("Registration failed:", error);
+    alert("Server error. Try again later.");
+  }
+}
+
+/*  function handleSubmit(e) {
     e.preventDefault();
     if (validate()) setShowConfirm(true);
   }
@@ -65,7 +89,7 @@ const AdminRegister = () => {
     setShowConfirm(false);
     alert("✅ Admin registered successfully!");
     navigate("/dashboard/admin"); // ✅ Redirect to Admin Dashboard
-  }
+  }*/
 
   return (
     <div className="admin-register-container">
@@ -149,30 +173,9 @@ const AdminRegister = () => {
           Register
         </button>
 
-        {showConfirm && (
-          <div className="confirm-popup">
-            <div className="popup-content">
-              <h3>Confirm Registration</h3>
-              <p>You're registering as an Admin. Proceed?</p>
-              <div className="popup-buttons">
-                <button
-                  type="button"
-                  className="confirm"
-                  onClick={handleConfirm}
-                >
-                  Yes, Register
-                </button>
-                <button
-                  type="button"
-                  className="cancel"
-                  onClick={() => setShowConfirm(false)}
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        
+            
+          
       </form>
     </div>
   );

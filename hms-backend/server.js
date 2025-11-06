@@ -3,12 +3,8 @@ import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import cors from "cors";
-
+import authRoutes from "./routes/authRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
-import staffRoutes from "./routes/staffRoutes.js";
-import doctorRoutes from "./routes/doctorRoutes.js";
-import nurseRoutes from "./routes/nurseRoutes.js";
-import patientRoutes from "./routes/patientRoutes.js";
 
 // ✅ explicitly load .env from current directory
 dotenv.config({ path: './.env' });
@@ -32,14 +28,9 @@ mongoose.connect(MONGOURL)
   })
   .catch((error) => console.log("❌ Database connection failed:", error));
 // Routes
+app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
-app.use("/api/staff", staffRoutes);
-console.log("✅ Patient routes loaded!");
 
-app.use("/api/patient", patientRoutes);
-
-app.use("/api/doctors", doctorRoutes);
-app.use("/api/nurses", nurseRoutes);
 
 app.get("/", (req, res) => {
   res.send("Backend is running!");
