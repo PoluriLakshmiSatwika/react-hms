@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
-
+import patientRoutes from "./routes/patientRoutes.js";
 // ✅ explicitly load .env from current directory
 dotenv.config({ path: './.env' });
 
@@ -30,7 +30,7 @@ mongoose.connect(MONGOURL)
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
-
+app.use("/api/patient", patientRoutes);
 
 app.get("/", (req, res) => {
   res.send("Backend is running!");

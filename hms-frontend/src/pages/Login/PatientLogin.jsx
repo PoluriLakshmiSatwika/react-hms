@@ -1,61 +1,83 @@
-// PatientLoginPage.jsx
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import './PatientLoginPage.css';
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import "./PatientLoginPage.css";
 
 const PatientLoginPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    rememberMe: false
+    email: "",
+    password: "",
+    rememberMe: false,
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
+  // ✅ Form validation
   const validateForm = () => {
     const newErrors = {};
-    
     if (!formData.email) {
       newErrors.email = 'Patient email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email is invalid';
     }
-    
+
     if (!formData.password) {
       newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!validateForm()) return;
-
-    setIsLoading(true);
-    
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      navigate('/dashboard/patient');
-    } catch (error) {
-      setErrors({ submit: 'Patient login failed. Please check your credentials.' });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+  // ✅ Handle form change
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
-    
+
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  // ✅ Handle submit
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    setIsLoading(true);
+    setErrors({}); // clear previous errors
+
+    try {
+      const res = await fetch("http://localhost:8000/api/patient/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        // ✅ Successful login
+        alert("✅ " + data.message);
+        navigate("/dashboard/patient");
+      } else {
+        // ❌ Invalid login
+        setErrors({ submit: data.message });
+      }
+
+    } catch (error) {
+      console.error("Login error:", error);
+      setErrors({ submit: "Server error. Try again later." });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -63,9 +85,7 @@ const PatientLoginPage = () => {
     <div className="patient-login-container">
       <div className="patient-login-card">
         <div className="login-header">
-          <div className="role-icon patient-icon">
-            👤
-          </div>
+          <div className="role-icon patient-icon">👤</div>
           <div className="header-text">
             <h1>Patient Login</h1>
             <p>Access your medical records and appointments</p>
@@ -81,10 +101,12 @@ const PatientLoginPage = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className={errors.email ? 'error' : ''}
+              className={errors.email ? "error" : ""}
               placeholder="Enter patient email"
             />
-            {errors.email && <span className="error-message">{errors.email}</span>}
+            {errors.email && (
+              <span className="error-message">{errors.email}</span>
+            )}
           </div>
 
           <div className="form-group">
@@ -95,10 +117,12 @@ const PatientLoginPage = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className={errors.password ? 'error' : ''}
+              className={errors.password ? "error" : ""}
               placeholder="Enter your password"
             />
-            {errors.password && <span className="error-message">{errors.password}</span>}
+            {errors.password && (
+              <span className="error-message">{errors.password}</span>
+            )}
           </div>
 
           <div className="form-options">
@@ -121,24 +145,22 @@ const PatientLoginPage = () => {
             <div className="submit-error">{errors.submit}</div>
           )}
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="login-button patient-button"
             disabled={isLoading}
           >
             {isLoading ? (
               <>
-                <div className="spinner"></div>
-                Signing In...
+                <div className="spinner"></div> Signing In...
               </>
             ) : (
-              'Patient Sign In'
+              "Patient Sign In"
             )}
           </button>
         </form>
 
         <div className="login-footer">
-          
           <p>
             Need help? <Link to="/contact">Contact Support</Link>
           </p>

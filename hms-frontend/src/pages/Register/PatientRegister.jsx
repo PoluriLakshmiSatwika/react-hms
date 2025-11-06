@@ -1,6 +1,6 @@
-import './PatientRegistration.css';
+import "./PatientRegistration.css";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ Import navigate hook
+import { useNavigate } from "react-router-dom";
 import {
   FaUser,
   FaEnvelope,
@@ -12,7 +12,7 @@ import {
 } from "react-icons/fa";
 
 const PatientRegistrationForm = () => {
-  const navigate = useNavigate(); // ✅ Initialize navigate
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -60,10 +60,27 @@ const PatientRegistrationForm = () => {
     if (validate()) setShowConfirm(true);
   }
 
-  function handleConfirm() {
+  async function handleConfirm() {
     setShowConfirm(false);
-    alert("Patient registered successfully!");
-    navigate("/dashboard/patient");
+    try {
+      const response = await fetch("http://localhost:8000/api/patient/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("✅ Patient registered successfully!");
+        navigate("/dashboard/patient");
+      } else {
+        alert(`❌ ${data.message || "Registration failed"}`);
+      }
+    } catch (error) {
+      console.error("❌ Server error:", error);
+      alert("Server error. Please try again later.");
+    }
   }
 
   return (
