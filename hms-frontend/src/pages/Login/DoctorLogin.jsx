@@ -39,7 +39,7 @@ const DoctorLogin = () => {
 
     try {
       // ✅ Use formData values
-      const res = await fetch("http://localhost:8000/api/doctor/login", {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/doctor/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

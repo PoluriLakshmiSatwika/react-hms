@@ -19,9 +19,9 @@ const AdminDashboard = () => {
     const fetchData = async () => {
       try {
         const [pendingRes, nursesRes, doctorsRes] = await Promise.all([
-          fetch("http://localhost:8000/api/admin/pending-staff"),
-          fetch("http://localhost:8000/api/admin/nurses"),
-          fetch("http://localhost:8000/api/admin/doctors"),
+          fetch(`${process.env.REACT_APP_API_URL}/api/admin/pending-staff`),
+          fetch(`${process.env.REACT_APP_API_URL}/api/admin/nurses`),
+          fetch(`${process.env.REACT_APP_API_URL}/api/admin/doctors`),
         ]);
 
         const pendingData = await pendingRes.json();
@@ -47,7 +47,7 @@ const AdminDashboard = () => {
   // ✅ Approve/Reject handlers
   const handleApprove = async (id) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/admin/approve/${id}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/approve/${id}`, {
         method: "POST",
       });
       const data = await res.json();
@@ -60,7 +60,7 @@ const AdminDashboard = () => {
 
   const handleReject = async (id) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/admin/reject/${id}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/reject/${id}`, {
         method: "POST",
       });
       const data = await res.json();
@@ -118,7 +118,7 @@ const AdminDashboard = () => {
                   <td>
                     {staff.uploadId ? (
                       <a
-                        href={`http://localhost:8000/${staff.uploadId}`}
+                        href={`${process.env.REACT_APP_API_URL}/${staff.uploadId}`}
                         target="_blank"
                         rel="noopener noreferrer"
                       >

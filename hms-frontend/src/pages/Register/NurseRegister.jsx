@@ -71,7 +71,7 @@ const NurseRegistrationForm = () => {
     Object.keys(form).forEach((key) => formData.append(key, form[key]));
 
     try {
-      const response = await fetch("http://localhost:8000/api/nurse/register", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/nurse/register`, {
         method: "POST",
         body: formData,
       });

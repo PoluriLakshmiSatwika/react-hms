@@ -13,8 +13,8 @@ const DoctorDashboard = () => {
     const fetchData = async () => {
       try {
         const [appointmentsRes, nursesRes] = await Promise.all([
-          fetch("http://localhost:8000/api/doctor/appointments"),
-          fetch("http://localhost:8000/api/admin/nurses"),
+          fetch(`${process.env.REACT_APP_API_URL}/api/doctor/appointments`),
+          fetch(`${process.env.REACT_APP_API_URL}/api/admin/nurses`),
         ]);
 
         const appointmentsData = await appointmentsRes.json();
@@ -53,7 +53,7 @@ const DoctorDashboard = () => {
     }
 
     try {
-      const res = await fetch("http://localhost:8000/api/doctor/assign-nurses", {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/doctor/assign-nurses`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ appointmentId, nurseIds }),

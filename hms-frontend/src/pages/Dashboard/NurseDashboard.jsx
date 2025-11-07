@@ -129,14 +129,5 @@ const NurseDashboard = () => {
   );
 };
 
-// Reusable tab button style
-const tabButtonStyle = {
-  border: "1px solid #ccc",
-  padding: "10px 16px",
-  margin: "0 6px",
-  borderRadius: "6px",
-  cursor: "pointer",
-  transition: "0.3s",
-};
 
 export default NurseDashboard;

@@ -1,18 +1,27 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const PatientDashboard = () => {
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   // Replace with your actual logged-in patient ID
   const patientId = "6520f1a2b3c4d5e67890abce";
 
-  // Fetch doctors from backend
+  // ✅ Handle Logout
+  const handleLogout = () => {
+    // Optionally clear token or session data
+    localStorage.removeItem("token");
+    navigate("/"); // Redirect to home page
+  };
+
+  // ✅ Fetch doctors from backend
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/admin/doctors"); // your doctors API
+        const res = await fetch("${process.env.REACT_APP_API_URL}/api/admin/doctors"); // your doctors API
         if (!res.ok) throw new Error("Failed to fetch doctors");
         const data = await res.json();
         setDoctors(data);
@@ -26,16 +35,16 @@ const PatientDashboard = () => {
     fetchDoctors();
   }, []);
 
-  // Handle booking appointment
+  // ✅ Handle booking appointment
   const handleBookAppointment = async (doctor) => {
     try {
-      const res = await fetch("http://localhost:8000/api/appointment", {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/appointment`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           doctorId: doctor._id,
           patientId: patientId,
-          date: new Date().toISOString(), // You can let patient choose date/time
+          date: new Date().toISOString(), // Can allow user to select date/time
         }),
       });
 
@@ -56,7 +65,28 @@ const PatientDashboard = () => {
 
   return (
     <div className="patient-dashboard" style={{ padding: "20px" }}>
-      <h1>Patient Dashboard</h1>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <h1>Patient Dashboard</h1>
+        <button
+          onClick={handleLogout}
+          style={{
+            backgroundColor: "#dc3545",
+            color: "#fff",
+            border: "none",
+            padding: "8px 14px",
+            borderRadius: "5px",
+            cursor: "pointer",
+          }}
+        >
+          Logout
+        </button>
+      </div>
 
       {message && <p style={{ color: "green", fontWeight: "bold" }}>{message}</p>}
 

@@ -59,7 +59,7 @@ const AdminRegister = () => {
   if (!validate()) return;
 
   try {
-    const res = await fetch("http://localhost:8000/api/admin/register", {
+    const res = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
