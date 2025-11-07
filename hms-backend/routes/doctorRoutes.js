@@ -84,6 +84,61 @@ router.post("/login", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+// ✅ Get doctor appointments
+router.get("/appointments", async (req, res) => {
+  try {
+    const appointments = await Appointment.find(); // you can filter by doctorId if needed
+    res.json(appointments);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
+// ✅ Assign nurses to appointment
+router.post("/assign-nurses", async (req, res) => {
+  const { appointmentId, nurseIds } = req.body;
+  try {
+    const appointment = await Appointment.findById(appointmentId);
+    if (!appointment) return res.status(404).json({ message: "Appointment not found" });
+
+    appointment.assignedNurses = nurseIds;
+    await appointment.save();
+
+    // Optional: notify nurses via email
+    const nurses = await Nurse.find({ _id: { $in: nurseIds } });
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "satwikapoluri@gmail.com",
+        pass: "qlvb txvy kbaw yphh",
+      },
+    });
+
+    nurses.forEach((nurse) => {
+      transporter.sendMail({
+        from: '"HMS Admin" <satwikapoluri@gmail.com>',
+        to: nurse.email,
+        subject: `New Appointment Assigned`,
+        text: `Hello ${nurse.fullName},\n\nYou have been assigned to an appointment on ${appointment.date}.\n\nRegards,\nHMS System`,
+      });
+    });
+
+    res.json({ message: "Nurses assigned successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.get("/doctors", async (req, res) => {
+  try {
+    const doctors = await Doctor.find(); // fetch all doctors
+    res.json(doctors);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 export default router;

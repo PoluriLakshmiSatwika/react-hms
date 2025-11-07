@@ -66,6 +66,8 @@ const PatientLoginPage = () => {
 
       if (res.ok) {
         // ✅ Successful login
+        // Save patient ID and name in localStorage
+      
         alert("✅ " + data.message);
         navigate("/dashboard/patient");
       } else {

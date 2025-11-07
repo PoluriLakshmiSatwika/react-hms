@@ -1,13 +1,10 @@
 import mongoose from "mongoose";
 
 const appointmentSchema = new mongoose.Schema({
-  patientId: { type: mongoose.Schema.Types.ObjectId, ref: "Patient", required: true },
   doctorId: { type: mongoose.Schema.Types.ObjectId, ref: "Doctor", required: true },
-  disease: { type: String },
-  slot: { type: String },
-  assignedNurseIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "Nurse" }],
-  feePaid: { type: Number },
-  validityCount: { type: Number, default: 1 },
+  patientId: { type: mongoose.Schema.Types.ObjectId, ref: "Patient", required: true },
+  date: { type: Date, default: Date.now },
+  message: { type: String, default: "Booked successfully" } // add message field
 });
 
-export default mongoose.model("Appointment", appointmentSchema);
+export default mongoose.model("Appointment", appointmentSchema, "appointment"); // explicitly use 'appointment' collection

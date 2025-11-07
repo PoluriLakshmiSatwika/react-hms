@@ -12,8 +12,7 @@ import doctorRoutes from "./routes/doctorRoutes.js";
 dotenv.config({ path: './.env' });
 import path from "path";
 import { fileURLToPath } from "url";
-
-
+import appointmentRoutes from "./routes/appointmentRoutes.js"
 // 🔹 Setup __dirname (for ES modules)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -42,8 +41,7 @@ app.use("/api/patient", patientRoutes);
 app.use("/api/nurse", nurseRoutes);
 app.use("/api/doctor", doctorRoutes);
 app.use("/uploads", express.static("uploads"));
-
-
+app.use("/api/appointment", appointmentRoutes);
 // ✅ Test route
 
 

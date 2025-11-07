@@ -55,12 +55,6 @@ const HomePage = () => {
         </nav>
 
         <button
-          className="appointment-btn"
-          onClick={() => navigate("/patient-register")}
-        >
-          Book an Appointment
-        </button>
-        <button
           className="auth-link symbol-link"
           onClick={() => navigate("/login")}
           title="Register / Login"
