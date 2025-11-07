@@ -8,6 +8,7 @@ import ForgotPasswordPage from './components/login/ForgotPasswordPage';
 import ResetPasswordPage from './components/login/ResetPasswordPage';
 import NurseLoginPage from './components/login/NurseLoginPage';
 import PatientLoginPage from './components/login/PatientLoginPage';
+import AppointmentBooking from "./components/appointments/AppointmentBooking";
 
 
 function App() {
@@ -26,9 +27,11 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         {/* <Route path="/reset-password" element={<ResetPasswordPage />} /> */}
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-    
+     
 
         {/* Other routes... */}
+<Route path="/appointment" element={<AppointmentBooking />} />
+
       </Routes>
     </BrowserRouter>
   );

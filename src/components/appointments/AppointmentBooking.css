@@ -1,0 +1,71 @@
+.appointment-container {
+  width: 400px;
+  margin: auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.input-box {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+.doctor-list {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 10px 0;
+}
+
+.doctor-card {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 120px;
+  text-align: center;
+}
+
+.doctor-card.selected {
+  border-color: blue;
+  background: #e6f0ff;
+}
+
+.slot-container {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 10px 0;
+}
+
+.slot {
+  padding: 8px 12px;
+  border: 1px solid #444;
+  background: white;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.selected-slot {
+  background: green;
+  color: white;
+}
+
+.book-btn {
+  width: 100%;
+  background: #2E86C1;
+  color: #fff;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.message {
+  margin-top: 10px;
+  font-weight: bold;
+}

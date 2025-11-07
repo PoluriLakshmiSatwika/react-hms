@@ -5,39 +5,57 @@ import Doctor from "../models/Doctor.js";
 
 const router = express.Router();
 
+/* ✅ FETCH DOCTORS BY DISEASE/SPECIALITY */
+router.get("/doctors/:disease", async (req, res) => {
+  try {
+    const disease = req.params.disease;
+
+    const doctors = await Doctor.find({ specialty: disease }).select(
+      "fullName specialty department fee slots"
+    );
+
+    if (!doctors.length) {
+      return res.status(404).json({ success: false, message: "No doctors found", doctors: [] });
+    }
+
+    res.json({ success: true, count: doctors.length, doctors });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
+  }
+});
+
+
 /* ✅ BOOK NEW APPOINTMENT */
 router.post("/book", async (req, res) => {
   try {
     const { patientId, doctorId, disease, appointmentDate, slotTime } = req.body;
 
-    // Basic validation
     if (!patientId || !doctorId || !disease || !appointmentDate || !slotTime) {
-      return res.status(400).json({ message: "All fields are required" });
+      return res.status(400).json({ success: false, message: "All fields are required" });
     }
 
-    // Check if patient exists
     const patient = await Patient.findById(patientId);
-    if (!patient) return res.status(404).json({ message: "Patient not found" });
+    if (!patient) return res.status(404).json({ success: false, message: "Patient not found" });
 
-    // Check if doctor exists
     const doctor = await Doctor.findById(doctorId);
-    if (!doctor) return res.status(404).json({ message: "Doctor not found" });
+    if (!doctor) return res.status(404).json({ success: false, message: "Doctor not found" });
 
-    // Create appointment
     const newAppointment = new Appointment({
       patientId,
       doctorId,
       disease,
       appointmentDate,
       slotTime,
-      status: "Pending"
+      status: "Pending",
+      feePaid: false,
+      validityCount: 3
     });
 
     await newAppointment.save();
 
     res.status(201).json({
       success: true,
-      message: "Appointment booked successfully (Pending confirmation)",
+      message: "Appointment booked successfully (Pending payment)",
       data: newAppointment
     });
   } catch (error) {
@@ -46,7 +64,7 @@ router.post("/book", async (req, res) => {
   }
 });
 
-/* 🔍 FETCH PATIENT APPOINTMENTS */
+/* ✅ FETCH PATIENT APPOINTMENTS */
 router.get("/patient/:patientId", async (req, res) => {
   try {
     const appointments = await Appointment.find({ patientId: req.params.patientId })
@@ -55,11 +73,11 @@ router.get("/patient/:patientId", async (req, res) => {
 
     res.json({ success: true, count: appointments.length, data: appointments });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Server error", error: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
-/* 👨‍⚕️ FETCH DOCTOR APPOINTMENTS */
+/* ✅ FETCH DOCTOR APPOINTMENTS */
 router.get("/doctor/:doctorId", async (req, res) => {
   try {
     const appointments = await Appointment.find({ doctorId: req.params.doctorId })
@@ -68,25 +86,25 @@ router.get("/doctor/:doctorId", async (req, res) => {
 
     res.json({ success: true, count: appointments.length, data: appointments });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Server error", error: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
-/* 🧑‍⚕️ ASSIGN NURSE */
+/* ✅ ASSIGN NURSE & CONFIRM APPOINTMENT */
 router.put("/assign-nurse", async (req, res) => {
   try {
     const { appointmentId, nurseId } = req.body;
 
     const appointment = await Appointment.findById(appointmentId);
-    if (!appointment) return res.status(404).json({ message: "Appointment not found" });
+    if (!appointment) return res.status(404).json({ success: false, message: "Appointment not found" });
 
     appointment.assignedNurse = nurseId;
     appointment.status = "Confirmed";
     await appointment.save();
 
-    res.json({ success: true, message: "Nurse assigned successfully", data: appointment });
+    res.json({ success: true, message: "Nurse assigned & appointment confirmed", data: appointment });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Server error", error: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
