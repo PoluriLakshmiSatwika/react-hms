@@ -26,6 +26,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         {/* <Route path="/reset-password" element={<ResetPasswordPage />} /> */}
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+    
 
         {/* Other routes... */}
       </Routes>

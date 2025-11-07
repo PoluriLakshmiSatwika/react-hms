@@ -46,16 +46,36 @@ export const sendResetEmail = async (email, name, resetLink) => {
       </div>
     `;
 
-    await transporter.sendMail({
+    console.log('Attempting to send email with config:', {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Password Reset Request'
+    });
+
+    const info = await transporter.sendMail({
       from: `"Hospital Management System" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "Password Reset Request – Hospital Management System",
       html: htmlContent,
     });
 
-    console.log(`✅ Reset email sent to ${email}`);
+    console.log('✅ Reset email sent successfully:', {
+      messageId: info.messageId,
+      response: info.response,
+      accepted: info.accepted,
+      rejected: info.rejected
+    });
   } catch (error) {
-    console.error("❌ Error sending reset email:", error);
+    console.error('❌ Detailed email error:', {
+      name: error.name,
+      message: error.message,
+      code: error.code,
+      command: error.command,
+      response: error.response,
+      responseCode: error.responseCode,
+      stack: error.stack
+    });
+    throw error; // Re-throw to be handled by the route
   }
 };
 
