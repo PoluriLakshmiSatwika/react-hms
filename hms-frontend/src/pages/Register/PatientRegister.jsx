@@ -10,7 +10,7 @@ import {
   FaNotesMedical,
   FaKey,
 } from "react-icons/fa";
-
+import API from "../../services/api";
 const PatientRegistrationForm = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({
@@ -63,12 +63,7 @@ const PatientRegistrationForm = () => {
   async function handleConfirm() {
     setShowConfirm(false);
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/patient/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-
+      const response = await API.post("/api/patient/register", form);
       const data = await response.json();
 
       if (response.ok) {

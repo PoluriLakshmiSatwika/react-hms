@@ -21,7 +21,7 @@ const PatientDashboard = () => {
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const res = await fetch("${process.env.REACT_APP_API_URL}/api/admin/doctors"); // your doctors API
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/doctors`); // your doctors API
         if (!res.ok) throw new Error("Failed to fetch doctors");
         const data = await res.json();
         setDoctors(data);

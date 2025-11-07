@@ -63,24 +63,32 @@ router.post("/register", upload.single("uploadId"), async (req, res) => {
 });
 
 // 🟢 Doctor Login
+// 🟢 Doctor Login
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-
-  if (!email || !password)
-    return res.status(400).json({ message: "Email and password required" });
-
   try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required" });
+    }
+
+    // ✅ Use Doctor model instead of Admin
     const doctor = await Doctor.findOne({ email });
-    if (!doctor || doctor.password !== password) {
-      return res.status(401).json({ message: "Invalid credentials" });
+    if (!doctor) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+
+    const isMatch = await bcrypt.compare(password, doctor.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid email or password" });
     }
 
     res.status(200).json({
-      success: true,
-      doctor: { id: doctor._id, name: doctor.fullName, email: doctor.email },
+      message: "Login successful",
+      doctorId: doctor._id,
     });
   } catch (err) {
-    console.error(err);
+    console.error("Doctor login error:", err);
     res.status(500).json({ message: "Server error" });
   }
 });

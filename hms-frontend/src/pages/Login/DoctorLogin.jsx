@@ -5,79 +5,78 @@ import "./DoctorLogin.css";
 const DoctorLogin = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    rememberMe: false,
+    email: '',
+    password: '',
+    rememberMe: false
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
+
+  // ✅ Form validation
   const validateForm = () => {
     const newErrors = {};
-
     if (!formData.email) {
-      newErrors.email = "Doctor email is required";
+      newErrors.email = 'Admin email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email is invalid";
+      newErrors.email = 'Email is invalid';
     }
 
     if (!formData.password) {
-      newErrors.password = "Password is required";
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+
+  // ✅ Handle form change
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+    // ✅ Handle submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) return;
 
     setIsLoading(true);
-    setErrors({});
+    setErrors({}); // clear previous errors
 
     try {
-      // ✅ Use formData values
       const res = await fetch(`${process.env.REACT_APP_API_URL}/api/doctor/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: formData.email,
-          password: formData.password,
+          password: formData.password
         }),
       });
-
       const data = await res.json();
-
       if (res.ok) {
-        // Optionally store token or user info
-        localStorage.setItem("doctorName", data.fullName);
-        localStorage.setItem("doctorId", data.doctorId);
-
-        navigate("/dashboard/doctor"); // Redirect on success
+        // ✅ Successful login
+        alert("✅ " + data.message);
+        navigate("/dashboard/admin");
       } else {
-        setErrors({ submit: data.message || "Invalid credentials." });
+        // ❌ Invalid login
+        setErrors({ submit: data.message });
       }
+
     } catch (error) {
       console.error("Login error:", error);
-      setErrors({
-        submit: "Unable to connect to server. Please try again later.",
-      });
+      setErrors({ submit: "Server error. Try again later." });
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
