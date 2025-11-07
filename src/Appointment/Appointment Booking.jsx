@@ -18,20 +18,32 @@ export default function AppointmentBooking() {
 
   const departments = [
     { id: 1, name: 'Cardiology', icon: '❤️' },
-    { id: 2, name: 'Neurology', icon: '🧠' },
-    { id: 3, name: 'Orthopedics', icon: '🦴' },
-    { id: 4, name: 'Pediatrics', icon: '👶' },
-    { id: 5, name: 'Dermatology', icon: '🩺' },
-    { id: 6, name: 'General Medicine', icon: '⚕️' }
+    { id: 2, name: 'Orthopedics', icon: '🦴' },
+    { id: 3, name: 'Pediatrics', icon: '👶' },
+    { id: 4, name: 'Neurology', icon: '🧠' },
+    { id: 5, name: 'Oncology', icon: '🎗️' },
+    { id: 6, name: 'Dermatology', icon: '🩺' },
+    { id: 7, name: 'Gynecology', icon: '👩‍⚕️' },
+    { id: 8, name: 'ENT', icon: '👂' },
+    { id: 9, name: 'Gastroenterology', icon: '🫀' },
+    { id: 10, name: 'Urology', icon: '💧' },
+    { id: 11, name: 'Ophthalmology', icon: '👁️' },
+    { id: 12, name: 'Psychiatry', icon: '🧘' }
   ];
 
   const doctors = {
     'Cardiology': ['Dr. Sarah Johnson', 'Dr. Michael Chen', 'Dr. Emily Rodriguez'],
-    'Neurology': ['Dr. David Kumar', 'Dr. Lisa Anderson', 'Dr. James Park'],
     'Orthopedics': ['Dr. Robert Taylor', 'Dr. Jennifer Lee', 'Dr. Mark Williams'],
     'Pediatrics': ['Dr. Amanda Brown', 'Dr. Christopher Davis', 'Dr. Maria Garcia'],
+    'Neurology': ['Dr. David Kumar', 'Dr. Lisa Anderson', 'Dr. James Park'],
+    'Oncology': ['Dr. Rachel Foster', 'Dr. Steven Mitchell', 'Dr. Patricia Wright'],
     'Dermatology': ['Dr. Susan Miller', 'Dr. Daniel Wilson', 'Dr. Rachel Moore'],
-    'General Medicine': ['Dr. Thomas White', 'Dr. Patricia Hall', 'Dr. Kevin Martin']
+    'Gynecology': ['Dr. Elizabeth Turner', 'Dr. Jessica Collins', 'Dr. Margaret Hill'],
+    'ENT': ['Dr. Anthony Scott', 'Dr. Nancy Phillips', 'Dr. Brian Carter'],
+    'Gastroenterology': ['Dr. Thomas White', 'Dr. Patricia Hall', 'Dr. Kevin Martin'],
+    'Urology': ['Dr. Richard Adams', 'Dr. Laura Nelson', 'Dr. George Campbell'],
+    'Ophthalmology': ['Dr. Helen Parker', 'Dr. Charles Evans', 'Dr. Michelle Roberts'],
+    'Psychiatry': ['Dr. William Green', 'Dr. Diana Brooks', 'Dr. Andrew Peterson']
   };
 
   const timeSlots = [
@@ -45,7 +57,6 @@ export default function AppointmentBooking() {
 
   const handleSubmit = () => {
     alert('Appointment booked successfully! You will receive a confirmation email shortly.');
-    // Reset form
     setFormData({
       department: '',
       doctor: '',
@@ -69,293 +80,657 @@ export default function AppointmentBooking() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Book an Appointment</h1>
-          <p className="text-gray-600">Schedule your visit with our expert doctors</p>
-        </div>
+    <>
+      <style>{`
+        * {
+          box-sizing: border-box;
+        }
+        
+        body {
+          margin: 0;
+          padding: 0;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+            'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+        }
+        
+        .appointment-container {
+          min-height: 100vh;
+          background: linear-gradient(135deg, #e0f2fe 0%, #ffffff 50%, #cffafe 100%);
+          padding: 2rem 1rem;
+        }
+        
+        .appointment-wrapper {
+          max-width: 1000px;
+          margin: 0 auto;
+        }
+        
+        .header {
+          text-align: center;
+          margin-bottom: 2rem;
+        }
+        
+        .title {
+          font-size: 2.5rem;
+          font-weight: bold;
+          color: #1f2937;
+          margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+          color: #6b7280;
+          font-size: 1.1rem;
+        }
+        
+        .progress-container {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 2rem;
+        }
+        
+        .progress-step {
+          display: flex;
+          align-items: center;
+        }
+        
+        .step-circle {
+          width: 2.5rem;
+          height: 2.5rem;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 600;
+          background-color: #e5e7eb;
+          color: #6b7280;
+          transition: all 0.3s ease;
+        }
+        
+        .step-circle.active {
+          background-color: #2563eb;
+          color: white;
+        }
+        
+        .step-label {
+          margin-left: 0.5rem;
+        }
+        
+        .step-text {
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: #6b7280;
+        }
+        
+        .step-text.active {
+          color: #2563eb;
+        }
+        
+        .step-line {
+          width: 4rem;
+          height: 0.25rem;
+          margin: 0 0.5rem;
+          background-color: #e5e7eb;
+          transition: all 0.3s ease;
+        }
+        
+        .step-line.active {
+          background-color: #2563eb;
+        }
+        
+        .main-card {
+          background: white;
+          border-radius: 1rem;
+          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+          padding: 2rem;
+        }
+        
+        .step-content {
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+        }
+        
+        .step-title {
+          font-size: 1.5rem;
+          font-weight: 600;
+          color: #1f2937;
+          margin-bottom: 1rem;
+        }
+        
+        .label {
+          display: block;
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: #374151;
+          margin-bottom: 0.75rem;
+        }
+        
+        .department-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1rem;
+        }
+        
+        @media (min-width: 768px) {
+          .department-grid {
+            grid-template-columns: repeat(3, 1fr);
+          }
+        }
+        
+        .department-card {
+          padding: 1rem;
+          border-radius: 0.5rem;
+          border: 2px solid #e5e7eb;
+          background: white;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        
+        .department-card:hover {
+          border-color: #93c5fd;
+        }
+        
+        .department-card.selected {
+          border-color: #2563eb;
+          background-color: #eff6ff;
+        }
+        
+        .department-icon {
+          font-size: 2rem;
+          margin-bottom: 0.5rem;
+        }
+        
+        .department-name {
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: #1f2937;
+        }
+        
+        .doctor-list {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+        
+        .doctor-card {
+          width: 100%;
+          padding: 1rem;
+          border-radius: 0.5rem;
+          border: 2px solid #e5e7eb;
+          background: white;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+        
+        .doctor-card:hover {
+          border-color: #93c5fd;
+        }
+        
+        .doctor-card.selected {
+          border-color: #2563eb;
+          background-color: #eff6ff;
+        }
+        
+        .doctor-info {
+          display: flex;
+          align-items: center;
+        }
+        
+        .doctor-avatar {
+          width: 3rem;
+          height: 3rem;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #60a5fa 0%, #06b6d4 100%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-weight: 600;
+          font-size: 1.25rem;
+        }
+        
+        .doctor-details {
+          margin-left: 1rem;
+          text-align: left;
+        }
+        
+        .doctor-name {
+          font-weight: 500;
+          color: #1f2937;
+          margin-bottom: 0.25rem;
+        }
+        
+        .doctor-specialty {
+          font-size: 0.875rem;
+          color: #6b7280;
+        }
+        
+        .date-input, .text-input {
+          width: 100%;
+          padding: 0.75rem;
+          border: 2px solid #e5e7eb;
+          border-radius: 0.5rem;
+          font-size: 1rem;
+          transition: border-color 0.2s ease;
+        }
+        
+        .date-input:focus, .text-input:focus {
+          outline: none;
+          border-color: #2563eb;
+        }
+        
+        .time-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 0.75rem;
+        }
+        
+        @media (min-width: 768px) {
+          .time-grid {
+            grid-template-columns: repeat(4, 1fr);
+          }
+        }
+        
+        .time-slot {
+          padding: 0.75rem;
+          border-radius: 0.5rem;
+          border: 2px solid #e5e7eb;
+          background: white;
+          cursor: pointer;
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: #374151;
+          transition: all 0.2s ease;
+        }
+        
+        .time-slot:hover {
+          border-color: #93c5fd;
+        }
+        
+        .time-slot.selected {
+          border-color: #2563eb;
+          background-color: #eff6ff;
+          color: #1e40af;
+        }
+        
+        .form-row {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1rem;
+        }
+        
+        .textarea-input {
+          width: 100%;
+          padding: 0.75rem;
+          border: 2px solid #e5e7eb;
+          border-radius: 0.5rem;
+          font-size: 1rem;
+          font-family: inherit;
+          resize: vertical;
+          transition: border-color 0.2s ease;
+        }
+        
+        .textarea-input:focus {
+          outline: none;
+          border-color: #2563eb;
+        }
+        
+        .button-container {
+          display: flex;
+          justify-content: space-between;
+          margin-top: 2rem;
+        }
+        
+        .btn {
+          padding: 0.75rem 1.5rem;
+          border-radius: 0.5rem;
+          font-weight: 500;
+          font-size: 1rem;
+          cursor: pointer;
+          border: none;
+          transition: all 0.2s ease;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+        
+        .btn-secondary {
+          background-color: #e5e7eb;
+          color: #374151;
+        }
+        
+        .btn-secondary:hover {
+          background-color: #d1d5db;
+        }
+        
+        .btn-primary {
+          background-color: #2563eb;
+          color: white;
+          margin-left: auto;
+        }
+        
+        .btn-primary:hover {
+          background-color: #1d4ed8;
+        }
+        
+        .btn-success {
+          background-color: #16a34a;
+          color: white;
+          margin-left: auto;
+          padding: 0.75rem 2rem;
+        }
+        
+        .btn-success:hover {
+          background-color: #15803d;
+        }
+        
+        .btn.disabled {
+          background-color: #e5e7eb;
+          color: #9ca3af;
+          cursor: not-allowed;
+        }
+        
+        .summary-card {
+          margin-top: 1.5rem;
+          background-color: #eff6ff;
+          border-radius: 0.75rem;
+          padding: 1.5rem;
+          border: 2px solid #bfdbfe;
+        }
+        
+        .summary-title {
+          font-weight: 600;
+          color: #1f2937;
+          margin-bottom: 0.75rem;
+        }
+        
+        .summary-content {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+          font-size: 0.875rem;
+        }
+        
+        .summary-label {
+          font-weight: 500;
+        }
+        
+        @media (max-width: 640px) {
+          .title {
+            font-size: 2rem;
+          }
+          
+          .main-card {
+            padding: 1.5rem;
+          }
+          
+          .step-label {
+            display: none;
+          }
+          
+          .form-row {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
+      
+      <div className="appointment-container">
+        <div className="appointment-wrapper">
+          <div className="header">
+            <h1 className="title">Book an Appointment</h1>
+            <p className="subtitle">Schedule your visit with our expert doctors</p>
+          </div>
 
-        {/* Progress Steps */}
-        <div className="flex items-center justify-center mb-8">
-          {[1, 2, 3].map((s) => (
-            <React.Fragment key={s}>
-              <div className="flex items-center">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-                  step >= s ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
-                }`}>
-                  {step > s ? <Check className="w-5 h-5" /> : s}
-                </div>
-                <div className="ml-2 hidden sm:block">
-                  <p className={`text-sm font-medium ${step >= s ? 'text-blue-600' : 'text-gray-500'}`}>
-                    {s === 1 ? 'Select' : s === 2 ? 'Schedule' : 'Details'}
-                  </p>
-                </div>
-              </div>
-              {s < 3 && <div className={`w-16 h-1 mx-2 ${step > s ? 'bg-blue-600' : 'bg-gray-200'}`} />}
-            </React.Fragment>
-          ))}
-        </div>
-
-        {/* Main Form Card */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <div>
-            {/* Step 1: Select Department & Doctor */}
-            {step === 1 && (
-              <div className="space-y-6">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Select Department & Doctor</h2>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">Department</label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {departments.map(dept => (
-                      <button
-                        key={dept.id}
-                        type="button"
-                        onClick={() => handleInputChange('department', dept.name)}
-                        className={`p-4 rounded-lg border-2 transition-all ${
-                          formData.department === dept.name
-                            ? 'border-blue-600 bg-blue-50'
-                            : 'border-gray-200 hover:border-blue-300'
-                        }`}
-                      >
-                        <div className="text-3xl mb-2">{dept.icon}</div>
-                        <div className="text-sm font-medium text-gray-800">{dept.name}</div>
-                      </button>
-                    ))}
+          <div className="progress-container">
+            {[1, 2, 3].map((s) => (
+              <React.Fragment key={s}>
+                <div className="progress-step">
+                  <div className={`step-circle ${step >= s ? 'active' : ''}`}>
+                    {step > s ? <Check className="w-5 h-5" /> : s}
+                  </div>
+                  <div className="step-label">
+                    <p className={`step-text ${step >= s ? 'active' : ''}`}>
+                      {s === 1 ? 'Select' : s === 2 ? 'Schedule' : 'Details'}
+                    </p>
                   </div>
                 </div>
+                {s < 3 && <div className={`step-line ${step > s ? 'active' : ''}`} />}
+              </React.Fragment>
+            ))}
+          </div>
 
-                {formData.department && (
+          <div className="main-card">
+            <div className="step-content">
+              {step === 1 && (
+                <>
+                  <h2 className="step-title">Select Department & Doctor</h2>
+                  
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">Select Doctor</label>
-                    <div className="space-y-2">
-                      {doctors[formData.department].map(doctor => (
+                    <label className="label">Department</label>
+                    <div className="department-grid">
+                      {departments.map(dept => (
                         <button
-                          key={doctor}
+                          key={dept.id}
                           type="button"
-                          onClick={() => handleInputChange('doctor', doctor)}
-                          className={`w-full p-4 rounded-lg border-2 transition-all flex items-center justify-between ${
-                            formData.doctor === doctor
-                              ? 'border-blue-600 bg-blue-50'
-                              : 'border-gray-200 hover:border-blue-300'
-                          }`}
+                          onClick={() => handleInputChange('department', dept.name)}
+                          className={`department-card ${formData.department === dept.name ? 'selected' : ''}`}
                         >
-                          <div className="flex items-center">
-                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center text-white font-semibold">
-                              {doctor.split(' ')[1][0]}
-                            </div>
-                            <div className="ml-4 text-left">
-                              <p className="font-medium text-gray-800">{doctor}</p>
-                              <p className="text-sm text-gray-600">{formData.department} Specialist</p>
-                            </div>
-                          </div>
-                          {formData.doctor === doctor && <Check className="w-5 h-5 text-blue-600" />}
+                          <div className="department-icon">{dept.icon}</div>
+                          <div className="department-name">{dept.name}</div>
                         </button>
                       ))}
                     </div>
                   </div>
-                )}
-              </div>
-            )}
 
-            {/* Step 2: Select Date & Time */}
-            {step === 2 && (
-              <div className="space-y-6">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Select Date & Time</h2>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Calendar className="w-4 h-4 inline mr-2" />
-                    Select Date
-                  </label>
-                  <input
-                    type="date"
-                    value={formData.date}
-                    onChange={(e) => handleInputChange('date', e.target.value)}
-                    min={new Date().toISOString().split('T')[0]}
-                    className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-600 focus:outline-none"
-                  />
-                </div>
+                  {formData.department && (
+                    <div>
+                      <label className="label">Select Doctor</label>
+                      <div className="doctor-list">
+                        {doctors[formData.department].map(doctor => (
+                          <button
+                            key={doctor}
+                            type="button"
+                            onClick={() => handleInputChange('doctor', doctor)}
+                            className={`doctor-card ${formData.doctor === doctor ? 'selected' : ''}`}
+                          >
+                            <div className="doctor-info">
+                              <div className="doctor-avatar">
+                                {doctor.split(' ')[1][0]}
+                              </div>
+                              <div className="doctor-details">
+                                <p className="doctor-name">{doctor}</p>
+                                <p className="doctor-specialty">{formData.department} Specialist</p>
+                              </div>
+                            </div>
+                            {formData.doctor === doctor && <Check className="w-5 h-5 text-blue-600" />}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
 
-                {formData.date && (
+              {step === 2 && (
+                <>
+                  <h2 className="step-title">Select Date & Time</h2>
+                  
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">
-                      <Clock className="w-4 h-4 inline mr-2" />
-                      Select Time Slot
+                    <label className="label">
+                      <Calendar className="w-4 h-4 inline mr-2" />
+                      Select Date
                     </label>
-                    <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
-                      {timeSlots.map(time => (
-                        <button
-                          key={time}
-                          type="button"
-                          onClick={() => handleInputChange('time', time)}
-                          className={`p-3 rounded-lg border-2 transition-all text-sm font-medium ${
-                            formData.time === time
-                              ? 'border-blue-600 bg-blue-50 text-blue-700'
-                              : 'border-gray-200 hover:border-blue-300 text-gray-700'
-                          }`}
-                        >
-                          {time}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Step 3: Patient Details */}
-            {step === 3 && (
-              <div className="space-y-6">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Patient Details</h2>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <User className="w-4 h-4 inline mr-2" />
-                    Full Name *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.patientName}
-                    onChange={(e) => handleInputChange('patientName', e.target.value)}
-                    className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-600 focus:outline-none"
-                    placeholder="Enter your full name"
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Age *</label>
                     <input
-                      type="number"
-                      value={formData.age}
-                      onChange={(e) => handleInputChange('age', e.target.value)}
-                      className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-600 focus:outline-none"
-                      placeholder="Age"
-                      required
+                      type="date"
+                      value={formData.date}
+                      onChange={(e) => handleInputChange('date', e.target.value)}
+                      min={new Date().toISOString().split('T')[0]}
+                      className="date-input"
                     />
                   </div>
+
+                  {formData.date && (
+                    <div>
+                      <label className="label">
+                        <Clock className="w-4 h-4 inline mr-2" />
+                        Select Time Slot
+                      </label>
+                      <div className="time-grid">
+                        {timeSlots.map(time => (
+                          <button
+                            key={time}
+                            type="button"
+                            onClick={() => handleInputChange('time', time)}
+                            className={`time-slot ${formData.time === time ? 'selected' : ''}`}
+                          >
+                            {time}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {step === 3 && (
+                <>
+                  <h2 className="step-title">Patient Details</h2>
+                  
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Gender *</label>
-                    <select
-                      value={formData.gender}
-                      onChange={(e) => handleInputChange('gender', e.target.value)}
-                      className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-600 focus:outline-none"
-                      required
-                    >
-                      <option value="">Select</option>
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="other">Other</option>
-                    </select>
+                    <label className="label">
+                      <User className="w-4 h-4 inline mr-2" />
+                      Full Name *
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.patientName}
+                      onChange={(e) => handleInputChange('patientName', e.target.value)}
+                      className="text-input"
+                      placeholder="Enter your full name"
+                    />
                   </div>
-                </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Phone className="w-4 h-4 inline mr-2" />
-                    Phone Number *
-                  </label>
-                  <input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => handleInputChange('phone', e.target.value)}
-                    className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-600 focus:outline-none"
-                    placeholder="+1 (555) 000-0000"
-                    required
-                  />
-                </div>
+                  <div className="form-row">
+                    <div>
+                      <label className="label">Age *</label>
+                      <input
+                        type="number"
+                        value={formData.age}
+                        onChange={(e) => handleInputChange('age', e.target.value)}
+                        className="text-input"
+                        placeholder="Age"
+                      />
+                    </div>
+                    <div>
+                      <label className="label">Gender *</label>
+                      <select
+                        value={formData.gender}
+                        onChange={(e) => handleInputChange('gender', e.target.value)}
+                        className="text-input"
+                      >
+                        <option value="">Select</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
+                  </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Mail className="w-4 h-4 inline mr-2" />
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-600 focus:outline-none"
-                    placeholder="your.email@example.com"
-                  />
-                </div>
+                  <div>
+                    <label className="label">
+                      <Phone className="w-4 h-4 inline mr-2" />
+                      Phone Number *
+                    </label>
+                    <input
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => handleInputChange('phone', e.target.value)}
+                      className="text-input"
+                      placeholder="+1 (555) 000-0000"
+                    />
+                  </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <FileText className="w-4 h-4 inline mr-2" />
-                    Reason for Visit
-                  </label>
-                  <textarea
-                    value={formData.reason}
-                    onChange={(e) => handleInputChange('reason', e.target.value)}
-                    className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-600 focus:outline-none"
-                    rows="4"
-                    placeholder="Brief description of your symptoms or reason for consultation"
-                  />
-                </div>
+                  <div>
+                    <label className="label">
+                      <Mail className="w-4 h-4 inline mr-2" />
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      className="text-input"
+                      placeholder="your.email@example.com"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="label">
+                      <FileText className="w-4 h-4 inline mr-2" />
+                      Reason for Visit
+                    </label>
+                    <textarea
+                      value={formData.reason}
+                      onChange={(e) => handleInputChange('reason', e.target.value)}
+                      className="textarea-input"
+                      rows="4"
+                      placeholder="Brief description of your symptoms or reason for consultation"
+                    />
+                  </div>
+                </>
+              )}
+
+              <div className="button-container">
+                {step > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => setStep(step - 1)}
+                    className="btn btn-secondary"
+                  >
+                    Back
+                  </button>
+                )}
+                
+                {step < 3 ? (
+                  <button
+                    type="button"
+                    onClick={() => setStep(step + 1)}
+                    disabled={!canProceed()}
+                    className={`btn ${canProceed() ? 'btn-primary' : 'disabled'}`}
+                  >
+                    Next
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleSubmit}
+                    disabled={!canProceed()}
+                    className={`btn ${canProceed() ? 'btn-success' : 'disabled'}`}
+                  >
+                    Book Appointment
+                  </button>
+                )}
               </div>
-            )}
-
-            {/* Navigation Buttons */}
-            <div className="flex justify-between mt-8">
-              {step > 1 && (
-                <button
-                  type="button"
-                  onClick={() => setStep(step - 1)}
-                  className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors"
-                >
-                  Back
-                </button>
-              )}
-              
-              {step < 3 ? (
-                <button
-                  type="button"
-                  onClick={() => setStep(step + 1)}
-                  disabled={!canProceed()}
-                  className={`ml-auto px-6 py-3 rounded-lg font-medium transition-colors flex items-center ${
-                    canProceed()
-                      ? 'bg-blue-600 text-white hover:bg-blue-700'
-                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  }`}
-                >
-                  Next
-                  <ChevronRight className="w-5 h-5 ml-2" />
-                </button>
-              ) : (
-                <button
-                  onClick={handleSubmit}
-                  disabled={!canProceed()}
-                  className={`ml-auto px-8 py-3 rounded-lg font-medium transition-colors ${
-                    canProceed()
-                      ? 'bg-green-600 text-white hover:bg-green-700'
-                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  }`}
-                >
-                  Book Appointment
-                </button>
-              )}
             </div>
           </div>
+
+          {(formData.department || formData.date || formData.patientName) && (
+            <div className="summary-card">
+              <h3 className="summary-title">Appointment Summary</h3>
+              <div className="summary-content">
+                {formData.department && <p><span className="summary-label">Department:</span> {formData.department}</p>}
+                {formData.doctor && <p><span className="summary-label">Doctor:</span> {formData.doctor}</p>}
+                {formData.date && <p><span className="summary-label">Date:</span> {new Date(formData.date).toLocaleDateString()}</p>}
+                {formData.time && <p><span className="summary-label">Time:</span> {formData.time}</p>}
+                {formData.patientName && <p><span className="summary-label">Patient:</span> {formData.patientName}</p>}
+              </div>
+            </div>
+          )}
         </div>
-
-        {/* Summary Card */}
-        {(formData.department || formData.date || formData.patientName) && (
-          <div className="mt-6 bg-blue-50 rounded-xl p-6 border-2 border-blue-100">
-            <h3 className="font-semibold text-gray-800 mb-3">Appointment Summary</h3>
-            <div className="space-y-2 text-sm">
-              {formData.department && <p><span className="font-medium">Department:</span> {formData.department}</p>}
-              {formData.doctor && <p><span className="font-medium">Doctor:</span> {formData.doctor}</p>}
-              {formData.date && <p><span className="font-medium">Date:</span> {new Date(formData.date).toLocaleDateString()}</p>}
-              {formData.time && <p><span className="font-medium">Time:</span> {formData.time}</p>}
-              {formData.patientName && <p><span className="font-medium">Patient:</span> {formData.patientName}</p>}
-            </div>
-          </div>
-        )}
       </div>
-    </div>
+    </>
   );
 }
