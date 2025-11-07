@@ -1,34 +1,37 @@
-import React, { useState } from 'react';
-import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import './ForgotPassword.css';
+import API_BASE_URL from "../../api/apiConfig";
 
 const ResetPasswordPage = () => {
-  const [searchParams] = useSearchParams();
+  const { token } = useParams(); // get token from URL path (e.g., /reset-password/:token)
   const navigate = useNavigate();
-  const token = searchParams.get('token');
+
   const [formData, setFormData] = useState({
     newPassword: '',
     confirmPassword: ''
   });
-  
-  // Redirect if no token is present
-  React.useEffect(() => {
-    if (!token) {
-      navigate('/login', { replace: true });
-    }
-  }, [token, navigate]);
+
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [successMsg, setSuccessMsg] = useState('');
+
+  // Redirect if no token is present
+  useEffect(() => {
+    if (!token) {
+      navigate('/login/select', { replace: true });
+    }
+  }, [token, navigate]);
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.newPassword) {
       newErrors.newPassword = 'New password is required';
     } else if (formData.newPassword.length < 8) {
       newErrors.newPassword = 'Password must be at least 8 characters';
     }
-    
+
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = 'Please confirm your password';
     } else if (formData.newPassword !== formData.confirmPassword) {
@@ -41,38 +44,30 @@ const ResetPasswordPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!validateForm()) return;
 
+    if (!validateForm()) return;
     setIsLoading(true);
-    
+    setErrors({});
+    setSuccessMsg('');
+
     try {
-      // Replace with your actual API endpoint
-      const response = await fetch('http://localhost:8080/api/auth/reset-password', {
+      const response = await fetch(`${API_BASE_URL}/api/password/reset-password/${token}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          token,
-          newPassword: formData.newPassword
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newPassword: formData.newPassword })
       });
 
-      if (response.ok) {
-        navigate('/login?reset=success');
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setSuccessMsg('✅ Password reset successful! Redirecting to login...');
+        setTimeout(() => navigate('/login/select'), 2500);
       } else {
-        const data = await response.json();
-        setErrors(prev => ({
-          ...prev,
-          submit: data.message || 'Failed to reset password'
-        }));
+        setErrors({ submit: data.message || 'Failed to reset password' });
       }
     } catch (error) {
-      setErrors(prev => ({
-        ...prev,
-        submit: 'An error occurred. Please try again.'
-      }));
+      console.error('Reset Password Error:', error);
+      setErrors({ submit: '❌ Unable to connect to backend server.' });
     } finally {
       setIsLoading(false);
     }
@@ -84,7 +79,6 @@ const ResetPasswordPage = () => {
       ...prev,
       [name]: value
     }));
-    
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -131,17 +125,16 @@ const ResetPasswordPage = () => {
             )}
           </div>
 
-          {errors.submit && (
-            <div className="error-message">{errors.submit}</div>
-          )}
-          
+          {errors.submit && <div className="error-message">{errors.submit}</div>}
+          {successMsg && <div className="success-message">{successMsg}</div>}
+
           <button type="submit" className="submit-button" disabled={isLoading}>
             {isLoading ? 'Resetting...' : 'Reset Password'}
           </button>
         </form>
 
         <div className="password-footer">
-          <p><Link to="/login">← Back to Login</Link></p>
+          <p><Link to="/login/select">← Back to Login</Link></p>
         </div>
       </div>
     </div>

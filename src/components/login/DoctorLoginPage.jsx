@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './DoctorLoginPage.css';
 
+import API_BASE_URL from "../../api/apiConfig";
+
 const DoctorLoginPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -30,22 +32,43 @@ const DoctorLoginPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!validateForm()) return;
 
-    setIsLoading(true);
-    
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      navigate('/doctor/dashboard');
-    } catch (error) {
-      setErrors({ submit: 'Doctor login failed. Please check your credentials.' });
-    } finally {
-      setIsLoading(false);
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!validateForm()) return;
+  setIsLoading(true);
+  setErrors({});
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        role: "admin",  // change to "doctor", "nurse", or "patient" for other pages
+        email: formData.email,
+        password: formData.password,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      localStorage.setItem("token", data.token);
+      console.log("✅ Login successful:", data);
+      navigate(`/doctor/dashboard`);
+    } else {
+      setErrors({ submit: data.message || "Invalid credentials" });
     }
-  };
+  } catch (error) {
+    console.error("❌ Login Error:", error);
+    setErrors({ submit: "Unable to connect to backend server." });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;

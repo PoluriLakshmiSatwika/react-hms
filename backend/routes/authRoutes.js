@@ -5,11 +5,12 @@ import Admin from "../models/Admin.js";
 import Doctor from "../models/Doctor.js";
 import Nurse from "../models/Nurse.js";
 import Patient from "../models/Patient.js";
-import PendingStaff from "../models/PendingStaff.js"; // ✅ New model
+import PendingStaff from "../models/PendingStaff.js"; // ✅ Pending model
+import { sendWelcomeEmail } from "./emailService.js"; // ✅ Email function
 
 const router = express.Router();
 
-/* 🧠 Helper Function: Role-based Model Selector */
+/* 🧠 Helper Function: Get Model by Role */
 const getModelByRole = (role) => {
   switch (role.toLowerCase()) {
     case "admin":
@@ -25,7 +26,7 @@ const getModelByRole = (role) => {
   }
 };
 
-/* ✅ POST /api/auth/register — Register New User */
+/* ✅ REGISTER: /api/auth/register */
 router.post("/register", async (req, res) => {
   try {
     const {
@@ -44,7 +45,7 @@ router.post("/register", async (req, res) => {
       password,
     } = req.body;
 
-    // Step 1: Basic validation
+    // Step 1️⃣: Basic Validation
     if (!role || !email || !password) {
       return res.status(400).json({
         success: false,
@@ -55,7 +56,7 @@ router.post("/register", async (req, res) => {
     const isDoctorOrNurse = ["doctor", "nurse"].includes(role.toLowerCase());
     const Model = getModelByRole(role);
 
-    // Step 2: Check if already exists in active or pending collections
+    // Step 2️⃣: Check if already exists in active or pending collections
     const existingUser =
       (Model && (await Model.findOne({ email }))) ||
       (await PendingStaff.findOne({ email }));
@@ -67,10 +68,10 @@ router.post("/register", async (req, res) => {
       });
     }
 
-    // Step 3: Hash password
+    // Step 3️⃣: Hash Password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Step 4: Doctor/Nurse go to Pending Staff collection
+    // Step 4️⃣: Handle Doctor/Nurse Registration → Pending Approval
     if (isDoctorOrNurse) {
       const newPending = new PendingStaff({
         role,
@@ -93,7 +94,7 @@ router.post("/register", async (req, res) => {
       });
     }
 
-    // Step 5: Direct registration for Admin/Patient
+    // Step 5️⃣: Direct Registration for Admin / Patient
     let newUserData = { fullName, email, phone, password: hashedPassword };
 
     if (role === "admin") {
@@ -107,6 +108,9 @@ router.post("/register", async (req, res) => {
 
     const newUser = new Model(newUserData);
     await newUser.save();
+
+    // Step 6️⃣: Send Welcome Email (only for Admin & Patient)
+    await sendWelcomeEmail(email, fullName || "User", role);
 
     res.status(201).json({
       success: true,
@@ -128,7 +132,7 @@ router.post("/register", async (req, res) => {
   }
 });
 
-/* 🔐 POST /api/auth/login — Authenticate User */
+/* 🔐 LOGIN: /api/auth/login */
 router.post("/login", async (req, res) => {
   try {
     const { role, email, password } = req.body;
@@ -139,22 +143,22 @@ router.post("/login", async (req, res) => {
     const Model = getModelByRole(role);
     if (!Model) return res.status(400).json({ message: "Invalid role" });
 
-    // Step 1: Find user
+    // Step 1️⃣: Find User
     const user = await Model.findOne({ email });
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // Step 2: Verify password
+    // Step 2️⃣: Verify Password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
-    // Step 3: Generate JWT
+    // Step 3️⃣: Generate JWT
     const token = jwt.sign(
       { id: user._id, role },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
-    // Step 4: Response
+    // Step 4️⃣: Success Response
     res.status(200).json({
       success: true,
       message: "Login successful",
@@ -176,7 +180,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-/* ✅ POST /api/auth/approve — Admin Approves or Rejects Pending Staff */
+/* ✅ APPROVE STAFF: /api/auth/approve */
 router.post("/approve", async (req, res) => {
   try {
     const { id, approve } = req.body; // approve = true / false
@@ -194,7 +198,7 @@ router.post("/approve", async (req, res) => {
       });
     }
 
-    // Approve case → Move to actual collection
+    // Approve case → Move to Actual Collection
     const hashedPassword = pending.password;
 
     if (pending.role === "doctor") {
@@ -221,6 +225,9 @@ router.post("/approve", async (req, res) => {
 
     await PendingStaff.findByIdAndDelete(id);
 
+    // ✅ Send Welcome Email After Approval
+    await sendWelcomeEmail(pending.email, pending.fullName, pending.role);
+
     res.json({
       success: true,
       message: `${pending.role} approved and moved to active staff list`,
@@ -235,7 +242,7 @@ router.post("/approve", async (req, res) => {
   }
 });
 
-/* ✅ GET /api/auth/pending — Get All Pending Staff (For Admin Dashboard) */
+/* ✅ GET ALL PENDING STAFF: /api/auth/pending */
 router.get("/pending", async (req, res) => {
   try {
     const pendingList = await PendingStaff.find();
@@ -253,7 +260,7 @@ router.get("/pending", async (req, res) => {
   }
 });
 
-/* ✅ Optional: Token Verification Route */
+/* ✅ VERIFY TOKEN: /api/auth/verify */
 router.get("/verify", (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
