@@ -1,71 +1,70 @@
 .appointment-container {
-  width: 400px;
+  width: 60%;
   margin: auto;
+  text-align: center;
   padding: 20px;
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
-.input-box {
-  width: 100%;
+select, input {
+  width: 80%;
   padding: 10px;
   margin: 10px 0;
+  border-radius: 6px;
+  border: 1px solid #2E86C1;
 }
 
 .doctor-list {
   display: flex;
-  gap: 10px;
+  justify-content: center;
   flex-wrap: wrap;
-  margin: 10px 0;
+  gap: 15px;
+  margin-top: 20px;
 }
 
 .doctor-card {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  border: 2px solid #2E86C1;
+  padding: 15px;
+  width: 220px;
+  border-radius: 8px;
   cursor: pointer;
-  width: 120px;
-  text-align: center;
+  transition: 0.3s;
 }
 
 .doctor-card.selected {
-  border-color: blue;
-  background: #e6f0ff;
+  background-color: #2E86C1;
+  color: white;
 }
 
 .slot-container {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin: 10px 0;
+  margin-top: 15px;
 }
 
 .slot {
+  margin: 5px;
   padding: 8px 12px;
-  border: 1px solid #444;
+  border: 1px solid #2E86C1;
   background: white;
-  cursor: pointer;
   border-radius: 5px;
+  cursor: pointer;
 }
 
 .selected-slot {
-  background: green;
+  background: #2E86C1;
   color: white;
 }
 
 .book-btn {
-  width: 100%;
-  background: #2E86C1;
-  color: #fff;
-  padding: 10px;
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: green;
+  color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  margin-top: 10px;
 }
 
 .message {
-  margin-top: 10px;
+  margin-top: 15px;
+  font-size: 16px;
   font-weight: bold;
 }

@@ -8,6 +8,11 @@ const doctorSchema = new mongoose.Schema({
   department: { type: String, required: true },
   uploadId: { type: String, required: true }, // File ID / Document reference
   password: { type: String, required: true },
+  slots: {
+  type: [String],
+  default: ["10:00 AM", "11:30 AM", "2:00 PM", "4:00 PM"] // Add default slots
+}
+
 });
 
 export default mongoose.model("Doctor", doctorSchema, "doctors");

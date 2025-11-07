@@ -7,10 +7,12 @@ const AppointmentBooking = () => {
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [selectedSlot, setSelectedSlot] = useState("");
-  const [date, setDate] = useState("");
-  const [patientId, setPatientId] = useState(""); // You can set this after login
+  const [appointmentDate, setAppointmentDate] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+
+  // 🔐 Temporary Patient ID (Later take from login session)
+  const patientId = "690b006c0301e8640732a726";
 
   const diseases = [
     "Cardiology",
@@ -21,57 +23,59 @@ const AppointmentBooking = () => {
     "General Physician",
   ];
 
-  const defaultSlots = ["09:00 AM", "11:00 AM", "02:00 PM", "04:00 PM", "06:00 PM"];
-
-  // ✅ Fetch doctors
-  const fetchDoctors = async (d) => {
-    setDisease(d);
-    setSelectedDoctor(null);
-    setDoctors([]);
+  // ✅ Fetch doctors based on disease
+  const fetchDoctors = async (disease) => {
     setLoading(true);
+    setDoctors([]);
+    setSelectedDoctor(null);
+    setSelectedSlot("");
+
     try {
-      const res = await fetch(`${API_BASE_URL}/api/appointments/doctors/${d}`);
+      const res = await fetch(`${API_BASE_URL}/api/appointments/doctors/${disease}`);
       const data = await res.json();
       if (data.success) {
         setDoctors(data.doctors);
       } else {
-        setDoctors([]);
+        setMessage("No doctors found");
       }
     } catch (err) {
-      console.error("Doctor fetch error", err);
+      console.error("❌ Doctor fetch error", err);
+      setMessage("Failed to load doctors");
     }
     setLoading(false);
   };
 
-  // ✅ Book Appointment
+  // ✅ Book Appointment API
   const bookAppointment = async () => {
-    if (!patientId) return setMessage("❌ Enter Patient ID");
-    if (!selectedDoctor || !selectedSlot || !date) {
-      return setMessage("❌ Select doctor, date & slot");
+    if (!selectedDoctor || !selectedSlot || !appointmentDate) {
+      alert("Please select date, doctor and slot");
+      return;
     }
 
-    setMessage("");
+    const payload = {
+      patientId,
+      doctorId: selectedDoctor._id,
+      disease,
+      appointmentDate,
+      slotTime: selectedSlot,
+    };
+
     try {
       const res = await fetch(`${API_BASE_URL}/api/appointments/book`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          patientId,
-          doctorId: selectedDoctor._id,
-          disease,
-          appointmentDate: date,
-          slotTime: selectedSlot,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
       if (data.success) {
         setMessage("✅ Appointment booked successfully!");
       } else {
-        setMessage("❌ " + data.message);
+        setMessage("❌ Booking Failed: " + data.message);
       }
     } catch (err) {
-      setMessage("❌ Server error");
+      console.error(err);
+      setMessage("❌ Server error while booking");
     }
   };
 
@@ -79,28 +83,29 @@ const AppointmentBooking = () => {
     <div className="appointment-container">
       <h2>Book Appointment</h2>
 
-      {/* Patient ID Input */}
-      <input
-        type="text"
-        placeholder="Enter Patient ID"
-        value={patientId}
-        onChange={(e) => setPatientId(e.target.value)}
-        className="input-box"
-      />
-
-      {/* Disease Selection */}
+      {/* Select Disease */}
       <select
         value={disease}
-        onChange={(e) => fetchDoctors(e.target.value)}
-        className="input-box"
+        onChange={(e) => {
+          setDisease(e.target.value);
+          fetchDoctors(e.target.value);
+        }}
       >
-        <option value="">Select Disease / Speciality</option>
+        <option value="">Select Disease / Specialty</option>
         {diseases.map((d, i) => (
-          <option key={i} value={d}>
-            {d}
-          </option>
+          <option key={i} value={d}>{d}</option>
         ))}
       </select>
+
+      {/* Date Picker */}
+      {disease && (
+        <input
+          type="date"
+          value={appointmentDate}
+          onChange={(e) => setAppointmentDate(e.target.value)}
+          min={new Date().toISOString().split("T")[0]}
+        />
+      )}
 
       {/* Doctors List */}
       {loading && <p>Loading doctors...</p>}
@@ -113,45 +118,42 @@ const AppointmentBooking = () => {
           >
             <h3>{doc.fullName}</h3>
             <p>{doc.specialty}</p>
+            <p>Department: {doc.department}</p>
+            <p>Fee: ₹{doc.fee || 300} (3 visits valid)</p>
           </div>
         ))}
       </div>
-
-      {/* Date Picker */}
-      {selectedDoctor && (
-        <input
-          type="date"
-          className="input-box"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-        />
-      )}
 
       {/* Slot Selection */}
       {selectedDoctor && (
         <>
           <h3>Available Slots</h3>
           <div className="slot-container">
-            {(selectedDoctor.slots || defaultSlots).map((slot, i) => (
-              <button
-                key={i}
-                className={selectedSlot === slot ? "slot selected-slot" : "slot"}
-                onClick={() => setSelectedSlot(slot)}
-              >
-                {slot}
-              </button>
-            ))}
+            {selectedDoctor.slots?.length > 0 ? (
+              selectedDoctor.slots.map((slot, i) => (
+                <button
+                  key={i}
+                  className={selectedSlot === slot ? "slot selected-slot" : "slot"}
+                  onClick={() => setSelectedSlot(slot)}
+                >
+                  {slot}
+                </button>
+              ))
+            ) : (
+              <p>No slots available</p>
+            )}
           </div>
         </>
       )}
 
-      {/* Book Button */}
-      {selectedDoctor && selectedSlot && date && (
+      {/* Book Appointment Button */}
+      {selectedDoctor && selectedSlot && appointmentDate && (
         <button className="book-btn" onClick={bookAppointment}>
-          Pay & Book Appointment
+          Book Appointment
         </button>
       )}
 
+      {/* Message */}
       {message && <p className="message">{message}</p>}
     </div>
   );

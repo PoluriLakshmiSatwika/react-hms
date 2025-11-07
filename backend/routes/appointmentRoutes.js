@@ -24,6 +24,21 @@ router.get("/doctors/:disease", async (req, res) => {
   }
 });
 
+// ✅ Get doctors by specialty (used in dropdown)
+router.get("/doctors/:specialty", async (req, res) => {
+  try {
+    const doctors = await Doctor.find({ specialty: req.params.specialty });
+
+    if (!doctors.length) {
+      return res.status(404).json({ success: false, message: "No doctors found" });
+    }
+
+    res.json({ success: true, doctors });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 
 /* ✅ BOOK NEW APPOINTMENT */
 router.post("/book", async (req, res) => {
