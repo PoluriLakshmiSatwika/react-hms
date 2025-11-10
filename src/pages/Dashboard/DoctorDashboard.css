@@ -1,0 +1,17 @@
+.doctor-dashboard-container {
+  padding: 20px;
+}
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.appointment-card {
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+button {
+  margin-top: 10px;
+}

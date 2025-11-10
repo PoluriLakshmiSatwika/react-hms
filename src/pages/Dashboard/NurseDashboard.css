@@ -1,0 +1,262 @@
+/* === Nurse Dashboard Styles === */
+
+/* General layout */
+.nurse-dashboard {
+  font-family: 'Poppins', sans-serif;
+  background: #f7faff;
+  min-height: 100vh;
+  padding: 20px;
+  color: #333;
+}
+
+/* === LOGIN PAGE === */
+.nurse-login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #6dd5fa, #ffffff);
+}
+
+.login-card {
+  background: #fff;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 360px;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.login-card:hover {
+  transform: translateY(-5px);
+}
+
+.login-card h2 {
+  margin-bottom: 20px;
+  color: #0077b6;
+}
+
+.login-card input {
+  width: 100%;
+  padding: 10px 12px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+.login-card input:focus {
+  border-color: #0077b6;
+  outline: none;
+}
+
+.login-card button {
+  width: 100%;
+  background: #0077b6;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.login-card button:hover {
+  background: #005f8a;
+}
+
+.note {
+  font-size: 13px;
+  color: #555;
+  margin-top: 10px;
+}
+
+.error-message {
+  background: #ffe6e6;
+  color: #d10000;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+/* === DASHBOARD HEADER === */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #0077b6;
+  color: white;
+  padding: 15px 25px;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-header h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.logout-btn {
+  background: #f94144;
+  border: none;
+  padding: 8px 16px;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.logout-btn:hover {
+  background: #d62828;
+}
+
+/* === AVAILABILITY BUTTON === */
+.dashboard-controls {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.availability-btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 30px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.availability-btn.available {
+  background: #06d6a0;
+  color: white;
+}
+
+.availability-btn.unavailable {
+  background: #adb5bd;
+  color: white;
+}
+
+.availability-btn:hover {
+  opacity: 0.9;
+}
+
+/* === ASSIGNMENT SECTION === */
+.assignments-section {
+  background: white;
+  padding: 20px 25px;
+  border-radius: 16px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+}
+
+.assignments-section h2 {
+  margin-bottom: 15px;
+  color: #0077b6;
+  text-align: center;
+}
+
+.assignments-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.assignment-card {
+  background: #f1f9ff;
+  border: 1px solid #d8ecff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+}
+
+.assignment-card:hover {
+  transform: translateY(-3px);
+}
+
+.assignment-info p {
+  margin: 6px 0;
+  font-size: 14px;
+}
+
+.status {
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.status.pending {
+  color: #f77f00;
+}
+
+.status.accepted {
+  color: #118ab2;
+}
+
+.status.completed {
+  color: #06d6a0;
+}
+
+/* Accept Button */
+.accept-btn {
+  background: #118ab2;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.accept-btn:hover {
+  background: #0b6988;
+}
+
+/* === NOTIFICATIONS === */
+.notification {
+  text-align: center;
+  margin: 15px auto;
+  padding: 10px 20px;
+  width: fit-content;
+  border-radius: 8px;
+  font-weight: 500;
+  animation: fadeIn 0.3s ease;
+}
+
+.notification.success {
+  background: #d8f3dc;
+  color: #1b4332;
+}
+
+.notification.error {
+  background: #ffe5e5;
+  color: #a4161a;
+}
+
+.loading {
+  text-align: center;
+  color: #555;
+  padding: 15px;
+}
+
+.no-assignments {
+  text-align: center;
+  font-size: 14px;
+  color: #777;
+  padding: 10px;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
