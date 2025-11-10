@@ -45,7 +45,7 @@ const handleSubmit = async (e) => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        role: "admin",  // change to "doctor", "nurse", or "patient" for other pages
+        role: "nurse",  // change to "doctor", "nurse", or "patient" for other pages
         email: formData.email,
         password: formData.password,
       }),
