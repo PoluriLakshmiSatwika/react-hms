@@ -79,8 +79,7 @@ router.get("/doctors/:specialty", async (req, res) => {
 //   }
 // });
 
-import Payment from "../models/Payment.js";
-import Appointment from "../models/Appointment.js";
+
 
 router.post("/book", async (req, res) => {
   try {
