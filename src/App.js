@@ -3,7 +3,7 @@ import React from 'react';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Appointment from './Appointment/Appointment Booking.jsx'
-//import Appointment from './Appointment/Appointment Booking.css';
+import Availability from './Availability/Nurse Availabile timings.jsx';
 
 export default function App() {
   return (
@@ -12,6 +12,8 @@ export default function App() {
       <About />
       <Contact />
       <Appointment />
+      <Availability />
+
     </div>
   );
 }
