@@ -21,16 +21,19 @@ function App() {
         <Route path="/login/select" element={<RoleSelectionPage />} />
         <Route path="/login/admin" element={<AdminLoginPage />} />
         <Route path="/login/doctor" element={<DoctorLoginPage />} />
-          <Route path="/login/nurse" element={<NurseLoginPage />} />
+        <Route path="/login/nurse" element={<NurseLoginPage />} />
         <Route path="/login/patient" element={<PatientLoginPage />} />
 
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         {/* <Route path="/reset-password" element={<ResetPasswordPage />} /> */}
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-     
+
 
         {/* Other routes... */}
-<Route path="/appointment" element={<AppointmentBooking />} />
+        <Route path="/appointment" element={<AppointmentBooking />} />
+
+        <Route path="/test-book" element={<AppointmentBooking />} />
+        <Route path="/" element={<Navigate to="/test-book" replace />} />
 
       </Routes>
     </BrowserRouter>
@@ -38,3 +41,4 @@ function App() {
 }
 
 export default App;
+

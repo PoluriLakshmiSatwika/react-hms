@@ -13,6 +13,14 @@ const AppointmentBooking = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const patient = window.currentPatient; // ✅ Logged in patient
+  window.currentPatient = {
+  id: "690b3860e29dd0f7e76d6e1d",  // ✅ your patient ID from MongoDB
+  fullName: "Test Patient",
+  phone: "9999999999",
+  age: 22,
+  gender: "Male"
+};
+
 
   if (!patient) {
     return (
