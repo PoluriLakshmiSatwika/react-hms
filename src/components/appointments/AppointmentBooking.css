@@ -170,3 +170,25 @@
   font-weight: bold;
   font-size: 1.2rem;
 }
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.popup-box {
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  font-size: 18px;
+  animation: zoom .3s ease-in-out;
+}
+
+@keyframes zoom {
+  from { transform: scale(0.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}

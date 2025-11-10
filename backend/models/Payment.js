@@ -42,6 +42,8 @@ const paymentSchema = new mongoose.Schema({
     type: Number,
     default: 3
   }
+  
+  
 });
 
 export default mongoose.model("Payment", paymentSchema);

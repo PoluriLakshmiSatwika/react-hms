@@ -1,203 +1,3 @@
-// import React, { useState } from "react";
-// import API_BASE_URL from "../../api/apiConfig";
-// import "./AppointmentBooking.css";
-
-
-// const AppointmentBooking = () => {
-
-//    const [disease, setDisease] = useState("");
-//   const [doctors, setDoctors] = useState([]);
-//   const [selectedDoctor, setSelectedDoctor] = useState(null);
-//   const [selectedSlot, setSelectedSlot] = useState("");
-//   const [appointmentDate, setAppointmentDate] = useState("");
-//   const [loading, setLoading] = useState(false);
-//   const [message, setMessage] = useState("");
-//   const patient = window.currentPatient; // ✅ Logged in patient
-// //   window.currentPatient = {
-// //   id: "690b3860e29dd0f7e76d6e1d",  // ✅ your patient ID from MongoDB
-// //   fullName: "Test Patient",
-// //   phone: "9999999999",
-// //   age: 22,
-// //   gender: "Male"
-// // };
-
-
-//   if (!patient) {
-//     return (
-//       <div className="appointment-container">
-//         <h2 style={{ color: "red", textAlign: "center" }}>
-//           ❗ Please login as Patient to book an appointment
-//         </h2>
-//       </div>
-//     );
-//   }
-
- 
-
-//   const diseases = [
-//     "Cardiology",
-//     "Orthopedics",
-//     "Neurology",
-//     "Dermatology",
-//     "ENT",
-//     "General Physician",
-//   ];
-
-//   // ✅ Fetch Doctors by disease
-//   const fetchDoctors = async (disease) => {
-//     setLoading(true);
-//     setDoctors([]);
-//     setSelectedDoctor(null);
-//     setSelectedSlot("");
-
-//     try {
-//       const res = await fetch(`${API_BASE_URL}/api/appointments/doctors/${disease}`);
-//       const data = await res.json();
-//       if (data.success) {
-//         setDoctors(data.doctors);
-//       } else {
-//         setMessage("No doctors found");
-//       }
-//     } catch (err) {
-//       console.error("❌ Doctor fetch error", err);
-//       setMessage("Failed to load doctors");
-//     }
-//     setLoading(false);
-//   };
-
-//   // ✅ Book Appointment
-//   const bookAppointment = async () => {
-//     if (!selectedDoctor || !selectedSlot || !appointmentDate) {
-//       alert("Please select date, doctor, and slot");
-//       return;
-//     }
-
-//     const payload = {
-//       patientId: patient.id, // ✅ From login
-//       doctorId: selectedDoctor._id,
-//       disease,
-//       appointmentDate,
-//       slotTime: selectedSlot,
-//       contactNumber: patient.phone,      // optional if you store in login
-//       patientName: patient.fullName,    // optional
-//       age: patient.age,                 // optional
-//       gender: patient.gender            // optional
-//     };
-
-//     try {
-//       const res = await fetch(`${API_BASE_URL}/api/appointments/book`, {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify(payload),
-//       });
-
-//       const data = await res.json();
-//       if (data.success) {
-//         setMessage("✅ Appointment booked successfully!");
-//       } else {
-//         setMessage("❌ Booking Failed: " + data.message);
-//       }
-//     } catch (err) {
-//       console.error(err);
-//       setMessage("❌ Server error while booking");
-//     }
-//   };
-
-//   return (
-//     <div className="appointment-container">
-//       <div className="appointment-wrapper">
-//         <div className="header">
-//           <h2 className="title">Book Appointment</h2>
-//           <p className="subtitle">Welcome, {patient.fullName}</p>
-//         </div>
-
-//         {/* Select Disease */}
-//         <select
-//           className="text-input"
-//           value={disease}
-//           onChange={(e) => {
-//             setDisease(e.target.value);
-//             fetchDoctors(e.target.value);
-//           }}
-//         >
-//           <option value="">Select Disease / Specialty</option>
-//           {diseases.map((d, i) => (
-//             <option key={i} value={d}>{d}</option>
-//           ))}
-//         </select>
-
-//         {/* Select Date */}
-//         {disease && (
-//           <input
-//             className="date-input"
-//             type="date"
-//             value={appointmentDate}
-//             onChange={(e) => setAppointmentDate(e.target.value)}
-//             min={new Date().toISOString().split("T")[0]}
-//           />
-//         )}
-
-//         {/* Doctors List */}
-//         {loading && <p className="label">Loading doctors...</p>}
-//         <div className="doctor-list">
-//           {doctors.map((doc) => (
-//             <div
-//               key={doc._id}
-//               className={`doctor-card ${selectedDoctor?._id === doc._id ? "selected" : ""}`}
-//               onClick={() => setSelectedDoctor(doc)}
-//             >
-//               <div className="doctor-info">
-//                 <div className="doctor-avatar">{doc.fullName[0]}</div>
-//                 <div className="doctor-details">
-//                   <p className="doctor-name">{doc.fullName}</p>
-//                   <p className="doctor-specialty">{doc.department}</p>
-//                 </div>
-//               </div>
-//             </div>
-//           ))}
-//         </div>
-
-//         {/* Slot Selection */}
-//         {selectedDoctor && (
-//           <>
-//             <h3 className="step-title">Available Slots</h3>
-//             <div className="time-grid">
-//               {selectedDoctor.slots?.length > 0 ? (
-//                 selectedDoctor.slots.map((slot, i) => (
-//                   <button
-//                     key={i}
-//                     className={`time-slot ${selectedSlot === slot ? "selected" : ""}`}
-//                     onClick={() => setSelectedSlot(slot)}
-//                   >
-//                     {slot}
-//                   </button>
-//                 ))
-//               ) : (
-//                 <p>No slots available</p>
-//               )}
-//             </div>
-//           </>
-//         )}
-
-//         {/* Book Button */}
-//         {selectedDoctor && selectedSlot && appointmentDate && (
-//           <div className="button-container">
-//             <button className="btn btn-success" onClick={bookAppointment}>
-//               Book Appointment
-//             </button>
-//           </div>
-//         )}
-
-//         {/* Message */}
-//         {message && <p className="summary-title" style={{ marginTop: "10px" }}>{message}</p>}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default AppointmentBooking;
-
-
 
 import React, { useState } from "react";
 import API_BASE_URL from "../../api/apiConfig";
@@ -213,7 +13,7 @@ const AppointmentBooking = () => {
   const [message, setMessage] = useState("");
 
   const patient = window.currentPatient;
-   window.currentPatient = {
+    window.currentPatient = {
   id: "690b3860e29dd0f7e76d6e1d",  // ✅ your patient ID from MongoDB
   fullName: "Test Patient",
   phone: "9999999999",
@@ -240,7 +40,7 @@ const AppointmentBooking = () => {
     "General Physician",
   ];
 
-  // ✅ Fetch Doctors by Disease
+  // ✅ Fetch doctors based on disease
   const fetchDoctors = async (disease) => {
     setLoading(true);
     setSelectedDoctor(null);
@@ -248,27 +48,25 @@ const AppointmentBooking = () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/appointments/doctors/${disease}`);
       const data = await res.json();
-      if (data.success) {
-        setDoctors(data.doctors);
-      } else {
-        setMessage("No doctors found");
-      }
-    } catch (err) {
-      console.error(err);
+      if (data.success) setDoctors(data.doctors);
+      else setMessage("No doctors found");
+    } catch {
       setMessage("Error loading doctors");
     }
     setLoading(false);
   };
 
-  // ✅ Payment + Appointment Confirmation Workflow
+  // ✅ Step 1: Book appointment (Pending) → Step 2: Process Payment → Confirm
   const handlePayAndBook = async () => {
     if (!selectedDoctor || !selectedSlot || !appointmentDate) {
       alert("Please select doctor, date and slot");
       return;
     }
 
+    setMessage(""); // Reset message
+
     try {
-      // 1️⃣ Create Appointment (status: Pending)
+      // ✅ 1. Create appointment (Pending status)
       const appointmentRes = await fetch(`${API_BASE_URL}/api/appointments/book`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -282,6 +80,7 @@ const AppointmentBooking = () => {
       });
 
       const appointmentData = await appointmentRes.json();
+      console.log("📌 Appointment API:", appointmentData);
 
       if (!appointmentData.success) {
         setMessage("❌ Failed to create appointment");
@@ -290,23 +89,37 @@ const AppointmentBooking = () => {
 
       const appointmentId = appointmentData.appointmentId;
 
-      // 2️⃣ Call payment API
-      const paymentRes = await fetch(`${API_BASE_URL}/api/payment/pay`, {
+      // ✅ 2. Call Payment API
+      const paymentRes = await fetch(`${API_BASE_URL}/api/payments/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           patientId: patient.id,
           doctorId: selectedDoctor._id,
           appointmentId,
-          amount: selectedDoctor.fee || 500, // Doctor fee from DB
-          paymentMethod: "UPI"
+          amount: selectedDoctor.fee || 500,
+          validityCount: 3,  // ✅ 3 valid visits per payment
+          paymentMethod: "UPI",
         }),
       });
 
-      const paymentData = await paymentRes.json();
+      // const paymentData = await paymentRes.json();
+      // ✅ Prevent HTML error crash
+    let paymentData;
+    try {
+      paymentData = await paymentRes.json();
+    } catch (err) {
+      console.error("❌ Payment API did not return JSON:", err);
+      setMessage("⚠ Payment server error. Check backend logs.");
+      return;
+    }
+      console.log("💰 Payment API:", paymentData);
 
       if (paymentData.success) {
-        setMessage("✅ Payment Successful & Appointment Confirmed!");
+        setMessage("✅ Payment Successful! Appointment Confirmed 🎉");
+setTimeout(() => {
+  window.location.href = "/patient/appointments";
+}, 1500);
       } else {
         setMessage("❌ Payment Failed");
       }
@@ -320,10 +133,11 @@ const AppointmentBooking = () => {
   return (
     <div className="appointment-container">
       <div className="appointment-wrapper">
+
         <h2 className="title">Book Appointment</h2>
         <p className="subtitle">Welcome, {patient.fullName}</p>
 
-        {/* Select Disease */}
+        {/* Disease Selection */}
         <select
           className="text-input"
           value={disease}
@@ -333,23 +147,23 @@ const AppointmentBooking = () => {
           }}
         >
           <option value="">Select Disease / Specialty</option>
-          {diseases.map((d, idx) => (
-            <option key={idx} value={d}>{d}</option>
+          {diseases.map((d, i) => (
+            <option key={i} value={d}>{d}</option>
           ))}
         </select>
 
-        {/* Select Date */}
+        {/* Date Selection */}
         {disease && (
           <input
-            className="date-input"
             type="date"
+            className="date-input"
             value={appointmentDate}
             onChange={(e) => setAppointmentDate(e.target.value)}
             min={new Date().toISOString().split("T")[0]}
           />
         )}
 
-        {/* Display Doctors */}
+        {/* Doctor List */}
         {loading && <p>Loading doctors...</p>}
         <div className="doctor-list">
           {doctors.map((doc) => (
@@ -370,7 +184,7 @@ const AppointmentBooking = () => {
           ))}
         </div>
 
-        {/* Slots */}
+        {/* Slot Selection */}
         {selectedDoctor && (
           <>
             <h3 className="step-title">Available Slots</h3>
@@ -402,7 +216,15 @@ const AppointmentBooking = () => {
         )}
 
         {/* Message */}
-        {message && <p style={{ marginTop: "10px" }}>{message}</p>}
+        {message && <p className="summary-title" style={{ marginTop: "10px" }}>{message}</p>}
+      {message.includes("Successful") && (
+  <div className="popup-overlay">
+    <div className="popup-box">
+      ✅ Appointment Booked & Paid Successfully!
+    </div>
+  </div>
+)}
+
       </div>
     </div>
   );
