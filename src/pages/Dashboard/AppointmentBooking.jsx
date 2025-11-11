@@ -33,19 +33,27 @@ const AppointmentBooking = () => {
   ];
 
   // ✅ Fetch doctors based on selected speciality
- const fetchDoctors = async (specialty) => {
+const fetchDoctors = async (specialty) => {
   setLoading(true);
   setSelectedDoctor(null);
   setSelectedSlot("");
   try {
-    const res = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/doctors/by-specialty/${specialty}`);
+    const res = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/doctors`);
     const data = await res.json();
-    if (res.ok && data.success && data.doctors?.length) {
-      setDoctors(data.doctors);
-      setMessage("");
+
+    if (res.ok && Array.isArray(data) && data.length > 0) {
+      const filtered = data.filter(
+        (doc) => doc.specialty?.toLowerCase() === specialty.toLowerCase()
+      );
+      if (filtered.length) {
+        setDoctors(filtered);
+        setMessage("");
+      } else {
+        setDoctors([]);
+        setMessage("No doctors found for this specialty");
+      }
     } else {
-      setDoctors([]);
-      setMessage(data.message || "No doctors found");
+      setMessage("No doctors available");
     }
   } catch (err) {
     console.error("❌ Fetch doctors error:", err);
@@ -54,6 +62,8 @@ const AppointmentBooking = () => {
     setLoading(false);
   }
 };
+
+
 
 
   // ✅ Book appointment only (no payment)
