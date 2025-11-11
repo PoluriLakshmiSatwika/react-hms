@@ -20,15 +20,15 @@ const AppointmentBooking = () => {
   gender: "Male"
 };
 
-  if (!patient) {
-    return (
-      <div className="appointment-container">
-        <h2 style={{ color: "red", textAlign: "center" }}>
-          ❗ Please login as Patient to book an appointment
-        </h2>
-      </div>
-    );
-  }
+//   if (!patient) {
+//     return (
+//       <div className="appointment-container">
+//         <h2 style={{ color: "red", textAlign: "center" }}>
+//           ❗ Please login as Patient to book an appointment
+//         </h2>
+//       </div>
+//     );
+//   }
 
   const diseases = [
     "Cardiology",
