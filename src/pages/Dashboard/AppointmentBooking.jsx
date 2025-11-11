@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./AppointmentBooking.css";
 
 const AppointmentBooking = () => {
@@ -11,24 +10,18 @@ const AppointmentBooking = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  const patient = window.currentPatient;
-    window.currentPatient = {
-  id: "690b3860e29dd0f7e76d6e1d",  // ✅ your patient ID from MongoDB
-  fullName: "Test Patient",
-  phone: "9999999999",
-  age: 22,
-  gender: "Male"
-};
+  // ✅ Get logged-in patient from localStorage
+  const patient = JSON.parse(localStorage.getItem("patient"));
 
-//   if (!patient) {
-//     return (
-//       <div className="appointment-container">
-//         <h2 style={{ color: "red", textAlign: "center" }}>
-//           ❗ Please login as Patient to book an appointment
-//         </h2>
-//       </div>
-//     );
-//   }
+  if (!patient) {
+    return (
+      <div className="appointment-container">
+        <h2 style={{ color: "red", textAlign: "center" }}>
+          ❗ Please login as Patient to book an appointment
+        </h2>
+      </div>
+    );
+  }
 
   const diseases = [
     "Cardiology",
@@ -39,7 +32,7 @@ const AppointmentBooking = () => {
     "General Physician",
   ];
 
-  // ✅ Fetch doctors based on disease
+  // ✅ Fetch doctors based on selected disease
   const fetchDoctors = async (disease) => {
     setLoading(true);
     setSelectedDoctor(null);
@@ -55,17 +48,17 @@ const AppointmentBooking = () => {
     setLoading(false);
   };
 
-  // ✅ Step 1: Book appointment (Pending) → Step 2: Process Payment → Confirm
+  // ✅ Book appointment and handle payment
   const handlePayAndBook = async () => {
     if (!selectedDoctor || !selectedSlot || !appointmentDate) {
       alert("Please select doctor, date and slot");
       return;
     }
 
-    setMessage(""); // Reset message
+    setMessage("");
 
     try {
-      // ✅ 1. Create appointment (Pending status)
+      // Create appointment
       const appointmentRes = await fetch(`${process.env.REACT_APP_API_URL}/api/appointments/book`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -79,8 +72,6 @@ const AppointmentBooking = () => {
       });
 
       const appointmentData = await appointmentRes.json();
-      console.log("📌 Appointment API:", appointmentData);
-
       if (!appointmentData.success) {
         setMessage("❌ Failed to create appointment");
         return;
@@ -88,7 +79,7 @@ const AppointmentBooking = () => {
 
       const appointmentId = appointmentData.appointmentId;
 
-      // ✅ 2. Call Payment API
+      // Process payment
       const paymentRes = await fetch(`${process.env.REACT_APP_API_URL}/api/payments/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -97,34 +88,29 @@ const AppointmentBooking = () => {
           doctorId: selectedDoctor._id,
           appointmentId,
           amount: selectedDoctor.fee || 500,
-          validityCount: 3,  // ✅ 3 valid visits per payment
+          validityCount: 3,
           paymentMethod: "UPI",
         }),
       });
 
-      // const paymentData = await paymentRes.json();
-      // ✅ Prevent HTML error crash
-    let paymentData;
-    try {
-      paymentData = await paymentRes.json();
-    } catch (err) {
-      console.error("❌ Payment API did not return JSON:", err);
-      setMessage("⚠ Payment server error. Check backend logs.");
-      return;
-    }
-      console.log("💰 Payment API:", paymentData);
+      let paymentData;
+      try {
+        paymentData = await paymentRes.json();
+      } catch {
+        setMessage("⚠ Payment server error. Check backend logs.");
+        return;
+      }
 
       if (paymentData.success) {
         setMessage("✅ Payment Successful! Appointment Confirmed 🎉");
-setTimeout(() => {
-  window.location.href = "/patient/appointments";
-}, 1500);
+        setTimeout(() => {
+          window.location.href = "/patient/appointments";
+        }, 1500);
       } else {
         setMessage("❌ Payment Failed");
       }
 
-    } catch (err) {
-      console.error(err);
+    } catch {
       setMessage("⚠ Something went wrong");
     }
   };
@@ -132,7 +118,6 @@ setTimeout(() => {
   return (
     <div className="appointment-container">
       <div className="appointment-wrapper">
-
         <h2 className="title">Book Appointment</h2>
         <p className="subtitle">Welcome, {patient.fullName}</p>
 
@@ -216,13 +201,13 @@ setTimeout(() => {
 
         {/* Message */}
         {message && <p className="summary-title" style={{ marginTop: "10px" }}>{message}</p>}
-      {message.includes("Successful") && (
-  <div className="popup-overlay">
-    <div className="popup-box">
-      ✅ Appointment Booked & Paid Successfully!
-    </div>
-  </div>
-)}
+        {message.includes("Successful") && (
+          <div className="popup-overlay">
+            <div className="popup-box">
+              ✅ Appointment Booked & Paid Successfully!
+            </div>
+          </div>
+        )}
 
       </div>
     </div>

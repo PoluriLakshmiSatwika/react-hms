@@ -43,46 +43,98 @@ const PatientLoginPage = () => {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
-
-  // ✅ Handle submit
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
+  e.preventDefault();
+  if (!validateForm()) return;
 
-    setIsLoading(true);
-    setErrors({}); // clear previous errors
+  setIsLoading(true);
+  setErrors({}); // clear previous errors
 
-    try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/patient/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password
-        }),
-      });
+  try {
+    const res = await fetch(`${process.env.REACT_APP_API_URL}/api/patient/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: formData.email,
+        password: formData.password
+      }),
+    });
 
-      const data = await res.json();
+    const data = await res.json();
 
-      if (res.ok) {
-        // ✅ Successful login
-        // Save patient ID and name in localStorage
-      
-        alert("✅ " + data.message);
-        navigate("/dashboard/appointment");
-        //navigate("/dashboard/patient");
-      } else {
-        // ❌ Invalid login
-        setErrors({ submit: data.message });
-      }
+    if (res.ok) {
+      // ✅ Successful login
+      // Save patient info in localStorage
+      localStorage.setItem(
+        "patient",
+        JSON.stringify({
+          id: data.patient._id,      // MongoDB patient ID
+          fullName: data.patient.fullName,
+          email: data.patient.email,
+          phone: data.patient.phone,
+          age: data.patient.age,
+          gender: data.patient.gender,
+        })
+      );
 
-    } catch (error) {
-      console.error("Login error:", error);
-      setErrors({ submit: "Server error. Try again later." });
-    } finally {
-      setIsLoading(false);
+      alert("✅ " + data.message);
+
+      // Navigate to AppointmentBooking page
+      navigate("/dashboard/appointment");
+
+    } else {
+      // ❌ Invalid login
+      setErrors({ submit: data.message });
     }
-  };
+
+  } catch (error) {
+    console.error("Login error:", error);
+    setErrors({ submit: "Server error. Try again later." });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+
+  // // ✅ Handle submit
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   if (!validateForm()) return;
+
+  //   setIsLoading(true);
+  //   setErrors({}); // clear previous errors
+
+  //   try {
+  //     const res = await fetch(`${process.env.REACT_APP_API_URL}/api/patient/login`, {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({
+  //         email: formData.email,
+  //         password: formData.password
+  //       }),
+  //     });
+
+  //     const data = await res.json();
+
+  //     if (res.ok) {
+  //       // ✅ Successful login
+  //       // Save patient ID and name in localStorage
+      
+  //       alert("✅ " + data.message);
+  //       navigate("/dashboard/appointment");
+  //       //navigate("/dashboard/patient");
+  //     } else {
+  //       // ❌ Invalid login
+  //       setErrors({ submit: data.message });
+  //     }
+
+  //   } catch (error) {
+  //     console.error("Login error:", error);
+  //     setErrors({ submit: "Server error. Try again later." });
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   return (
     <div className="patient-login-container">
