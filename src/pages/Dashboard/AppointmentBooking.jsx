@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./AppointmentBooking.css";
 
 const AppointmentBooking = () => {
@@ -38,7 +38,7 @@ const AppointmentBooking = () => {
     setSelectedDoctor(null);
     setSelectedSlot("");
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/appointments/doctors/${disease}`);
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/doctors/${disease}`);
       const data = await res.json();
       if (data.success) setDoctors(data.doctors);
       else setMessage("No doctors found");
@@ -48,8 +48,8 @@ const AppointmentBooking = () => {
     setLoading(false);
   };
 
-  // ✅ Book appointment and handle payment
-  const handlePayAndBook = async () => {
+  // ✅ Book appointment only (no payment)
+  const handleBookAppointment = async () => {
     if (!selectedDoctor || !selectedSlot || !appointmentDate) {
       alert("Please select doctor, date and slot");
       return;
@@ -58,8 +58,7 @@ const AppointmentBooking = () => {
     setMessage("");
 
     try {
-      // Create appointment
-      const appointmentRes = await fetch(`${process.env.REACT_APP_API_URL}/api/appointments/book`, {
+      const appointmentRes = await fetch(`${process.env.REACT_APP_API_URL}/api/appointment`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -72,44 +71,14 @@ const AppointmentBooking = () => {
       });
 
       const appointmentData = await appointmentRes.json();
-      if (!appointmentData.success) {
-        setMessage("❌ Failed to create appointment");
-        return;
-      }
-
-      const appointmentId = appointmentData.appointmentId;
-
-      // Process payment
-      const paymentRes = await fetch(`${process.env.REACT_APP_API_URL}/api/payments/create`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          patientId: patient.id,
-          doctorId: selectedDoctor._id,
-          appointmentId,
-          amount: selectedDoctor.fee || 500,
-          validityCount: 3,
-          paymentMethod: "UPI",
-        }),
-      });
-
-      let paymentData;
-      try {
-        paymentData = await paymentRes.json();
-      } catch {
-        setMessage("⚠ Payment server error. Check backend logs.");
-        return;
-      }
-
-      if (paymentData.success) {
-        setMessage("✅ Payment Successful! Appointment Confirmed 🎉");
+      if (appointmentData.success) {
+        setMessage("✅ Appointment booked successfully 🎉");
         setTimeout(() => {
           window.location.href = "/patient/appointments";
         }, 1500);
       } else {
-        setMessage("❌ Payment Failed");
+        setMessage("❌ Failed to book appointment");
       }
-
     } catch {
       setMessage("⚠ Something went wrong");
     }
@@ -132,7 +101,9 @@ const AppointmentBooking = () => {
         >
           <option value="">Select Disease / Specialty</option>
           {diseases.map((d, i) => (
-            <option key={i} value={d}>{d}</option>
+            <option key={i} value={d}>
+              {d}
+            </option>
           ))}
         </select>
 
@@ -190,25 +161,26 @@ const AppointmentBooking = () => {
           </>
         )}
 
-        {/* Pay & Confirm Button */}
+        {/* Confirm Appointment Button */}
         {selectedDoctor && selectedSlot && appointmentDate && (
           <div className="button-container">
-            <button className="btn btn-success" onClick={handlePayAndBook}>
-              Pay & Confirm Appointment
+            <button className="btn btn-success" onClick={handleBookAppointment}>
+              Confirm Appointment
             </button>
           </div>
         )}
 
         {/* Message */}
-        {message && <p className="summary-title" style={{ marginTop: "10px" }}>{message}</p>}
-        {message.includes("Successful") && (
+        {message && (
+          <p className="summary-title" style={{ marginTop: "10px" }}>
+            {message}
+          </p>
+        )}
+        {message.includes("successfully") && (
           <div className="popup-overlay">
-            <div className="popup-box">
-              ✅ Appointment Booked & Paid Successfully!
-            </div>
+            <div className="popup-box">✅ Appointment Booked Successfully!</div>
           </div>
         )}
-
       </div>
     </div>
   );
