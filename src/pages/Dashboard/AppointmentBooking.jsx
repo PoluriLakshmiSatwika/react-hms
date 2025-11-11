@@ -32,21 +32,29 @@ const AppointmentBooking = () => {
     "General Physician",
   ];
 
-  // ✅ Fetch doctors based on selected disease
-  const fetchDoctors = async (disease) => {
-    setLoading(true);
-    setSelectedDoctor(null);
-    setSelectedSlot("");
-    try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/doctors/${disease}`);
-      const data = await res.json();
-      if (data.success) setDoctors(data.doctors);
-      else setMessage("No doctors found");
-    } catch {
-      setMessage("Error loading doctors");
+  // ✅ Fetch doctors based on selected speciality
+ const fetchDoctors = async (specialty) => {
+  setLoading(true);
+  setSelectedDoctor(null);
+  setSelectedSlot("");
+  try {
+    const res = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/doctors/by-specialty/${specialty}`);
+    const data = await res.json();
+    if (res.ok && data.success && data.doctors?.length) {
+      setDoctors(data.doctors);
+      setMessage("");
+    } else {
+      setDoctors([]);
+      setMessage(data.message || "No doctors found");
     }
+  } catch (err) {
+    console.error("❌ Fetch doctors error:", err);
+    setMessage("Error loading doctors");
+  } finally {
     setLoading(false);
-  };
+  }
+};
+
 
   // ✅ Book appointment only (no payment)
   const handleBookAppointment = async () => {
