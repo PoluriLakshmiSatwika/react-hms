@@ -76,17 +76,19 @@ const fetchDoctors = async (specialty) => {
     setMessage("");
 
     try {
-      const appointmentRes = await fetch(`${process.env.REACT_APP_API_URL}/api/appointment`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          patientId: patient.id,
-          doctorId: selectedDoctor._id,
-          disease,
-          appointmentDate,
-          slotTime: selectedSlot,
-        }),
-      });
+        const appointmentRes = await fetch(`${process.env.REACT_APP_API_URL}/api/appointments/book`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    patientId: patient.id,
+    doctorId: selectedDoctor._id,
+    disease,
+    appointmentDate,
+    slotTime: selectedSlot,
+  }),
+});
+
+      
 
       const appointmentData = await appointmentRes.json();
       if (appointmentData.success) {
