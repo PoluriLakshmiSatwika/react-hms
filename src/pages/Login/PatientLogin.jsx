@@ -69,7 +69,8 @@ const PatientLoginPage = () => {
         // Save patient ID and name in localStorage
       
         alert("✅ " + data.message);
-        navigate("/dashboard/patient");
+        navigate("/dashboard/appointment");
+        //navigate("/dashboard/patient");
       } else {
         // ❌ Invalid login
         setErrors({ submit: data.message });
