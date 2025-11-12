@@ -1,5 +1,6 @@
 
 import React, { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import API_BASE_URL from "../../api/apiConfig";
 import "./AppointmentBooking.css";
 
@@ -11,15 +12,17 @@ const AppointmentBooking = () => {
   const [appointmentDate, setAppointmentDate] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [bookedSlotsMap, setBookedSlotsMap] = useState({});
+  const navigate = useNavigate();
 
   const patient = window.currentPatient;
-    window.currentPatient = {
-  id: "690b3860e29dd0f7e76d6e1d",  // ✅ your patient ID from MongoDB
-  fullName: "Test Patient",
-  phone: "9999999999",
-  age: 22,
-  gender: "Male"
-};
+  window.currentPatient = {
+    id: "6914010e12c5cc1ee2b4d45c",  // ✅ your patient ID from MongoDB
+    fullName: "Test Patient",
+    phone: "9999999999",
+    age: 22,
+    gender: "Male"
+  };
 
   if (!patient) {
     return (
@@ -48,8 +51,12 @@ const AppointmentBooking = () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/appointments/doctors/${disease}`);
       const data = await res.json();
-      if (data.success) setDoctors(data.doctors);
-      else setMessage("No doctors found");
+      if (data.success) {
+        setDoctors(data.doctors);
+        setBookedSlotsMap(data.bookedSlotsMap || {}); // ✅ Store booked slots map
+      } else {
+        setMessage("No doctors found");
+      }
     } catch {
       setMessage("Error loading doctors");
     }
@@ -83,11 +90,18 @@ const AppointmentBooking = () => {
       console.log("📌 Appointment API:", appointmentData);
 
       if (!appointmentData.success) {
-        setMessage("❌ Failed to create appointment");
+        // Show specific error message if slot is already booked
+        if (appointmentRes.status === 409) {
+          setMessage("❌ This slot is already booked by another patient. Please choose another slot or date.");
+        } else {
+          setMessage(`❌ Failed to create appointment: ${appointmentData.message || 'Unknown error'}`);
+        }
         return;
       }
 
-      const appointmentId = appointmentData.appointmentId;
+      // const appointmentId = appointmentData.appointmentId;
+      const appointmentId = appointmentData.appointmentId || appointmentData.data._id;
+
 
       // ✅ 2. Call Payment API
       const paymentRes = await fetch(`${API_BASE_URL}/api/payments/create`, {
@@ -105,21 +119,31 @@ const AppointmentBooking = () => {
 
       // const paymentData = await paymentRes.json();
       // ✅ Prevent HTML error crash
-    let paymentData;
-    try {
-      paymentData = await paymentRes.json();
-    } catch (err) {
-      console.error("❌ Payment API did not return JSON:", err);
-      setMessage("⚠ Payment server error. Check backend logs.");
-      return;
-    }
+      let paymentData;
+      try {
+        paymentData = await paymentRes.json();
+      } catch (err) {
+        console.error("❌ Payment API did not return JSON:", err);
+        setMessage("⚠ Payment server error. Check backend logs.");
+        return;
+      }
       console.log("💰 Payment API:", paymentData);
 
       if (paymentData.success) {
         setMessage("✅ Payment Successful! Appointment Confirmed 🎉");
-setTimeout(() => {
-  window.location.href = "/patient/appointments";
-}, 1500);
+
+        // 🔄 Refresh doctors list to show updated slot availability
+        setTimeout(() => {
+          if (disease) {
+            fetchDoctors(disease);
+          }
+        }, 1000);
+
+        // Redirect to patient appointments after 2 seconds using router navigation
+        setTimeout(() => {
+          // Use react-router navigation to avoid full page reload
+          navigate('/patientAppointment');
+        }, 2000);
       } else {
         setMessage("❌ Payment Failed");
       }
@@ -185,26 +209,40 @@ setTimeout(() => {
         </div>
 
         {/* Slot Selection */}
-        {selectedDoctor && (
-          <>
-            <h3 className="step-title">Available Slots</h3>
-            <div className="time-grid">
-              {selectedDoctor.slots?.length > 0 ? (
-                selectedDoctor.slots.map((slot, idx) => (
-                  <button
-                    key={idx}
-                    className={`time-slot ${selectedSlot === slot ? "selected" : ""}`}
-                    onClick={() => setSelectedSlot(slot)}
-                  >
-                    {slot}
-                  </button>
-                ))
-              ) : (
-                <p>No Slots Available</p>
-              )}
-            </div>
-          </>
-        )}
+{selectedDoctor && (
+  <>
+    <h3 className="step-title">Available Slots</h3>
+
+    <div className="time-grid">
+      {selectedDoctor.slots?.length > 0 ? (
+        selectedDoctor.slots.map((slot, idx) => {
+          // slot can be string ("10:00 AM") or object { time: "", isBooked: true }
+          const slotTime = slot.time || slot;
+          
+          // ✅ Check if slot is booked using the booked slots map and selected date
+          const slotKey = `${selectedDoctor._id}_${appointmentDate}_${slotTime}`;
+          const isBooked = bookedSlotsMap[slotKey] || false;
+
+          return (
+            <button
+              key={idx}
+              disabled={isBooked}
+              className={`time-slot ${
+                selectedSlot === slotTime ? "selected" : ""
+              } ${isBooked ? "booked" : ""}`}
+              onClick={() => !isBooked && setSelectedSlot(slotTime)}
+            >
+              {isBooked ? `${slotTime} ❌` : slotTime}
+            </button>
+          );
+        })
+      ) : (
+        <p>No Slots Available</p>
+      )}
+    </div>
+  </>
+)}
+
 
         {/* Pay & Confirm Button */}
         {selectedDoctor && selectedSlot && appointmentDate && (
@@ -217,13 +255,13 @@ setTimeout(() => {
 
         {/* Message */}
         {message && <p className="summary-title" style={{ marginTop: "10px" }}>{message}</p>}
-      {message.includes("Successful") && (
-  <div className="popup-overlay">
-    <div className="popup-box">
-      ✅ Appointment Booked & Paid Successfully!
-    </div>
-  </div>
-)}
+        {message.includes("Successful") && (
+          <div className="popup-overlay">
+            <div className="popup-box">
+              ✅ Appointment Booked & Paid Successfully!
+            </div>
+          </div>
+        )}
 
       </div>
     </div>

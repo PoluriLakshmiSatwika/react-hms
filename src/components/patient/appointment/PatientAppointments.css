@@ -1,0 +1,73 @@
+.patient-appointments {
+  width: 90%;
+  max-width: 900px;
+  margin: 30px auto;
+  font-family: "Poppins", sans-serif;
+}
+
+.patient-appointments h2 {
+  text-align: center;
+  font-size: 26px;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+.appointment-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+  margin-top: 10px;
+}
+
+.appointment-card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 15px 18px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.08);
+  border-left: 5px solid #2a9d8f;
+  transition: 0.3s ease-in-out;
+}
+
+.appointment-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0px 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+.appointment-card p {
+  margin: 6px 0;
+  font-size: 15px;
+  color: #444;
+}
+
+.appointment-card strong {
+  color: #2a9d8f;
+}
+
+/* Status colors */
+.appointment-card p:last-child {
+  font-weight: 600;
+}
+
+.status-confirmed {
+  color: #27ae60;
+}
+
+.status-pending {
+  color: #e67e22;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .appointment-card {
+    padding: 12px;
+  }
+}
+
+.booked-slot {
+  background: #ff4d4f;
+  color: white;
+  cursor: not-allowed;
+  opacity: 0.6;
+  border: 1px solid #ff1a1a;
+}
+

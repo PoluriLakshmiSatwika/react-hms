@@ -9,7 +9,9 @@ import ResetPasswordPage from './components/login/ResetPasswordPage';
 import NurseLoginPage from './components/login/NurseLoginPage';
 import PatientLoginPage from './components/login/PatientLoginPage';
 import AppointmentBooking from "./components/appointments/AppointmentBooking";
-
+import PatientAppointments from './components/patient/appointment/PatientAppointments';
+import Footer from './components/footer/Footer';
+import NurseDashboard from './components/dashboards/NurseDashboard';
 
 function App() {
   return (
@@ -33,8 +35,15 @@ function App() {
         <Route path="/appointment" element={<AppointmentBooking />} />
 
         <Route path="/test-book" element={<AppointmentBooking />} />
-        <Route path="/" element={<Navigate to="/test-book" replace />} />
+  {/* <Route path="/patient/appointments" element={<PatientAppointments />} /> */}
+  <Route path="/patientAppointment" element={<PatientAppointments />} />
 
+        <Route path="/" element={<Navigate to="/test-book" replace />} />
+          <Route path="/dashboard/nurse" element={<NurseDashboard />} />
+          
+
+        {/* Footer Route */}
+        <Route path="*" element={<Footer />} />
       </Routes>
     </BrowserRouter>
   );

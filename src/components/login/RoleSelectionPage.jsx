@@ -1,6 +1,6 @@
 // RoleSelectionPage.jsx
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import './RoleSelectionPage.css';
 
 const RoleSelectionPage = () => {
@@ -83,10 +83,10 @@ const RoleSelectionPage = () => {
 
         <div className="footer-links">
           <p>
-            Don't have an account? <a href="/register">Register here</a>
+            Don't have an account? <Link to="/register">Register here</Link>
           </p>
           <p>
-            <a href="/">← Back to Home</a>
+            <Link to="/">← Back to Home</Link>
           </p>
         </div>
       </div>

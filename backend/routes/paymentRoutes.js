@@ -109,7 +109,7 @@ const router = express.Router();
 /* ✅ CREATE PAYMENT (One payment → 3 appointments) */
 router.post("/create", async (req, res) => {
   try {
-    const { patientId, doctorId, amount, paymentMethod } = req.body;
+    const { patientId, doctorId, amount, paymentMethod, appointmentId } = req.body;
 
     // Validate required fields
     if (!patientId || !doctorId || !amount) {
@@ -123,7 +123,7 @@ router.post("/create", async (req, res) => {
       remainingSlots: { $gt: 0 }
     });
 
-    if (existingPayment) {
+    if (existingPayment && !appointmentId) {
       return res.status(200).json({
         success: true,
         message: "Existing valid payment found",
@@ -147,6 +147,22 @@ router.post("/create", async (req, res) => {
     });
 
     await payment.save();
+
+    // ✅ If appointmentId provided, link payment to appointment and mark as paid & confirmed
+    if (appointmentId) {
+      try {
+        const Appointment = (await import("../models/Appointment.js")).default;
+        const appointment = await Appointment.findById(appointmentId);
+        if (appointment) {
+          appointment.feePaid = true;
+          appointment.paymentId = payment._id;
+          appointment.status = "Confirmed";
+          await appointment.save();
+        }
+      } catch (linkErr) {
+        console.error("❌ Could not link payment to appointment:", linkErr);
+      }
+    }
 
     res.status(201).json({
       success: true,
