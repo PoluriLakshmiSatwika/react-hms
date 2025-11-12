@@ -7,7 +7,8 @@ import { AuthProvider } from "./context/AuthContext";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <HashRouter basename="/react-hms">
+  <HashRouter>
+  {/*<HashRouter basename="/react-hms"> */}
     <AuthProvider>
       <App />
     </AuthProvider>
