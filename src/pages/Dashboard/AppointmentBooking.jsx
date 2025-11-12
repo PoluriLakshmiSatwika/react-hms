@@ -66,43 +66,45 @@ const fetchDoctors = async (specialty) => {
 
 
 
-  // ✅ Book appointment only (no payment)
-  const handleBookAppointment = async () => {
-    if (!selectedDoctor || !selectedSlot || !appointmentDate) {
-      alert("Please select doctor, date and slot");
-      return;
-    }
+const handleBookAppointment = async () => {
+  if (!selectedDoctor || !selectedSlot || !appointmentDate) {
+    alert("Please select doctor, date, and slot");
+    return;
+  }
 
-    setMessage("");
+  setMessage("");
 
-    try {
-        const appointmentRes = await fetch(`${process.env.REACT_APP_API_URL}/api/appointments/book`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    patientId: patient.id,
-    doctorId: selectedDoctor._id,
-    disease,
-    appointmentDate,
-    slotTime: selectedSlot,
-  }),
-});
-
-      
-
-      const appointmentData = await appointmentRes.json();
-      if (appointmentData.success) {
-        setMessage("✅ Appointment booked successfully 🎉");
-        setTimeout(() => {
-          window.location.href = "/patient/appointments";
-        }, 1500);
-      } else {
-        setMessage("❌ Failed to book appointment");
+  try {
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/appointments/book`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          patientId: patient.id,
+          doctorId: selectedDoctor._id,
+          disease,
+          appointmentDate,
+          slotTime: selectedSlot,
+        }),
       }
-    } catch {
-      setMessage("⚠ Something went wrong");
+    );
+
+    const data = await response.json();
+
+    if (data.success) {
+      setMessage("✅ Appointment booked successfully 🎉");
+      setTimeout(() => {
+        window.location.href = "/patient/appointments";
+      }, 1500);
+    } else {
+      setMessage(`❌ ${data.message || "Failed to book appointment"}`);
     }
-  };
+  } catch (err) {
+    console.error("⚠ Appointment booking error:", err);
+    setMessage("⚠ Something went wrong. Please try again.");
+  }
+};
 
   return (
     <div className="appointment-container">
