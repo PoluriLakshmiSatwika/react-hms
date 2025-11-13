@@ -46,6 +46,7 @@ const DoctorLogin = () => {
     }
   };
     // ✅ Handle submit
+ // ✅ Handle submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -62,14 +63,18 @@ const DoctorLogin = () => {
           password: formData.password
         }),
       });
+
       const data = await res.json();
-      if (res.ok) {
-        // ✅ Successful login
+
+      if (res.ok && data.success) {
+        // ✅ Store doctor ID and token if available
+        localStorage.setItem("doctorId", data.doctor._id);
+        if (data.token) localStorage.setItem("token", data.token);
+
         alert("✅ " + data.message);
         navigate("/dashboard/doctor");
       } else {
-        // ❌ Invalid login
-        setErrors({ submit: data.message });
+        setErrors({ submit: data.message || "Login failed" });
       }
 
     } catch (error) {

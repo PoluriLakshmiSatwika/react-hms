@@ -43,6 +43,8 @@ const PatientLoginPage = () => {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
+
+  
 const handleSubmit = async (e) => {
   e.preventDefault();
   if (!validateForm()) return;
