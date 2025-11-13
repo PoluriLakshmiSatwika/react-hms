@@ -1,14 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import "./DoctorDashboard.css";
-import jwt_decode from "jwt-decode";
 
-const token = localStorage.getItem("token");
-let doctorId = null;
 
-if (token) {
-  const decoded = jwt_decode(token);
-  doctorId = decoded.doctorId; // make sure your token has doctorId
-}
+
 
 // 🔹 Nurse Assignment Component
 const NurseAssignment = ({ appointment, nurses, onAssign }) => {
