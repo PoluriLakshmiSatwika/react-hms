@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import "./DoctorDashboard.css";
 
 
-
+const doctorId = localStorage.getItem("doctorId"); // ✅ add this
 
 // 🔹 Nurse Assignment Component
 const NurseAssignment = ({ appointment, nurses, onAssign }) => {

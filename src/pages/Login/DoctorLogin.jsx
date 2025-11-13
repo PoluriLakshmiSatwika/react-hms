@@ -34,51 +34,49 @@ const DoctorLogin = () => {
 
 
   // ✅ Handle form change
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!validateForm()) return;
 
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+  setIsLoading(true);
+  setErrors({});
+
+  try {
+    const res = await fetch(`${process.env.REACT_APP_API_URL}/api/doctor/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: formData.email, password: formData.password }),
+    });
+
+    const data = await res.json();
+    console.log("Login response:", data);
+
+    if (data.success) {
+      localStorage.setItem("token", data.token);
+      localStorage.setItem(
+        "doctor",
+        JSON.stringify({
+          id: data.doctor._id,
+          fullName: data.doctor.fullName,
+          email: data.doctor.email,
+          phone: data.doctor.phone,
+          specialty: data.doctor.specialty,
+          department: data.doctor.department,
+        })
+      );
+      alert("✅ " + data.message);
+      navigate("/dashboard/doctor");
+    } else {
+      setErrors({ submit: data.message || "Invalid credentials" });
     }
-  };
-    // ✅ Handle submit
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
 
-    setIsLoading(true);
-    setErrors({}); // clear previous errors
-
-    try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/doctor/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password
-        }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        // ✅ Successful login
-        alert("✅ " + data.message);
-        navigate("/dashboard/doctor");
-      } else {
-        // ❌ Invalid login
-        setErrors({ submit: data.message });
-      }
-
-    } catch (error) {
-      console.error("Login error:", error);
-      setErrors({ submit: "Server error. Try again later." });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  } catch (err) {
+    console.error("Login error:", err);
+    setErrors({ submit: "Server error. Try again later." });
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="doctor-login-container">
