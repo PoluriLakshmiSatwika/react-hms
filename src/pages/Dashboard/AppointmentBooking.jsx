@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import "./AppointmentBooking.css";
+import { useNavigate } from "react-router-dom"; 
 
 const AppointmentBooking = () => {
+  const navigate = useNavigate();
   const [disease, setDisease] = useState("");
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
@@ -10,6 +12,7 @@ const AppointmentBooking = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [bookedSlotsMap, setBookedSlotsMap] = useState({}); // ✅ added
+  
 
   // ✅ Get logged-in patient from localStorage
   const patient = JSON.parse(localStorage.getItem("patient"));
