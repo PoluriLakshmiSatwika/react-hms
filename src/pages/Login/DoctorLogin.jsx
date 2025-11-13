@@ -12,49 +12,64 @@ const DoctorLogin = () => {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
+
+  // ✅ Form validation
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.email) newErrors.email = 'Doctor email is required';
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
+    if (!formData.email) {
+      newErrors.email = 'Doctor email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Email is invalid';
+    }
 
-    if (!formData.password) newErrors.password = 'Password is required';
-    else if (formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters';
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+
+  // ✅ Handle form change
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
-    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
-  };
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
 
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+    // ✅ Handle submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
     setIsLoading(true);
-    setErrors({});
+    setErrors({}); // clear previous errors
 
     try {
       const res = await fetch(`${process.env.REACT_APP_API_URL}/api/doctor/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: formData.email, password: formData.password }),
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        }),
       });
       const data = await res.json();
-
-      if (res.ok && data.success) {
-        // ✅ Store doctor ID and optionally token
-        const doctorId = data.data?._id || data.doctorId; // adjust based on backend response
-        if (doctorId) localStorage.setItem("doctorId", doctorId);
-        if (data.token) localStorage.setItem("token", data.token); // if backend sends JWT
-
-        // ✅ Navigate to dashboard
+      if (res.ok) {
+        // ✅ Successful login
+        alert("✅ " + data.message);
         navigate("/dashboard/doctor");
       } else {
-        setErrors({ submit: data.message || "Invalid login" });
+        // ❌ Invalid login
+        setErrors({ submit: data.message });
       }
 
     } catch (error) {
@@ -88,7 +103,9 @@ const DoctorLogin = () => {
               className={errors.email ? "error" : ""}
               placeholder="Enter doctor email"
             />
-            {errors.email && <span className="error-message">{errors.email}</span>}
+            {errors.email && (
+              <span className="error-message">{errors.email}</span>
+            )}
           </div>
 
           <div className="form-group">
@@ -102,36 +119,57 @@ const DoctorLogin = () => {
               className={errors.password ? "error" : ""}
               placeholder="Enter your password"
             />
-            {errors.password && <span className="error-message">{errors.password}</span>}
+            {errors.password && (
+              <span className="error-message">{errors.password}</span>
+            )}
           </div>
 
-          <div className="form-options">
-            <label className="checkbox-label">
-              <input
-                type="checkbox"
-                name="rememberMe"
-                checked={formData.rememberMe}
-                onChange={handleChange}
-              />
-              <span className="checkmark"></span>
-              Remember me
-            </label>
-            <Link to="/forgot-password" className="forgot-password">Forgot Password?</Link>
-          </div>
-
-          {errors.submit && <div className="submit-error">{errors.submit}</div>}
-
-          <button type="submit" className="login-button admin-button" disabled={isLoading}>
-            {isLoading ? <>Signing In...</> : 'Sign In'}
-          </button>
-        </form>
-
-        <div className="login-footer">
-          <p><Link to="/">← Back to Home</Link></p>
-        </div>
-      </div>
-    </div>
-  );
-};
+          {/* Remember me / forgot */}
+                    <div className="form-options">
+                      <label className="checkbox-label">
+                        <input
+                          type="checkbox"
+                          name="rememberMe"
+                          checked={formData.rememberMe}
+                          onChange={handleChange}
+                        />
+                        <span className="checkmark"></span>
+                        Remember me
+                      </label>
+                      <Link to="/forgot-password" className="forgot-password">
+                        Forgot Password?
+                      </Link>
+                    </div>
+          
+                    {/* Submit error */}
+                    {errors.submit && (
+                      <div className="submit-error">{errors.submit}</div>
+                    )}
+          
+                    {/* Submit button */}
+                    <button 
+                      type="submit" 
+                      className="login-button admin-button"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <>
+                          <div className="spinner"></div>
+                          Signing In...
+                        </>
+                      ) : (
+                        'Admin Sign In'
+                      )}
+                    </button>
+                  </form>
+          
+                  <div className="login-footer">
+                    <p><Link to="/">← Back to Home</Link></p>
+                  </div>
+                </div>
+              </div>
+            );
+          };
+          
 
 export default DoctorLogin;
