@@ -20,6 +20,7 @@ import PatientLogin from "./pages/Login/PatientLogin";
 import RoleLoginSelection from "./pages/Login/RoleLoginSelection";
 import AdminLogin from './pages/Login/AdminLogin';
 import AppointmentBooking from './pages/Dashboard/AppointmentBooking';
+import PatientAppointments from './pages/Dashboard/PatientAppointments';
 
 
 function App() {
@@ -51,6 +52,8 @@ function App() {
         <Route path="/dashboard/nurse" element={<NurseDashboard />} />
         <Route path="/dashboard/patient" element={<PatientDashboard />} />
         <Route path="/dashboard/appointment" element={<AppointmentBooking />} />
+        <Route path="/patientAppointment" element={<PatientAppointments />} />
+
 
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />

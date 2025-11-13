@@ -9,6 +9,7 @@ const AppointmentBooking = () => {
   const [appointmentDate, setAppointmentDate] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [bookedSlotsMap, setBookedSlotsMap] = useState({}); // ✅ added
 
   // ✅ Get logged-in patient from localStorage
   const patient = JSON.parse(localStorage.getItem("patient"));
@@ -32,79 +33,72 @@ const AppointmentBooking = () => {
     "General Physician",
   ];
 
-  // ✅ Fetch doctors based on selected speciality
-const fetchDoctors = async (specialty) => {
-  setLoading(true);
-  setSelectedDoctor(null);
-  setSelectedSlot("");
-  try {
-    const res = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/doctors`);
-    const data = await res.json();
+  // ✅ Fetch doctors based on selected specialty
+  const fetchDoctors = async (specialty) => {
+    setLoading(true);
+    setSelectedDoctor(null);
+    setSelectedSlot("");
 
-    if (res.ok && Array.isArray(data) && data.length > 0) {
-      const filtered = data.filter(
-        (doc) => doc.specialty?.toLowerCase() === specialty.toLowerCase()
-      );
-      if (filtered.length) {
-        setDoctors(filtered);
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/appointments/doctors/${specialty}`);
+      const data = await res.json();
+
+      if (data.success && Array.isArray(data.doctors)) {
+        setDoctors(data.doctors);
+        setBookedSlotsMap(data.bookedSlotsMap || {}); // ✅ store booked slots info
         setMessage("");
       } else {
         setDoctors([]);
         setMessage("No doctors found for this specialty");
       }
-    } else {
-      setMessage("No doctors available");
+    } catch (err) {
+      console.error("❌ Fetch doctors error:", err);
+      setMessage("Error loading doctors");
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error("❌ Fetch doctors error:", err);
-    setMessage("Error loading doctors");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
+  // ✅ Book appointment
+  const handleBookAppointment = async () => {
+    if (!selectedDoctor || !selectedSlot || !appointmentDate) {
+      alert("Please select doctor, date, and slot");
+      return;
+    }
 
+    setMessage("");
 
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/appointments/book`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            patientId: patient.id,
+            doctorId: selectedDoctor._id,
+            disease,
+            appointmentDate,
+            slotTime: selectedSlot,
+          }),
+        }
+      );
 
-const handleBookAppointment = async () => {
-  if (!selectedDoctor || !selectedSlot || !appointmentDate) {
-    alert("Please select doctor, date, and slot");
-    return;
-  }
+      const data = await response.json();
 
-  setMessage("");
-
-  try {
-    const response = await fetch(
-      `${process.env.REACT_APP_API_URL}/api/appointments/book`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          patientId: patient.id,
-          doctorId: selectedDoctor._id,
-          disease,
-          appointmentDate,
-          slotTime: selectedSlot,
-        }),
+      if (data.success) {
+        setMessage("✅ Appointment booked successfully 🎉");
+        setTimeout(() => {
+          window.location.href = "/patient/appointment";
+        }, 1500);
+      } else {
+        setMessage(`❌ ${data.message || "Failed to book appointment"}`);
       }
-    );
-
-    const data = await response.json();
-
-    if (data.success) {
-      setMessage("✅ Appointment booked successfully 🎉");
-      setTimeout(() => {
-        window.location.href = "/patient/appointments";
-      }, 1500);
-    } else {
-      setMessage(`❌ ${data.message || "Failed to book appointment"}`);
+    } catch (err) {
+      console.error("⚠ Appointment booking error:", err);
+      setMessage("⚠ Something went wrong. Please try again.");
     }
-  } catch (err) {
-    console.error("⚠ Appointment booking error:", err);
-    setMessage("⚠ Something went wrong. Please try again.");
-  }
-};
+  };
 
   return (
     <div className="appointment-container">
@@ -146,7 +140,9 @@ const handleBookAppointment = async () => {
           {doctors.map((doc) => (
             <div
               key={doc._id}
-              className={`doctor-card ${selectedDoctor?._id === doc._id ? "selected" : ""}`}
+              className={`doctor-card ${
+                selectedDoctor?._id === doc._id ? "selected" : ""
+              }`}
               onClick={() => setSelectedDoctor(doc)}
             >
               <div className="doctor-info">
@@ -161,21 +157,33 @@ const handleBookAppointment = async () => {
           ))}
         </div>
 
-        {/* Slot Selection */}
+        {/* ✅ Slot Selection with Booked Slot Logic */}
         {selectedDoctor && (
           <>
             <h3 className="step-title">Available Slots</h3>
+
             <div className="time-grid">
               {selectedDoctor.slots?.length > 0 ? (
-                selectedDoctor.slots.map((slot, idx) => (
-                  <button
-                    key={idx}
-                    className={`time-slot ${selectedSlot === slot ? "selected" : ""}`}
-                    onClick={() => setSelectedSlot(slot)}
-                  >
-                    {slot}
-                  </button>
-                ))
+                selectedDoctor.slots.map((slot, idx) => {
+                  const slotTime = slot.time || slot;
+                  const slotKey = `${selectedDoctor._id}_${new Date(
+                    appointmentDate
+                  ).toISOString().split("T")[0]}_${slotTime}`;
+                  const isBooked = bookedSlotsMap[slotKey] || false;
+
+                  return (
+                    <button
+                      key={idx}
+                      disabled={isBooked}
+                      className={`time-slot ${
+                        selectedSlot === slotTime ? "selected" : ""
+                      } ${isBooked ? "booked" : ""}`}
+                      onClick={() => !isBooked && setSelectedSlot(slotTime)}
+                    >
+                      {isBooked ? `${slotTime} ❌` : slotTime}
+                    </button>
+                  );
+                })
               ) : (
                 <p>No Slots Available</p>
               )}
