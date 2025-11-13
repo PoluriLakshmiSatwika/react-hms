@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/react-hms/static/css/main.0d269341.css",
-    "main.js": "/react-hms/static/js/main.4b00581c.js",
+    "main.js": "/react-hms/static/js/main.ca4386d0.js",
     "static/media/hospital-bg.jpeg": "/react-hms/static/media/hospital-bg.a9fc08c385b7e824f079.jpeg",
     "index.html": "/react-hms/index.html",
     "main.0d269341.css.map": "/react-hms/static/css/main.0d269341.css.map",
-    "main.4b00581c.js.map": "/react-hms/static/js/main.4b00581c.js.map"
+    "main.ca4386d0.js.map": "/react-hms/static/js/main.ca4386d0.js.map"
   },
   "entrypoints": [
     "static/css/main.0d269341.css",
-    "static/js/main.4b00581c.js"
+    "static/js/main.ca4386d0.js"
   ]
 }
