@@ -43,32 +43,29 @@ const PatientLoginPage = () => {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
   e.preventDefault();
   if (!validateForm()) return;
 
   setIsLoading(true);
-  setErrors({}); // clear previous errors
+  setErrors({});
 
   try {
     const res = await fetch(`${process.env.REACT_APP_API_URL}/api/patient/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: formData.email,
-        password: formData.password
-      }),
+      body: JSON.stringify({ email: formData.email, password: formData.password }),
     });
 
     const data = await res.json();
+    console.log("Login response:", data);
 
-    if (res.ok) {
-      // ✅ Successful login
-      // Save patient info in localStorage
+    if (data.success) {
+      localStorage.setItem("token", data.token);
       localStorage.setItem(
         "patient",
         JSON.stringify({
-          id: data.patient._id,      // MongoDB patient ID
+          id: data.patient._id,
           fullName: data.patient.fullName,
           email: data.patient.email,
           phone: data.patient.phone,
@@ -76,19 +73,14 @@ const PatientLoginPage = () => {
           gender: data.patient.gender,
         })
       );
-
       alert("✅ " + data.message);
-
-      // Navigate to AppointmentBooking page
       navigate("/dashboard/appointment");
-
     } else {
-      // ❌ Invalid login
-      setErrors({ submit: data.message });
+      setErrors({ submit: data.message || "Invalid credentials" });
     }
 
-  } catch (error) {
-    console.error("Login error:", error);
+  } catch (err) {
+    console.error("Login error:", err);
     setErrors({ submit: "Server error. Try again later." });
   } finally {
     setIsLoading(false);
