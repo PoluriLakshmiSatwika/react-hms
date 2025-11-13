@@ -89,7 +89,7 @@ const AppointmentBooking = () => {
       if (data.success) {
         setMessage("✅ Appointment booked successfully 🎉");
         setTimeout(() => {
-          window.location.href = "/patient/appointment";
+          navigate('/patient/appointment');
         }, 1500);
       } else {
         setMessage(`❌ ${data.message || "Failed to book appointment"}`);
