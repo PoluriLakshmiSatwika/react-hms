@@ -39,7 +39,7 @@ function App() {
   <Route path="/patientAppointment" element={<PatientAppointments />} />
 
         <Route path="/" element={<Navigate to="/test-book" replace />} />
-          <Route path="/dashboard/nurse" element={<NurseDashboard />} />
+          <Route path="/nurse/dashboard" element={<NurseDashboard />} />
           
 
         {/* Footer Route */}

@@ -147,14 +147,15 @@ router.post("/book", async (req, res) => {
 /* ✅ DOCTOR ASSIGNS MULTIPLE NURSES */
 router.put("/assign-nurses", async (req, res) => {
   try {
-    const { appointmentId, nurseIds } = req.body;
+    const { appointmentId, nurseId} = req.body;
+  
 
     const appointment = await Appointment.findById(appointmentId);
     if (!appointment) return res.status(404).json({ success: false, message: "Appointment not found" });
 
-    appointment.assignedNurses = nurseIds; // ✅ multiple nurses
-    appointment.status = "Confirmed";
-
+    appointment.assignedNurse = nurseId; // ✅ multiple nurses
+    // appointment.status = "Confirmed";
+  appointment.status = "Pending";
     await appointment.save();
 
     res.json({
