@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import "./DoctorDashboard.css";
-
+import { useNavigate } from "react-router-dom";
 const DoctorDashboard = () => {
+  const navigate = useNavigate(); // add this
   const [doctor, setDoctor] = useState(null);
   const [appointments, setAppointments] = useState([]);
   const [nurses, setNurses] = useState([]);
