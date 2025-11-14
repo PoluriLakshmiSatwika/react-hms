@@ -15,7 +15,7 @@ import PatientRegister from "./pages/Register/PatientRegister";
 import ForgotPasswordPage from "./pages/Login/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/Login/ResetPasswordPage";
 import DoctorLogin from "./pages/Login/DoctorLogin";
-import NurseLogin from "./pages/Login/NurseLogin";
+import NurseLogin from "./pages/Login/NurseLogin"; // ✅ correct
 import PatientLogin from "./pages/Login/PatientLogin";
 import RoleLoginSelection from "./pages/Login/RoleLoginSelection";
 import AdminLogin from './pages/Login/AdminLogin';
@@ -37,6 +37,7 @@ function App() {
         <Route path="/login/admin" element={<AdminLogin />} />
         <Route path="/login/doctor" element={<DoctorLogin />} />
         <Route path="/login/nurse" element={<NurseLogin />} />
+
         <Route path="/login/patient" element={<PatientLogin />} />
 
         {/* Registration Pages */}
