@@ -85,7 +85,8 @@ const DoctorDashboard = () => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("doctor");
-    window.location.reload();
+    navigate("/"); // redirect to homepage
+
   };
 
   useEffect(() => {
