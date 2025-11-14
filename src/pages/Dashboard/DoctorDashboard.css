@@ -1,84 +1,77 @@
 .doctor-dashboard {
-  max-width: 900px;
-  margin: 20px auto;
-  font-family: Arial, sans-serif;
-  padding: 10px;
+  padding: 20px;
+  font-family: "Arial", sans-serif;
+  background: #f7f9fc;
+  min-height: 100vh;
 }
 
-.doctor-dashboard h2 {
-  text-align: center;
-  color: #2a9d8f;
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
 }
 
-.message {
-  text-align: center;
-  margin-bottom: 15px;
+.logout-btn {
+  background: #f44336;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
   font-weight: bold;
-  color: #264653;
+}
+
+.logout-btn:hover {
+  background: #d32f2f;
+}
+
+.message {
+  padding: 10px;
+  background: #e3f2fd;
+  color: #0d47a1;
+  border-radius: 6px;
+  margin-bottom: 15px;
+}
+
+.section {
+  margin-bottom: 30px;
 }
 
 .appointment-card {
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  background: white;
   padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   margin-bottom: 15px;
-  background: #f9f9f9;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-.appointment-card p {
-  margin: 5px 0;
+.nurse-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-.appointment-card strong {
-  color: #264653;
+.nurse-table th,
+.nurse-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
 }
 
-.nurse-assign {
-  margin-top: 10px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.nurse-table th {
+  background: #0d47a1;
+  color: white;
 }
 
-.nurse-assign label {
-  font-weight: bold;
-  color: #264653;
+.nurse-table tr:hover {
+  background-color: #f1f1f1;
 }
 
-.nurse-assign select {
-  padding: 5px 8px;
+select {
+  padding: 5px;
   border-radius: 5px;
-  border: 1px solid #ccc;
-  background: #fff;
-  cursor: pointer;
-}
-
-.nurse-assign select:hover {
-  border-color: #2a9d8f;
-}
-
-.appointment-card p strong {
-  width: 120px;
-  display: inline-block;
-}
-
-p {
-  font-size: 14px;
-}
-
-p span.cancelled {
-  color: red;
-  font-weight: bold;
-}
-
-p span.confirmed {
-  color: green;
-  font-weight: bold;
-}
-
-p span.pending {
-  color: orange;
-  font-weight: bold;
 }
