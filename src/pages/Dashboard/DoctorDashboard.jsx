@@ -83,12 +83,13 @@ const DoctorDashboard = () => {
   };
 
   // Logout
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("doctor");
-    navigate("/"); // redirect to homepage
+ const handleLogout = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("doctor");
+  setDoctor(null);  // clear state
+  navigate("/");    // redirect to homepage
+};
 
-  };
 
   useEffect(() => {
     if (doctor?.id) {
