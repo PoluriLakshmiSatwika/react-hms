@@ -76,7 +76,7 @@ const DoctorLogin = () => {
         );
 
         alert("✅ " + data.message);
-        navigate("/dashboard/appointment");
+        navigate("/dashboard/doctor");
       } else {
         setErrors({ submit: data.message || "Invalid credentials" });
       }
