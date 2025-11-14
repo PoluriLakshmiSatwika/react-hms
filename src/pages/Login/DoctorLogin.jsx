@@ -31,6 +31,18 @@ const DoctorLogin = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+  // ✅ Handle form change
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
 
 
   // ✅ Handle form change
