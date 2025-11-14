@@ -11,8 +11,7 @@ const AppointmentBooking = () => {
   const [appointmentDate, setAppointmentDate] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [bookedSlotsMap, setBookedSlotsMap] = useState({}); // ✅ added
-  
+  const [bookedSlotsMap, setBookedSlotsMap] = useState({});
 
   // ✅ Get logged-in patient from localStorage
   const patient = JSON.parse(localStorage.getItem("patient"));
@@ -27,28 +26,33 @@ const AppointmentBooking = () => {
     );
   }
 
+  // ✅ Map display names to DB values
   const diseases = [
-    "Cardiology",
-    "Orthopedics",
-    "Neurology",
-    "Dermatology",
-    "ENT",
-    "General Physician",
+    { label: "Cardiology", value: "cardiology" },
+    { label: "Orthopedics", value: "Orthopedics" },
+    { label: "Neurology", value: "Neurology" },
+    { label: "Dermatology", value: "Dermatology" },
+    { label: "ENT", value: "ent" },
+    { label: "General Physician", value: "General Physician" },
   ];
 
   // ✅ Fetch doctors based on selected specialty
   const fetchDoctors = async (specialty) => {
+    if (!specialty) return;
+
     setLoading(true);
     setSelectedDoctor(null);
     setSelectedSlot("");
 
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/appointments/doctors/${specialty}`);
+      const res = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/appointments/doctors/${specialty}`
+      );
       const data = await res.json();
 
       if (data.success && Array.isArray(data.doctors)) {
         setDoctors(data.doctors);
-        setBookedSlotsMap(data.bookedSlotsMap || {}); // ✅ store booked slots info
+        setBookedSlotsMap(data.bookedSlotsMap || {});
         setMessage("");
       } else {
         setDoctors([]);
@@ -115,13 +119,13 @@ const AppointmentBooking = () => {
           value={disease}
           onChange={(e) => {
             setDisease(e.target.value);
-            fetchDoctors(e.target.value);
+            fetchDoctors(e.target.value); // send DB-friendly value
           }}
         >
           <option value="">Select Disease / Specialty</option>
-          {diseases.map((d, i) => (
-            <option key={i} value={d}>
-              {d}
+          {diseases.map((d) => (
+            <option key={d.value} value={d.value}>
+              {d.label}
             </option>
           ))}
         </select>
@@ -143,16 +147,14 @@ const AppointmentBooking = () => {
           {doctors.map((doc) => (
             <div
               key={doc._id}
-              className={`doctor-card ${
-                selectedDoctor?._id === doc._id ? "selected" : ""
-              }`}
+              className={`doctor-card ${selectedDoctor?._id === doc._id ? "selected" : ""}`}
               onClick={() => setSelectedDoctor(doc)}
             >
               <div className="doctor-info">
                 <div className="doctor-avatar">{doc.fullName[0]}</div>
                 <div className="doctor-details">
                   <p className="doctor-name">{doc.fullName}</p>
-                  <p className="doctor-specialty">{doc.department}</p>
+                  <p className="doctor-specialty">{doc.specialty}</p>
                   <p>Fee: ₹{doc.fee || 500}</p>
                 </div>
               </div>
@@ -160,11 +162,10 @@ const AppointmentBooking = () => {
           ))}
         </div>
 
-        {/* ✅ Slot Selection with Booked Slot Logic */}
+        {/* Slot Selection */}
         {selectedDoctor && (
           <>
             <h3 className="step-title">Available Slots</h3>
-
             <div className="time-grid">
               {selectedDoctor.slots?.length > 0 ? (
                 selectedDoctor.slots.map((slot, idx) => {
@@ -178,9 +179,7 @@ const AppointmentBooking = () => {
                     <button
                       key={idx}
                       disabled={isBooked}
-                      className={`time-slot ${
-                        selectedSlot === slotTime ? "selected" : ""
-                      } ${isBooked ? "booked" : ""}`}
+                      className={`time-slot ${selectedSlot === slotTime ? "selected" : ""} ${isBooked ? "booked" : ""}`}
                       onClick={() => !isBooked && setSelectedSlot(slotTime)}
                     >
                       {isBooked ? `${slotTime} ❌` : slotTime}
@@ -194,7 +193,7 @@ const AppointmentBooking = () => {
           </>
         )}
 
-        {/* Confirm Appointment Button */}
+        {/* Confirm Appointment */}
         {selectedDoctor && selectedSlot && appointmentDate && (
           <div className="button-container">
             <button className="btn btn-success" onClick={handleBookAppointment}>
@@ -204,11 +203,7 @@ const AppointmentBooking = () => {
         )}
 
         {/* Message */}
-        {message && (
-          <p className="summary-title" style={{ marginTop: "10px" }}>
-            {message}
-          </p>
-        )}
+        {message && <p className="summary-title" style={{ marginTop: "10px" }}>{message}</p>}
         {message.includes("successfully") && (
           <div className="popup-overlay">
             <div className="popup-box">✅ Appointment Booked Successfully!</div>
