@@ -120,7 +120,7 @@ const NurseDashboard = () => {
 
     try {
       const res = await fetch(
-        `${API_BASE_URL}/api/nurse/assignments/${id}/accept`,
+        `${process.env.REACT_APP_API_URL}/api/nurse/assignments/${id}/accept`,
         {
           method: "PUT",
           headers: {
@@ -145,7 +145,7 @@ const NurseDashboard = () => {
   const handleCompleteAssignment = async (id) => {
     try {
       const res = await fetch(
-        `${API_BASE_URL}/api/nurse/assignments/${id}/complete`,
+        `${process.env.REACT_APP_API_URL}/api/nurse/assignments/${id}/complete`,
         {
           method: "PUT",
           headers: {
