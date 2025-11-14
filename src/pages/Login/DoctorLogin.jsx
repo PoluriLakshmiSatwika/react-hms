@@ -72,12 +72,12 @@ const handleSubmit = async (e) => {
           fullName: data.doctor.fullName,
           email: data.doctor.email,
           phone: data.doctor.phone,
-          specialty: data.doctor.specialty,
           department: data.doctor.department,
+          specialty: data.doctor.specialty,
         })
       );
       alert("✅ " + data.message);
-      navigate("/dashboard/doctor");
+      navigate("/dashboard/appointment");
     } else {
       setErrors({ submit: data.message || "Invalid credentials" });
     }
@@ -89,6 +89,7 @@ const handleSubmit = async (e) => {
     setIsLoading(false);
   }
 };
+
 
   return (
     <div className="doctor-login-container">
@@ -168,7 +169,7 @@ const handleSubmit = async (e) => {
                           Signing In...
                         </>
                       ) : (
-                        'Admin Sign In'
+                        'Doctor Sign In'
                       )}
                     </button>
                   </form>
