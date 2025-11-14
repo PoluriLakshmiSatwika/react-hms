@@ -6,44 +6,64 @@ const appointmentSchema = new mongoose.Schema({
     ref: "Patient",
     required: true
   },
+
   doctorId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Doctor",
     required: true
   },
+
   disease: {
     type: String,
     required: true
   },
+
   appointmentDate: {
     type: Date,
     required: true
   },
+
   slotTime: {
     type: String,
     required: true
   },
+
   feePaid: {
     type: Boolean,
     default: false
   },
+
   paymentId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Payment"
   },
+
   validityCount: {
     type: Number,
-    default: 3 // means patient can book 3 times per payment
+    default: 3
   },
-  assignedNurse: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Nurse"
-  },
+
+  /* --------------------------------------------------
+     MULTIPLE NURSES
+  --------------------------------------------------- */
+  assignedNurse: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Nurse"
+    }
+  ],
+
+  /* --------------------------------------------------
+     STATUS ENUM — FIXED 🌟
+     Now supports full flow:
+     Pending → Accepted → Confirmed → Completed
+  --------------------------------------------------- */
   status: {
     type: String,
-    enum: ["Pending", "Confirmed", "Completed", "Cancelled"],
+    enum: ["Pending", "Accepted", "Confirmed", "Completed"],
     default: "Pending"
   },
+
   createdAt: {
     type: Date,
     default: Date.now

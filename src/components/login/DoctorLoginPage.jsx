@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './DoctorLoginPage.css';
-
 import API_BASE_URL from "../../api/apiConfig";
 
 const DoctorLoginPage = () => {
@@ -32,43 +31,46 @@ const DoctorLoginPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
+    if (!validateForm()) return;
+    setIsLoading(true);
+    setErrors({});
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          role: "doctor",
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
 
-  if (!validateForm()) return;
-  setIsLoading(true);
-  setErrors({});
+      const data = await response.json();
 
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        role: "doctor",  // change to "doctor", "nurse", or "patient" for other pages
-        email: formData.email,
-        password: formData.password,
-      }),
-    });
+      if (data.success) {
 
-    const data = await response.json();
+        // ⭐ IMPORTANT: Store doctorId & doctorName
+        localStorage.setItem("doctorId", data.user.id);
+        localStorage.setItem("doctorName", data.user.fullName);
 
-    if (data.success) {
-      localStorage.setItem("token", data.token);
-      console.log("✅ Login successful:", data);
-      navigate(`/doctor/dashboard`);
-    } else {
-      setErrors({ submit: data.message || "Invalid credentials" });
+        localStorage.setItem("token", data.token);
+
+        console.log("✅ Login successful:", data);
+        navigate(`/doctor/dashboard`);
+      } else {
+        setErrors({ submit: data.message || "Invalid credentials" });
+      }
+    } catch (error) {
+      console.error("❌ Login Error:", error);
+      setErrors({ submit: "Unable to connect to backend server." });
+    } finally {
+      setIsLoading(false);
     }
-  } catch (error) {
-    console.error("❌ Login Error:", error);
-    setErrors({ submit: "Unable to connect to backend server." });
-  } finally {
-    setIsLoading(false);
-  }
-};
-
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -86,9 +88,7 @@ const handleSubmit = async (e) => {
     <div className="doctor-login-container">
       <div className="doctor-login-card">
         <div className="login-header">
-          <div className="role-icon doctor-icon">
-            👨‍⚕️
-          </div>
+          <div className="role-icon doctor-icon">👨‍⚕️</div>
           <div className="header-text">
             <h1>Doctor Login</h1>
             <p>Access medical dashboard and appointments</p>
@@ -140,9 +140,7 @@ const handleSubmit = async (e) => {
             </a>
           </div>
 
-          {errors.submit && (
-            <div className="submit-error">{errors.submit}</div>
-          )}
+          {errors.submit && <div className="submit-error">{errors.submit}</div>}
 
           <button 
             type="submit" 

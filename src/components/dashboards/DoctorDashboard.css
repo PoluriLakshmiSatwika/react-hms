@@ -1,0 +1,244 @@
+/* ================= GLOBAL ================= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.doctor-dashboard {
+  padding: 25px;
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(to bottom right, #eaf3ff, #f8fbff);
+  min-height: 100vh;
+  color: #1d3557;
+}
+
+/* ================= HEADER ================= */
+.doctor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding: 18px 25px;
+  background: #1d3557;
+  color: white;
+  border-radius: 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+.doctor-header h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.header-controls {
+  display: flex;
+  gap: 12px;
+}
+
+.refresh-btn,
+.logout-btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.25s ease;
+  font-size: 0.95rem;
+}
+
+.refresh-btn {
+  background: #457b9d;
+  color: white;
+}
+.refresh-btn:hover {
+  background: #366480;
+  transform: scale(1.05);
+}
+
+.logout-btn {
+  background: #e63946;
+  color: white;
+}
+.logout-btn:hover {
+  background: #c72533;
+  transform: scale(1.05);
+}
+
+/* ============== SECTION BOX (Card Style) ============== */
+.section-container {
+  background: white;
+  padding: 20px;
+  border-radius: 14px;
+  margin-bottom: 25px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+  transition: 0.25s;
+}
+
+.section-container:hover {
+  transform: translateY(-3px);
+}
+
+/* ================= APPOINTMENT CARDS ================= */
+.card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px;
+  margin-top: 12px;
+}
+
+.appt-card {
+  background: #ffffff;
+  padding: 18px;
+  border-radius: 14px;
+  border-left: 6px solid #457b9d;
+  cursor: pointer;
+  transition: 0.25s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+}
+
+.appt-card:hover {
+  background: #f1f7ff;
+  transform: scale(1.03);
+}
+
+.appt-card.selected {
+  background: #dff0ff;
+  border-left: 6px solid #1d3557;
+  box-shadow: 0 5px 20px rgba(29, 53, 87, 0.25);
+}
+
+/* ================= STATUS BADGE ================= */
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+.status-confirmed {
+  background: #d1f7dd;
+  color: #0f7b33;
+}
+
+.status-pending {
+  background: #fff3bf;
+  color: #7a5700;
+}
+
+.status-completed {
+  background: #d0ebff;
+  color: #0b6fc2;
+}
+
+/* NEW — Assigned Status */
+.status-assigned {
+  background: #e3f0ff;
+  color: #1d3557;
+}
+
+/* ================= NURSE LIST ================= */
+.nurse-list {
+  margin-top: 18px;
+}
+
+.nurse-item {
+  background: #ffffff;
+  padding: 14px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-left: 6px solid #1d3557;
+  margin-bottom: 12px;
+  transition: 0.25s ease;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+}
+
+.nurse-item:hover {
+  background: #eef7ff;
+  transform: scale(1.02);
+}
+
+.nurse-item input {
+  width: 20px;
+  height: 20px;
+}
+
+/* ================= AVAILABILITY DOT ================= */
+.availability-dot {
+  margin-left: 10px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.availability-dot.available {
+  color: green;
+}
+
+.availability-dot.offline {
+  color: red;
+}
+
+/* ============== ASSIGN BUTTON ============== */
+.assign-btn {
+  margin-top: 15px;
+  padding: 14px 20px;
+  background: #1d3557;
+  color: white;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: 0.25s ease;
+}
+
+.assign-btn:hover {
+  background: #152946;
+  transform: scale(1.05);
+}
+
+/* Disabled style (when no nurse selected or loading) */
+.assign-btn:disabled {
+  background: #9fb0c5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* ================= TOAST ================= */
+.notification {
+  text-align: center;
+  padding: 12px 16px;
+  border-radius: 8px;
+  width: fit-content;
+  margin: 10px auto;
+  font-size: 0.95rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.notification.success {
+  background: #d1f7dd;
+  color: #0a6530;
+}
+
+.notification.error {
+  background: #ffe0e0;
+  color: #8b1a1a;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ================= NO DATA ================= */
+.no-data {
+  color: gray;
+  font-style: italic;
+  text-align: center;
+  padding: 10px 0;
+}

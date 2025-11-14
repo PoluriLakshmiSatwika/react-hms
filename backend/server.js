@@ -8,6 +8,7 @@ import appointmentRoutes from "./routes/appointmentRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import passwordRoutes from "./routes/passwordRoutes.js";
 import nurseRoutes from "./routes/nurseRoutes.js";
+import doctorRoutes from "./routes/doctorRoutes.js";
   // ⭐ ADDED
 
 dotenv.config();
@@ -32,6 +33,7 @@ app.use("/api/appointments", appointmentRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/password", passwordRoutes);
 app.use("/api/nurse", nurseRoutes);    // ⭐ IMPORTANT
+app.use("/api/doctor", doctorRoutes);
 
 // Root
 app.get("/", (req, res) => {

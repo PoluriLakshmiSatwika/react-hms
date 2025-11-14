@@ -8,6 +8,11 @@ const nurseSchema = new mongoose.Schema({
   shiftTiming: { type: String, required: true }, // e.g. "Morning", "Night"
   uploadId: { type: String, required: true }, // Uploaded ID proof
   password: { type: String, required: true },
+   // 🔥 ADD THIS
+  available: {
+    type: Boolean,
+    default: true
+  }
 });
 
 export default mongoose.model("Nurse", nurseSchema, "nurses");

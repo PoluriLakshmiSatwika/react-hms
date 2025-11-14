@@ -12,6 +12,7 @@ import AppointmentBooking from "./components/appointments/AppointmentBooking";
 import PatientAppointments from './components/patient/appointment/PatientAppointments';
 import Footer from './components/footer/Footer';
 import NurseDashboard from './components/dashboards/NurseDashboard';
+import DoctorDashboard from './components/dashboards/DoctorDashboard';
 
 function App() {
   return (
@@ -40,6 +41,8 @@ function App() {
 
         <Route path="/" element={<Navigate to="/test-book" replace />} />
           <Route path="/nurse/dashboard" element={<NurseDashboard />} />
+          <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
+
           
 
         {/* Footer Route */}

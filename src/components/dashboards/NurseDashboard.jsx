@@ -1,3 +1,4 @@
+// NurseDashboard.jsx
 import React, { useState, useEffect, useCallback } from "react";
 import "./NurseDashboard.css";
 import API_BASE_URL from "../../api/apiConfig";
@@ -6,135 +7,178 @@ const NurseDashboard = () => {
   const nurseId = localStorage.getItem("nurseId");
   const nurseName = localStorage.getItem("nurseName");
 
-  const [available, setAvailable] = useState(false);
+  const [available, setAvailable] = useState(true);
   const [assignments, setAssignments] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [notification, setNotification] = useState({
-    message: "",
-    type: "",
-  });
+  const [notification, setNotification] = useState({ message: "", type: "" });
 
-  // ==========================
-  // FETCH ASSIGNMENTS
-  // ==========================
+  /* ============================================================
+      SHOW NOTIFICATION
+  ============================================================ */
+  const showNotification = (message, type = "success") => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification({ message: "", type: "" }), 2500);
+  };
+
+  /* ============================================================
+      FETCH ASSIGNMENTS
+  ============================================================ */
   const fetchAssignments = useCallback(async () => {
-    if (!nurseId) {
-      setError("No nurseId found. Please login again.");
-      return;
-    }
+    if (!nurseId) return;
 
     setIsLoading(true);
-    setError(null);
-
     try {
       const res = await fetch(
-        `${API_BASE_URL}/api/nurse/assignments?nurseId=${nurseId}`,
-        { credentials: "include" }
+        `${API_BASE_URL}/api/nurse/assignments?nurseId=${nurseId}`
       );
-
-      if (!res.ok) throw new Error(`API Error: ${res.status}`);
-
       const data = await res.json();
-      setAssignments(data?.data || []);
+
+      if (data.success) setAssignments(data.data || []);
+      else setAssignments([]);
     } catch (err) {
-      console.error("Fetch Error:", err);
-      setError("Failed to fetch assignments.");
+      console.error("FETCH ERROR:", err);
+      setAssignments([]);
     } finally {
       setIsLoading(false);
     }
   }, [nurseId]);
 
-  // Load once
+  /* ============================================================
+      FETCH OWN AVAILABILITY
+  ============================================================ */
+  const fetchOwnAvailability = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/doctor/nurses`);
+      const data = await res.json();
+
+      const me = data?.data?.find((n) => String(n._id) === String(nurseId));
+      if (me) setAvailable(Boolean(me.available));
+    } catch (err) {
+      console.error("AVAILABILITY FETCH ERROR");
+    }
+  }, [nurseId]);
+
   useEffect(() => {
     fetchAssignments();
-  }, [fetchAssignments]);
+    fetchOwnAvailability();
+  }, [fetchAssignments, fetchOwnAvailability]);
 
-  // 🔄 Auto-refresh every 3 seconds
+  // Auto Refresh every 3 sec
   useEffect(() => {
     const interval = setInterval(() => {
       fetchAssignments();
+      fetchOwnAvailability();
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [fetchAssignments]);
+  }, [fetchAssignments, fetchOwnAvailability]);
 
-  // ==========================
-  // NOTIFICATION
-  // ==========================
-  const showNotification = (message, type = "success") => {
-    setNotification({ message, type });
-    setTimeout(() => setNotification({ message: "", type: "" }), 3000);
-  };
-
-  // ==========================
-  // TOGGLE AVAILABILITY
-  // ==========================
+  /* ============================================================
+      TOGGLE AVAILABILITY
+  ============================================================ */
   const handleToggleAvailability = async () => {
     const newState = !available;
     setAvailable(newState);
 
     try {
-      await fetch(`${API_BASE_URL}/api/nurse/availability`, {
+      const res = await fetch(`${API_BASE_URL}/api/nurse/availability`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nurseId, available: newState }),
       });
 
-      showNotification(
-        newState ? "You are now available" : "You are now unavailable"
-      );
+      const data = await res.json();
+
+      if (!data.success) {
+        setAvailable(!newState);
+        showNotification("Failed to update availability", "error");
+      } else {
+        showNotification(
+          newState ? "You are now online" : "You are now offline",
+          newState ? "success" : "error"
+        );
+      }
     } catch (err) {
-      console.error(err);
       setAvailable(!newState);
-      showNotification("Failed to update availability", "error");
+      showNotification("Server error", "error");
     }
   };
 
-  // ==========================
-  // ACCEPT ASSIGNMENT
-  // ==========================
+  /* ============================================================
+      ACCEPT ASSIGNMENT
+  ============================================================ */
   const handleAcceptAssignment = async (id) => {
-    try {
-      await fetch(`${API_BASE_URL}/api/nurse/assignments/${id}/accept`, {
-        method: "PUT",
-      });
+    if (!available) {
+      return showNotification(
+        "❌ You are offline. Go online to accept appointments.",
+        "error"
+      );
+    }
 
-      showNotification("Assignment Confirmed");
-      fetchAssignments();
+    try {
+      const res = await fetch(
+        `${API_BASE_URL}/api/nurse/assignments/${id}/accept`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ nurseId }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (data.success) {
+        showNotification("👍 Appointment accepted!", "success");
+        fetchAssignments();
+      } else {
+        showNotification(data.message, "error");
+      }
     } catch (err) {
-      showNotification("Failed to confirm assignment", "error");
+      showNotification("Server error", "error");
     }
   };
 
-  // ==========================
-  // COMPLETE ASSIGNMENT
-  // ==========================
+  /* ============================================================
+      COMPLETE ASSIGNMENT
+  ============================================================ */
   const handleCompleteAssignment = async (id) => {
     try {
-      await fetch(`${API_BASE_URL}/api/nurse/assignments/${id}/complete`, {
-        method: "PUT",
-      });
+      const res = await fetch(
+        `${API_BASE_URL}/api/nurse/assignments/${id}/complete`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ nurseId }),
+        }
+      );
 
-      showNotification("Marked Completed");
-      fetchAssignments();
+      const data = await res.json();
+
+      if (data.success) {
+        showNotification("✔ Appointment completed", "success");
+        fetchAssignments();
+      } else {
+        showNotification(data.message, "error");
+      }
     } catch (err) {
-      showNotification("Failed to complete assignment", "error");
+      showNotification("Server error", "error");
     }
   };
 
-  // ==========================
-  // LOGOUT
-  // ==========================
+  /* ============================================================
+      LOGOUT
+  ============================================================ */
   const handleLogout = () => {
     localStorage.removeItem("nurseId");
     localStorage.removeItem("nurseName");
     window.location.href = "/login";
   };
 
+  /* ============================================================
+      UI
+  ============================================================ */
   return (
     <div className="nurse-dashboard">
-      {/* Notification */}
       {notification.message && (
         <div className={`notification ${notification.type}`}>
           {notification.message}
@@ -144,8 +188,7 @@ const NurseDashboard = () => {
       {/* HEADER */}
       <header className="dashboard-header">
         <h1>👩‍⚕️ Nurse Dashboard — {nurseName}</h1>
-
-        <button onClick={handleLogout} className="logout-btn">
+        <button className="logout-btn" onClick={handleLogout}>
           Logout
         </button>
       </header>
@@ -158,54 +201,49 @@ const NurseDashboard = () => {
           }`}
           onClick={handleToggleAvailability}
         >
-          {available ? "✅ Available" : "🚫 Not Available"}
+          {available ? "✅ Online" : "🚫 Offline"}
         </button>
 
-        <button onClick={fetchAssignments} className="refresh-btn">
-          Refresh
+        <button className="refresh-btn" onClick={fetchAssignments}>
+          🔄 Refresh
         </button>
       </div>
 
-      {/* ASSIGNMENTS */}
+      {/* MAIN */}
       <main className="assignments-section">
         <h2>Assigned Appointments</h2>
 
-        {error && <p className="error-message">{error}</p>}
-
         {isLoading ? (
-          <div className="loading">Loading...</div>
+          <p className="loading">Loading...</p>
         ) : assignments.length === 0 ? (
           <p className="no-assignments">No assignments yet.</p>
         ) : (
           <div className="assignments-list">
             {assignments.map((a) => (
               <div key={a._id} className="assignment-card">
-                <div className="assignment-info">
-                  <p>
-                    <strong>Patient:</strong> {a.patientId?.fullName || "Unknown"}
-                  </p>
-                  <p>
-                    <strong>Time:</strong> {a.slotTime || "N/A"}
-                  </p>
-                  <p>
-                    <strong>Status:</strong>{" "}
-                    <span className={`status ${a.status?.toLowerCase()}`}>
-                      {a.status}
-                    </span>
-                  </p>
-                </div>
+                <p><strong>Patient:</strong> {a.patientId?.fullName}</p>
+                <p><strong>Time:</strong> {a.slotTime}</p>
+                <p>
+                  <strong>Status:</strong>{" "}
+                  <span className={`status ${a.status.toLowerCase()}`}>
+                    {a.status}
+                  </span>
+                </p>
 
                 <div className="assignment-actions">
                   {a.status === "Pending" && (
                     <button
-                      className="accept-btn"
+                      className={`accept-btn ${
+                        !available ? "disabled-accept" : ""
+                      }`}
                       onClick={() => handleAcceptAssignment(a._id)}
+                      disabled={!available}
                     >
                       Accept
                     </button>
                   )}
 
-                  {a.status === "Confirmed" && (
+                  {a.status === "Accepted" && (
                     <button
                       className="complete-btn"
                       onClick={() => handleCompleteAssignment(a._id)}

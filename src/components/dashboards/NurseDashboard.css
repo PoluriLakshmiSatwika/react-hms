@@ -1,119 +1,246 @@
-/* NurseDashboard.css (improved + responsive) */
-
-* { box-sizing: border-box; }
-body { font-family: 'Poppins', system-ui, -apple-system, sans-serif; }
-
-.nurse-dashboard {
-  background: #f7faff;
-  min-height: 100vh;
-  padding: 20px;
-  color: #111827;
+* {
+  box-sizing: border-box;
 }
 
-/* header */
+.nurse-dashboard {
+  background: #f4f8ff;
+  min-height: 100vh;
+  padding: 20px;
+  font-family: "Poppins", sans-serif;
+}
+
+/* ================= HEADER ================= */
 .dashboard-header {
+  background: #005f9e;
+  color: white;
+  padding: 20px;
+  border-radius: 14px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #0370b7;
-  color: white;
-  padding: 18px 22px;
-  border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(3,112,183,0.08);
-  margin-bottom: 18px;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.15);
 }
-.dashboard-header h1 { margin: 0; font-size: 1.25rem; }
-.logout-btn { background: #f94144; border: none; padding: 8px 14px; border-radius: 8px; color: white; cursor: pointer; }
 
+.dashboard-header h1 {
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+/* ================= LOGOUT BUTTON ================= */
+.logout-btn {
+  background: #e63946;
+  border: none;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.25s ease;
+  font-size: 0.95rem;
+}
+.logout-btn:hover {
+  transform: scale(1.05);
+  background: #c72c36;
+}
+
+/* ================= CONTROLS ================= */
 .dashboard-controls {
   display: flex;
   gap: 12px;
-  align-items: center;
   margin: 18px 0;
 }
 
+/* Availability toggle */
 .availability-btn {
-  padding: 10px 16px;
+  padding: 12px 22px;
   border-radius: 999px;
   border: none;
-  cursor: pointer;
   font-weight: 600;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: 0.2s ease;
 }
-.availability-btn.available { background: #06d6a0; color: #064e3b; }
-.availability-btn.unavailable { background: #9ca3af; color: white; }
 
+.available {
+  background: #2ed573;
+  color: white;
+}
+.available:hover {
+  background: #28c766;
+  transform: scale(1.05);
+}
+
+.unavailable {
+  background: #a4b0be;
+  color: white;
+}
+.unavailable:hover {
+  background: #8c99a7;
+  transform: scale(1.05);
+}
+
+/* Refresh button */
 .refresh-btn {
-  background: white; border: 1px solid #e6eef8; padding: 10px 14px; border-radius: 8px; cursor: pointer;
+  background: white;
+  border: 1px solid #dce6f5;
+  padding: 12px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.2s ease;
+}
+.refresh-btn:hover {
+  transform: scale(1.05);
+  background: #eef4ff;
 }
 
-/* assignments section */
+/* ================= ASSIGNMENTS SECTION ================= */
 .assignments-section {
   background: white;
   padding: 22px;
-  border-radius: 12px;
-  box-shadow: 0 8px 30px rgba(2,6,23,0.04);
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.07);
 }
-.assignments-section h2 { margin-top: 0; color: #0369a1; }
 
+.assignments-section h2 {
+  margin-bottom: 14px;
+  color: #005f9e;
+}
+
+/* Cards */
 .assignments-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 14px;
-  margin-top: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px;
 }
 
 .assignment-card {
-  background: #fbfdff;
-  border: 1px solid #e6f3ff;
-  padding: 14px;
+  background: #f9fbff;
+  border-left: 6px solid #005f9e;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 3px 14px rgba(0,0,0,0.05);
+  transition: 0.25s ease;
+}
+
+.assignment-card:hover {
+  transform: translateY(-4px);
+  background: #eef5ff;
+}
+
+/* ================= STATUS BADGES ================= */
+
+.status {
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  display: inline-block;
+}
+
+/* Pending */
+.status.pending {
+  background: #fff0b3;
+  color: #8a7300;
+}
+
+/* Assigned (NEW) */
+.status.assigned {
+  background: #d7e7ff;
+  color: #005f9e;
+}
+
+/* Confirmed */
+.status.confirmed {
+  background: #c9f7d4;
+  color: #0f7a36;
+}
+
+/* Completed */
+.status.completed {
+  background: #cfe7ff;
+  color: #0b59a3;
+}
+
+/* ================= ACTION BUTTONS ================= */
+
+.accept-btn,
+.complete-btn {
+  padding: 10px 16px;
   border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.assignment-info p { margin: 6px 0; color: #374151; font-size: 14px; }
-
-.status { font-weight: 700; text-transform: capitalize; }
-.status.pending { color: #d97706; }
-.status.accepted { color: #0ea5a5; }
-.status.completed { color: #16a34a; }
-
-.assignment-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 6px;
-}
-
-.accept-btn, .complete-btn {
-  padding: 8px 10px;
-  border-radius: 8px;
   border: none;
   cursor: pointer;
   font-weight: 600;
-}
-.accept-btn { background: #0b84c7; color: white; }
-.complete-btn { background: #059669; color: white; }
-
-/* notifications & messages */
-.notification {
+  transition: 0.25s ease;
+  width: 100px;
   text-align: center;
-  margin: 10px auto;
-  padding: 10px 16px;
-  width: fit-content;
-  border-radius: 8px;
-  font-weight: 600;
-  z-index: 999;
 }
-.notification.success { background: #d9f7e0; color: #065f46; }
-.notification.error { background: #ffe6e6; color: #8b0000; }
 
-.loading, .no-assignments, .error-message { text-align: center; padding: 12px 0; color: #6b7280; }
+.accept-btn {
+  background: #1e90ff;
+  color: white;
+}
+.accept-btn:hover {
+  background: #1776d1;
+  transform: scale(1.05);
+}
 
-/* small screens */
-@media (max-width: 640px) {
-  .dashboard-controls { flex-direction: column; align-items: stretch; gap: 10px; }
+.complete-btn {
+  background: #2ed573;
+  color: white;
+}
+.complete-btn:hover {
+  background: #28c766;
+  transform: scale(1.05);
+}
+
+/* ================= DISABLED ACCEPT BUTTON (OFFLINE MODE) ================= */
+
+.accept-btn.disabled-accept,
+.accept-btn:disabled {
+  background: #b0c8e0 !important;
+  color: #6b7b8c !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  opacity: 0.7;
+}
+
+/* ================= TOAST ================= */
+.notification {
+  padding: 12px 18px;
+  border-radius: 10px;
+  width: fit-content;
+  margin: 10px auto;
+  text-align: center;
+  animation: fadeNotif 0.3s ease;
+  font-weight: 600;
+}
+
+.notification.success {
+  background: #d6ffe4;
+  color: #066b33;
+}
+
+.notification.error {
+  background: #ffe1e1;
+  color: #8b0000;
+}
+
+@keyframes fadeNotif {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ================= EMPTY & LOADING ================= */
+.loading,
+.no-assignments {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  padding: 12px;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 600px) {
+  .dashboard-controls { flex-direction: column; }
   .assignments-list { grid-template-columns: 1fr; }
-  .dashboard-header { padding: 14px; }
 }
