@@ -1,18 +1,22 @@
 import React, { useState, useEffect, useCallback } from "react";
 import "./DoctorDashboard.css";
 
+// ✅ FIXED doctorId retrieval
+const doctor = JSON.parse(localStorage.getItem("doctor"));
+const doctorId = doctor?.id;
 
-const doctorId = localStorage.getItem("doctorId"); // ✅ add this
-
-// 🔹 Nurse Assignment Component
 const NurseAssignment = ({ appointment, nurses, onAssign }) => {
-  const [selectedNurses, setSelectedNurses] = useState(appointment.assignedNurses || []);
+  const [selectedNurses, setSelectedNurses] = useState(
+    appointment.assignedNurses || []
+  );
   const [shiftFilter, setShiftFilter] = useState("All");
-  const shifts = ["All", ...new Set(nurses.map(n => n.shift))];
+  const shifts = ["All", ...new Set(nurses.map((n) => n.shift))];
 
   const toggleNurse = (nurseId) => {
-    setSelectedNurses(prev =>
-      prev.includes(nurseId) ? prev.filter(id => id !== nurseId) : [...prev, nurseId]
+    setSelectedNurses((prev) =>
+      prev.includes(nurseId)
+        ? prev.filter((id) => id !== nurseId)
+        : [...prev, nurseId]
     );
   };
 
@@ -20,22 +24,31 @@ const NurseAssignment = ({ appointment, nurses, onAssign }) => {
     <div className="assignment-box">
       <div className="assignment-controls">
         <label>Filter by Shift:</label>
-        <select value={shiftFilter} onChange={(e) => setShiftFilter(e.target.value)}>
-          {shifts.map(s => <option key={s}>{s}</option>)}
+        <select
+          value={shiftFilter}
+          onChange={(e) => setShiftFilter(e.target.value)}
+        >
+          {shifts.map((s) => (
+            <option key={s}>{s}</option>
+          ))}
         </select>
       </div>
 
       <div className="nurse-list-container">
         {nurses
-          .filter(n => n.available && (shiftFilter === "All" || n.shift === shiftFilter))
-          .map(nurse => (
+          .filter(
+            (n) => n.available && (shiftFilter === "All" || n.shift === shiftFilter)
+          )
+          .map((nurse) => (
             <div key={nurse._id} className="nurse-item">
               <input
                 type="checkbox"
                 checked={selectedNurses.includes(nurse._id)}
                 onChange={() => toggleNurse(nurse._id)}
               />
-              <label>{nurse.fullName} ({nurse.shift})</label>
+              <label>
+                {nurse.fullName} ({nurse.shift})
+              </label>
             </div>
           ))}
       </div>
@@ -51,7 +64,6 @@ const NurseAssignment = ({ appointment, nurses, onAssign }) => {
   );
 };
 
-// 🔹 Main Doctor Dashboard
 const DoctorDashboard = () => {
   const [appointments, setAppointments] = useState([]);
   const [nurses, setNurses] = useState([]);
@@ -59,23 +71,29 @@ const DoctorDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [expandedAppointments, setExpandedAppointments] = useState({});
 
+  // ✅ FIXED appointments URL
   const fetchAppointments = async () => {
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}api/appointments/doctor/${doctorId}`);
+      const res = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/appointments/doctor/${doctorId}`
+      );
       const data = await res.json();
       if (data.success) setAppointments(data.data);
-    } catch {
-      console.error("Failed to fetch appointments");
+    } catch (err) {
+      console.error("Failed to fetch appointments:", err);
     }
   };
 
+  // ✅ FIXED nurses API URL
   const fetchNurses = async () => {
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/nurses`);
+      const res = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/doctor/nurses`
+      );
       const data = await res.json();
       if (data.success) setNurses(data.data);
-    } catch {
-      console.error("Failed to fetch nurses");
+    } catch (err) {
+      console.error("Failed to fetch nurses:", err);
     }
   };
 
@@ -89,13 +107,18 @@ const DoctorDashboard = () => {
     load();
   }, []);
 
+  // ✅ FIXED assign API URL
   const handleNurseAssignment = async (appointmentId, nurseIds) => {
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/doctor/assign-nurses`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ appointmentId, nurseIds }),
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/doctor/assign-nurses`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ appointmentId, nurseIds }),
+        }
+      );
+
       const data = await res.json();
 
       if (data.success) {
@@ -111,35 +134,51 @@ const DoctorDashboard = () => {
     setTimeout(() => setNotification(""), 3000);
   };
 
-  const getNurseNames = useCallback((ids = []) => {
-    if (!ids.length) return "None assigned";
-    return ids.map(id => nurses.find(n => n._id === id)?.fullName || "Unknown").join(", ");
-  }, [nurses]);
+  const getNurseNames = useCallback(
+    (ids = []) => {
+      if (!ids.length) return "None assigned";
+      return ids
+        .map((id) => nurses.find((n) => n._id === id)?.fullName || "Unknown")
+        .join(", ");
+    },
+    [nurses]
+  );
 
   const togglePanel = (id) => {
-    setExpandedAppointments(prev => ({ ...prev, [id]: !prev[id] }));
+    setExpandedAppointments((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   if (loading) return <div className="loading-state">Loading dashboard...</div>;
 
   return (
     <div className="doctor-dashboard">
-      <h1>Doctor Appointment Dashboard 👩‍⚕</h1>
+      <h1>Doctor Appointment Dashboard 👩‍⚕️</h1>
       {notification && <div className="notification-banner">{notification}</div>}
 
       <h2>Upcoming Appointments</h2>
+
       {appointments.length === 0 ? (
         <p>No appointments found.</p>
       ) : (
-        appointments.map(app => (
+        appointments.map((app) => (
           <div key={app._id} className="appointment-card">
-            <div className="appointment-header" onClick={() => togglePanel(app._id)}>
+            <div
+              className="appointment-header"
+              onClick={() => togglePanel(app._id)}
+            >
               <div>
                 <h3>{app.patientName}</h3>
-                <p>{app.slotTime} on {new Date(app.appointmentDate).toLocaleDateString()}</p>
-                <p><b>Assigned:</b> {getNurseNames(app.assignedNurses)}</p>
+                <p>
+                  {app.slotTime} on{" "}
+                  {new Date(app.appointmentDate).toLocaleDateString()}
+                </p>
+                <p>
+                  <b>Assigned:</b> {getNurseNames(app.assignedNurses)}
+                </p>
               </div>
-              <div className="toggle-icon">{expandedAppointments[app._id] ? "▲" : "▼"}</div>
+              <div className="toggle-icon">
+                {expandedAppointments[app._id] ? "▲" : "▼"}
+              </div>
             </div>
 
             {expandedAppointments[app._id] && (
