@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import "./NurseDashboard.css";
-import API_BASE_URL from "../../api/apiConfig";
+
 
 const NurseDashboard = () => {
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ const NurseDashboard = () => {
 
     setIsLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/nurse/assignments`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/nurse/assignments`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -51,7 +51,7 @@ const NurseDashboard = () => {
     if (!token) return;
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/nurse/profile`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/nurse/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -84,7 +84,7 @@ const NurseDashboard = () => {
     setAvailable(newState);
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/nurse/availability`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/nurse/availability`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
