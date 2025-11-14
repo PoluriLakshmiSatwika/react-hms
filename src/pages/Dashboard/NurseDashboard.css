@@ -1,262 +1,246 @@
-/* === Nurse Dashboard Styles === */
+* {
+  box-sizing: border-box;
+}
 
-/* General layout */
 .nurse-dashboard {
-  font-family: 'Poppins', sans-serif;
-  background: #f7faff;
+  background: #f4f8ff;
   min-height: 100vh;
   padding: 20px;
-  color: #333;
+  font-family: "Poppins", sans-serif;
 }
 
-/* === LOGIN PAGE === */
-.nurse-login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: linear-gradient(135deg, #6dd5fa, #ffffff);
-}
-
-.login-card {
-  background: #fff;
-  padding: 40px;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  width: 360px;
-  text-align: center;
-  transition: transform 0.2s ease;
-}
-
-.login-card:hover {
-  transform: translateY(-5px);
-}
-
-.login-card h2 {
-  margin-bottom: 20px;
-  color: #0077b6;
-}
-
-.login-card input {
-  width: 100%;
-  padding: 10px 12px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 14px;
-  transition: border-color 0.2s ease;
-}
-
-.login-card input:focus {
-  border-color: #0077b6;
-  outline: none;
-}
-
-.login-card button {
-  width: 100%;
-  background: #0077b6;
-  color: white;
-  padding: 10px;
-  border: none;
-  border-radius: 8px;
-  font-size: 15px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.login-card button:hover {
-  background: #005f8a;
-}
-
-.note {
-  font-size: 13px;
-  color: #555;
-  margin-top: 10px;
-}
-
-.error-message {
-  background: #ffe6e6;
-  color: #d10000;
-  padding: 8px;
-  border-radius: 6px;
-  font-size: 14px;
-  margin-bottom: 10px;
-}
-
-/* === DASHBOARD HEADER === */
+/* ================= HEADER ================= */
 .dashboard-header {
+  background: #005f9e;
+  color: white;
+  padding: 20px;
+  border-radius: 14px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #0077b6;
-  color: white;
-  padding: 15px 25px;
-  border-radius: 12px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.15);
 }
 
 .dashboard-header h1 {
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   font-weight: 600;
 }
 
+/* ================= LOGOUT BUTTON ================= */
 .logout-btn {
-  background: #f94144;
+  background: #e63946;
   border: none;
-  padding: 8px 16px;
   color: white;
-  border-radius: 8px;
+  padding: 10px 16px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: 0.25s ease;
+  font-size: 0.95rem;
 }
-
 .logout-btn:hover {
-  background: #d62828;
+  transform: scale(1.05);
+  background: #c72c36;
 }
 
-/* === AVAILABILITY BUTTON === */
+/* ================= CONTROLS ================= */
 .dashboard-controls {
   display: flex;
-  justify-content: center;
-  margin: 20px 0;
+  gap: 12px;
+  margin: 18px 0;
 }
 
+/* Availability toggle */
 .availability-btn {
-  padding: 12px 20px;
+  padding: 12px 22px;
+  border-radius: 999px;
   border: none;
-  border-radius: 30px;
-  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  transition: 0.2s ease;
 }
 
-.availability-btn.available {
-  background: #06d6a0;
+.available {
+  background: #2ed573;
   color: white;
 }
+.available:hover {
+  background: #28c766;
+  transform: scale(1.05);
+}
 
-.availability-btn.unavailable {
-  background: #adb5bd;
+.unavailable {
+  background: #a4b0be;
   color: white;
 }
-
-.availability-btn:hover {
-  opacity: 0.9;
+.unavailable:hover {
+  background: #8c99a7;
+  transform: scale(1.05);
 }
 
-/* === ASSIGNMENT SECTION === */
+/* Refresh button */
+.refresh-btn {
+  background: white;
+  border: 1px solid #dce6f5;
+  padding: 12px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.2s ease;
+}
+.refresh-btn:hover {
+  transform: scale(1.05);
+  background: #eef4ff;
+}
+
+/* ================= ASSIGNMENTS SECTION ================= */
 .assignments-section {
   background: white;
-  padding: 20px 25px;
-  border-radius: 16px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+  padding: 22px;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.07);
 }
 
 .assignments-section h2 {
-  margin-bottom: 15px;
-  color: #0077b6;
-  text-align: center;
+  margin-bottom: 14px;
+  color: #005f9e;
 }
 
+/* Cards */
 .assignments-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px;
 }
 
 .assignment-card {
-  background: #f1f9ff;
-  border: 1px solid #d8ecff;
-  border-radius: 12px;
+  background: #f9fbff;
+  border-left: 6px solid #005f9e;
   padding: 16px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease;
+  border-radius: 12px;
+  box-shadow: 0 3px 14px rgba(0,0,0,0.05);
+  transition: 0.25s ease;
 }
 
 .assignment-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px);
+  background: #eef5ff;
 }
 
-.assignment-info p {
-  margin: 6px 0;
-  font-size: 14px;
-}
+/* ================= STATUS BADGES ================= */
 
 .status {
   font-weight: 600;
-  text-transform: capitalize;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  display: inline-block;
 }
 
+/* Pending */
 .status.pending {
-  color: #f77f00;
+  background: #fff0b3;
+  color: #8a7300;
 }
 
-.status.accepted {
-  color: #118ab2;
+/* Assigned (NEW) */
+.status.assigned {
+  background: #d7e7ff;
+  color: #005f9e;
 }
 
+/* Confirmed */
+.status.confirmed {
+  background: #c9f7d4;
+  color: #0f7a36;
+}
+
+/* Completed */
 .status.completed {
-  color: #06d6a0;
+  background: #cfe7ff;
+  color: #0b59a3;
 }
 
-/* Accept Button */
-.accept-btn {
-  background: #118ab2;
-  color: white;
+/* ================= ACTION BUTTONS ================= */
+
+.accept-btn,
+.complete-btn {
+  padding: 10px 16px;
+  border-radius: 10px;
   border: none;
-  padding: 8px 14px;
-  border-radius: 8px;
-  margin-top: 10px;
   cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.accept-btn:hover {
-  background: #0b6988;
-}
-
-/* === NOTIFICATIONS === */
-.notification {
+  font-weight: 600;
+  transition: 0.25s ease;
+  width: 100px;
   text-align: center;
-  margin: 15px auto;
-  padding: 10px 20px;
+}
+
+.accept-btn {
+  background: #1e90ff;
+  color: white;
+}
+.accept-btn:hover {
+  background: #1776d1;
+  transform: scale(1.05);
+}
+
+.complete-btn {
+  background: #2ed573;
+  color: white;
+}
+.complete-btn:hover {
+  background: #28c766;
+  transform: scale(1.05);
+}
+
+/* ================= DISABLED ACCEPT BUTTON (OFFLINE MODE) ================= */
+
+.accept-btn.disabled-accept,
+.accept-btn:disabled {
+  background: #b0c8e0 !important;
+  color: #6b7b8c !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  opacity: 0.7;
+}
+
+/* ================= TOAST ================= */
+.notification {
+  padding: 12px 18px;
+  border-radius: 10px;
   width: fit-content;
-  border-radius: 8px;
-  font-weight: 500;
-  animation: fadeIn 0.3s ease;
+  margin: 10px auto;
+  text-align: center;
+  animation: fadeNotif 0.3s ease;
+  font-weight: 600;
 }
 
 .notification.success {
-  background: #d8f3dc;
-  color: #1b4332;
+  background: #d6ffe4;
+  color: #066b33;
 }
 
 .notification.error {
-  background: #ffe5e5;
-  color: #a4161a;
+  background: #ffe1e1;
+  color: #8b0000;
 }
 
-.loading {
-  text-align: center;
-  color: #555;
-  padding: 15px;
+@keyframes fadeNotif {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
+/* ================= EMPTY & LOADING ================= */
+.loading,
 .no-assignments {
   text-align: center;
-  font-size: 14px;
-  color: #777;
-  padding: 10px;
+  color: #666;
+  font-style: italic;
+  padding: 12px;
 }
 
-/* Animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* ================= RESPONSIVE ================= */
+@media (max-width: 600px) {
+  .dashboard-controls { flex-direction: column; }
+  .assignments-list { grid-template-columns: 1fr; }
 }
