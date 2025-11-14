@@ -11,7 +11,10 @@ const DoctorDashboard = () => {
   // ✅ Load doctor from localStorage
   useEffect(() => {
     const storedDoctor = JSON.parse(localStorage.getItem("doctor"));
-    if (storedDoctor?._id) setDoctor(storedDoctor);
+    if (storedDoctor?.id) {
+      // normalize _id for consistency
+      setDoctor({ ...storedDoctor, _id: storedDoctor.id });
+    }
   }, []);
 
   // ✅ Fetch appointments for this doctor
@@ -19,7 +22,9 @@ const DoctorDashboard = () => {
     if (!doctorId) return;
     setLoading(true);
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/appointments/doctor/${doctorId}`);
+      const res = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/appointments/doctor/${doctorId}`
+      );
       const data = await res.json();
       if (data.success) setAppointments(data.data);
       else setAppointments([]);
@@ -37,6 +42,7 @@ const DoctorDashboard = () => {
       const res = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/nurses`);
       const data = await res.json();
       if (Array.isArray(data)) setNurses(data);
+      else setNurses([]);
     } catch (err) {
       console.error("Error fetching nurses:", err);
       setNurses([]);
@@ -87,13 +93,26 @@ const DoctorDashboard = () => {
       ) : (
         appointments.map((a) => (
           <div key={a._id} className="appointment-card">
-            <p><strong>Patient:</strong> {a.patientId?.fullName || "N/A"}</p>
-            <p><strong>Disease:</strong> {a.disease}</p>
-            <p><strong>Date:</strong> {new Date(a.appointmentDate).toLocaleDateString()}</p>
-            <p><strong>Time:</strong> {a.slotTime}</p>
+            <p>
+              <strong>Patient:</strong> {a.patientId?.fullName || "N/A"}
+            </p>
+            <p>
+              <strong>Disease:</strong> {a.disease}
+            </p>
+            <p>
+              <strong>Date:</strong>{" "}
+              {new Date(a.appointmentDate).toLocaleDateString()}
+            </p>
+            <p>
+              <strong>Time:</strong> {a.slotTime}
+            </p>
             <p>
               <strong>Status:</strong>{" "}
-              {a.status === "Cancelled" ? "❌ Cancelled" : a.feePaid ? "✅ Confirmed" : "⏳ Pending"}
+              {a.status === "Cancelled"
+                ? "❌ Cancelled"
+                : a.feePaid
+                ? "✅ Confirmed"
+                : "⏳ Pending"}
             </p>
             <p>
               <strong>Assigned Nurses:</strong>{" "}
