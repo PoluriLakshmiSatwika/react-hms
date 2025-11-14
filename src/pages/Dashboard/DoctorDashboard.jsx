@@ -19,14 +19,9 @@ const DoctorDashboard = () => {
     if (!doctorId) return;
     setLoading(true);
     try {
-      const res = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/appointments/doctor/${doctorId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/appointments/doctor/${doctorId}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
       const data = await res.json();
       if (data.success) setAppointments(data.data);
       else setAppointments([]);
@@ -42,9 +37,7 @@ const DoctorDashboard = () => {
   const fetchNurses = async () => {
     try {
       const res = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/nurses`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       const data = await res.json();
       if (Array.isArray(data)) setNurses(data);
@@ -67,17 +60,22 @@ const DoctorDashboard = () => {
         },
         body: JSON.stringify({
           appointmentId: appointment._id,
-          patientName: appointment.patientId.fullName,
-          date: appointment.appointmentDate,
-          time: appointment.slotTime,
-          assignedNurses: [{ nurseId: nurse._id, nurseName: nurse.fullName }],
+          nurseIds: [nurse._id], // Send IDs only for backend logic
         }),
       });
 
       const data = await res.json();
       if (data.success) {
         setMessage(`✅ Nurse ${nurse.fullName} assigned successfully`);
-        fetchAppointments(doctor.id);
+
+        // Update appointments state locally to show assignment immediately
+        setAppointments((prev) =>
+          prev.map((a) =>
+            a._id === appointment._id
+              ? { ...a, assignedNurses: data.data.assignedNurses }
+              : a
+          )
+        );
       } else {
         setMessage(`❌ Failed to assign nurse: ${data.message || "Unknown error"}`);
       }
@@ -129,7 +127,7 @@ const DoctorDashboard = () => {
               <label>Assign Nurse:</label>
               <select
                 onChange={(e) => {
-                  const selected = nurses.find(n => n._id === e.target.value);
+                  const selected = nurses.find((n) => n._id === e.target.value);
                   handleAssignNurse(a, selected);
                 }}
               >
