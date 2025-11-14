@@ -53,7 +53,7 @@ function App() {
         <Route path="/dashboard/patient" element={<PatientDashboard />} />
         <Route path="/dashboard/appointment" element={<AppointmentBooking />} />
         <Route path="/patient/Appointment" element={<PatientAppointments />} />
-        <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
+       
 
 
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
