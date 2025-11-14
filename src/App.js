@@ -54,6 +54,7 @@ function App() {
         <Route path="/dashboard/patient" element={<PatientDashboard />} />
         <Route path="/dashboard/appointment" element={<AppointmentBooking />} />
         <Route path="/patient/Appointment" element={<PatientAppointments />} />
+        
        
 
 
