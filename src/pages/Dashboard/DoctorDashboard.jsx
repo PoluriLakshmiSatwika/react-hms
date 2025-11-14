@@ -88,7 +88,7 @@ const DoctorDashboard = () => {
   const fetchNurses = async () => {
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/doctor/nurses`
+        `${process.env.REACT_APP_API_URL}/api/admin/nurses`
       );
       const data = await res.json();
       if (data.success) setNurses(data.data);
