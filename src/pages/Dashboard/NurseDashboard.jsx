@@ -72,20 +72,19 @@ const NurseDashboard = () => {
 
   // ====================== Auto Fetch on Mount ======================
   useEffect(() => {
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-    fetchAssignments();
-    fetchAvailability();
+  if (!token) {
+    navigate("/login");
+    return;
+  }
 
-    const interval = setInterval(() => {
-      fetchAssignments();
-      fetchAvailability();
-    }, 3000);
+  const fetchData = async () => {
+    await fetchAssignments();
+    await fetchAvailability();
+  };
 
-    return () => clearInterval(interval);
-  }, [fetchAssignments, fetchAvailability, navigate, token]);
+  fetchData();
+}, [navigate, token]);
+
 
   // ====================== Toggle Availability ======================
   const handleToggleAvailability = async () => {
@@ -227,7 +226,7 @@ const NurseDashboard = () => {
       {assignments.map((a) => (
         <div key={a._id} className="assignment-card">
           <p>
-            <strong>Patient:</strong> {a.patientId?.fullName || a.patientName}
+            <strong>Patient:</strong> {a.patientId?.fullName || a.patientName|| "Unknown"}
           </p>
           <p>
             <strong>Time:</strong> {a.time} {/* fixed: use time from schema */}
