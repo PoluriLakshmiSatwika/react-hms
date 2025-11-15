@@ -9,7 +9,7 @@ const NurseDashboard = () => {
 
   // ✅ Load nurse info from localStorage
   const nurse = JSON.parse(localStorage.getItem("nurse")) || {};
-  const nurseId = nurse.id;
+  const nurseId = nurse._id; // fixed: use _id
   const nurseName = nurse.fullName;
 
   const [available, setAvailable] = useState(true);
@@ -26,15 +26,17 @@ const NurseDashboard = () => {
     setTimeout(() => setNotification({ message: "", type: "" }), 2500);
   };
 
-  // ====================== Fetch Assignments ======================
-  const fetchAssignments = useCallback(async () => {
+   const fetchAssignments = useCallback(async () => {
     if (!token) return;
 
     setIsLoading(true);
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/nurse/assignments`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/nurse/assignments`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       const data = await res.json();
 
       if (data.success) setAssignments(data.data || []);
@@ -48,35 +50,25 @@ const NurseDashboard = () => {
   }, [token]);
 
   // ====================== Fetch Nurse Availability ======================
+  const fetchAvailability = useCallback(async () => {
+    if (!token) return;
 
-const fetchAvailability = useCallback(async () => {
-  const token = localStorage.getItem("token"); // ✅ get token here
-  if (!token) {
-    console.warn("No token found, cannot fetch nurse profile");
-    return;
-  }
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/nurse/profile`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-  try {
-    const res = await fetch(`${process.env.REACT_APP_API_URL}/api/nurse/profile`, {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`, // ✅ send token
-      },
-    });
+      const data = await res.json();
+      console.log("Profile data:", data);
 
-    const data = await res.json();
-    console.log("Profile data:", data);
-
-    if (data.success) {
-      setAvailable(Boolean(data.nurse?.available));
-    } else {
-      console.warn("Failed to fetch nurse profile:", data.message);
+      if (data.success) setAvailable(Boolean(data.nurse?.available));
+    } catch (err) {
+      console.error("AVAILABILITY FETCH ERROR:", err);
     }
-  } catch (err) {
-    console.error("AVAILABILITY FETCH ERROR:", err);
-  }
-}, []);
-
+  }, [token]);
 
   // ====================== Auto Fetch on Mount ======================
   useEffect(() => {
@@ -182,6 +174,7 @@ const fetchAvailability = useCallback(async () => {
       showNotification("Server error", "error");
     }
   };
+
 
   // ====================== Logout ======================
   const handleLogout = () => {
