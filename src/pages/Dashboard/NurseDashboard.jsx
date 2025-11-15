@@ -28,86 +28,49 @@ const NurseDashboard = () => {
     /* ============================================================
       FETCH ASSIGNMENTS
   ============================================================ */
-const fetchAssignments = useCallback(async () => {
-  if (!nurseId) return;
+   const fetchAssignments = useCallback(async () => {
+    if (!token) return;
 
-  setIsLoading(true);
-  try {
-    const res = await fetch(
-      `${process.env.REACT_APP_API_URL}/api/nurse/assignments?nurseId=${nurseId}`
-    );
-    const data = await res.json();
+    setIsLoading(true);
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/nurse/assignments`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const data = await res.json();
 
-    if (data.success) {
-      setAssignments(data.data || []);
-    } else {
+      if (data.success) setAssignments(data.data || []);
+      else setAssignments([]);
+    } catch (err) {
+      console.error("FETCH ERROR:", err);
       setAssignments([]);
+    } finally {
+      setIsLoading(false);
     }
-  } catch (err) {
-    console.error("FETCH ERROR:", err);
-    setAssignments([]);
-  } finally {
-    setIsLoading(false);
-  }
-}, [nurseId]);
-
-
-
-  //  const fetchAssignments = useCallback(async () => {
-  //   if (!token) return;
-
-  //   setIsLoading(true);
-  //   try {
-  //     const res = await fetch(
-  //       `${process.env.REACT_APP_API_URL}/api/nurse/assignments`,
-  //       {
-  //         headers: { Authorization: `Bearer ${token}` },
-  //       }
-  //     );
-  //     const data = await res.json();
-
-  //     if (data.success) setAssignments(data.data || []);
-  //     else setAssignments([]);
-  //   } catch (err) {
-  //     console.error("FETCH ERROR:", err);
-  //     setAssignments([]);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // }, [token]);
+  }, [token]);
 
   // ====================== Fetch Nurse Availability ======================
   const fetchAvailability = useCallback(async () => {
-  try {
-    const res = await fetch(`${process.env.REACT_APP_API_URL}/api/nurse/profile`);
-    const data = await res.json();
+    if (!token) return;
 
-    const me = data?.data?.find((n) => String(n._id) === String(nurseId));
-    if (me) setAvailable(Boolean(me.available));
-  } catch (err) {
-    console.error("AVAILABILITY FETCH ERROR:", err);
-  }
-}, [nurseId]);
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/nurse/profile`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-  // const fetchAvailability = useCallback(async () => {
-  //   if (!token) return;
+      const data = await res.json();
+      console.log("Profile data:", data);
 
-  //   try {
-  //     const res = await fetch(`${process.env.REACT_APP_API_URL}/api/nurse/profile`, {
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     });
-
-  //     const data = await res.json();
-  //     console.log("Profile data:", data);
-
-  //     if (data.success) setAvailable(Boolean(data.nurse?.available));
-  //   } catch (err) {
-  //     console.error("AVAILABILITY FETCH ERROR:", err);
-  //   }
-  // }, [token]);
+      if (data.success) setAvailable(Boolean(data.nurse?.available));
+    } catch (err) {
+      console.error("AVAILABILITY FETCH ERROR:", err);
+    }
+  }, [token]);
 
   // ====================== Auto Fetch on Mount ======================
   useEffect(() => {
@@ -222,7 +185,7 @@ const fetchAssignments = useCallback(async () => {
   };
 
   // ====================== UI ======================
-   return (
+  return (
     <div className="nurse-dashboard">
       {notification.message && (
         <div className={`notification ${notification.type}`}>
@@ -241,151 +204,67 @@ const fetchAssignments = useCallback(async () => {
       {/* CONTROLS */}
       <div className="dashboard-controls">
         <button
-          className={`availability-btn ${
-            available ? "available" : "unavailable"
-          }`}
+          className={`availability-btn ${available ? "available" : "unavailable"}`}
           onClick={handleToggleAvailability}
         >
           {available ? "✅ Online" : "🚫 Offline"}
         </button>
-
         <button className="refresh-btn" onClick={fetchAssignments}>
           🔄 Refresh
         </button>
       </div>
 
-      {/* MAIN */}
-      <main className="assignments-section">
-        <h2>Assigned Appointments</h2>
+      {/* ASSIGNMENTS */}
+      {/* ASSIGNMENTS */}
+<main className="assignments-section">
+  <h2>Assigned Appointments</h2>
 
-        {isLoading ? (
-          <p className="loading">Loading...</p>
-        ) : assignments.length === 0 ? (
-          <p className="no-assignments">No assignments yet.</p>
-        ) : (
-          <div className="assignments-list">
-            {assignments.map((a) => (
-              <div key={a._id} className="assignment-card">
-                <p><strong>Patient:</strong> {a.patientId?.fullName}</p>
-                <p><strong>Time:</strong> {a.slotTime}</p>
-                <p>
-                  <strong>Status:</strong>{" "}
-                  <span className={`status ${a.status.toLowerCase()}`}>
-                    {a.status}
-                  </span>
-                </p>
-
-                <div className="assignment-actions">
-                  {a.status === "Pending" && (
-                    <button
-                      className={`accept-btn ${
-                        !available ? "disabled-accept" : ""
-                      }`}
-                      onClick={() => handleAcceptAssignment(a._id)}
-                      disabled={!available}
-                    >
-                      Accept
-                    </button>
-                  )}
-
-                  {a.status === "Accepted" && (
-                    <button
-                      className="complete-btn"
-                      onClick={() => handleCompleteAssignment(a._id)}
-                    >
-                      Complete
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
+  {isLoading ? (
+    <p className="loading">Loading...</p>
+  ) : assignments.length === 0 ? (
+    <p className="no-assignments">No assignments yet.</p>
+  ) : (
+    <div className="assignments-list">
+      {assignments.map((a) => (
+        <div key={a._id} className="assignment-card">
+          <p>
+            <strong>Patient:</strong> {a.patientId?.fullName || a.patientName|| "Unknown"}
+          </p>
+          <p>
+            <strong>Time:</strong> {a.time} {/* fixed: use time from schema */}
+          </p>
+          <p>
+            <strong>Status:</strong>{" "}
+            <span className={`status ${a.status?.toLowerCase() || "pending"}`}>
+              {a.status || "Pending"}
+            </span>
+          </p>
+          <div className="assignment-actions">
+            {a.status === "Pending" || !a.status ? (
+              <button
+                className={`accept-btn ${!available ? "disabled-accept" : ""}`}
+                onClick={() => handleAcceptAssignment(a._id)}
+                disabled={!available}
+              >
+                Accept
+              </button>
+            ) : a.status === "Accepted" ? (
+              <button
+                className="complete-btn"
+                onClick={() => handleCompleteAssignment(a._id)}
+              >
+                Complete
+              </button>
+            ) : null}
           </div>
-        )}
-      </main>
+        </div>
+      ))}
+    </div>
+  )}
+</main>
+
     </div>
   );
 };
-
-//   return (
-//     <div className="nurse-dashboard">
-//       {notification.message && (
-//         <div className={`notification ${notification.type}`}>
-//           {notification.message}
-//         </div>
-//       )}
-
-//       {/* HEADER */}
-//       <header className="dashboard-header">
-//         <h1>👩‍⚕️ Nurse Dashboard — {nurseName}</h1>
-//         <button className="logout-btn" onClick={handleLogout}>
-//           Logout
-//         </button>
-//       </header>
-
-//       {/* CONTROLS */}
-//       <div className="dashboard-controls">
-//         <button
-//           className={`availability-btn ${available ? "available" : "unavailable"}`}
-//           onClick={handleToggleAvailability}
-//         >
-//           {available ? "✅ Online" : "🚫 Offline"}
-//         </button>
-//         <button className="refresh-btn" onClick={fetchAssignments}>
-//           🔄 Refresh
-//         </button>
-//       </div>
-
-//       {/* ASSIGNMENTS */}
-//       {/* ASSIGNMENTS */}
-// <main className="assignments-section">
-//   <h2>Assigned Appointments</h2>
-
-//   {isLoading ? (
-//     <p className="loading">Loading...</p>
-//   ) : assignments.length === 0 ? (
-//     <p className="no-assignments">No assignments yet.</p>
-//   ) : (
-//     <div className="assignments-list">
-//       {assignments.map((a) => (
-//         <div key={a._id} className="assignment-card">
-//           <p>
-//             <strong>Patient:</strong> {a.patientId?.fullName || a.patientName|| "Unknown"}
-//           </p>
-//           <p>
-//             <strong>Time:</strong> {a.time} {/* fixed: use time from schema */}
-//           </p>
-//           <p>
-//             <strong>Status:</strong>{" "}
-//             <span className={`status ${a.status?.toLowerCase() || "pending"}`}>
-//               {a.status || "Pending"}
-//             </span>
-//           </p>
-//           <div className="assignment-actions">
-//             {a.status === "Pending" || !a.status ? (
-//               <button
-//                 className={`accept-btn ${!available ? "disabled-accept" : ""}`}
-//                 onClick={() => handleAcceptAssignment(a._id)}
-//                 disabled={!available}
-//               >
-//                 Accept
-//               </button>
-//             ) : a.status === "Accepted" ? (
-//               <button
-//                 className="complete-btn"
-//                 onClick={() => handleCompleteAssignment(a._id)}
-//               >
-//                 Complete
-//               </button>
-//             ) : null}
-//           </div>
-//         </div>
-//       ))}
-//     </div>
-//   )}
-// </main>
-
-//     </div>
-//   );
-// };
 
 export default NurseDashboard;
