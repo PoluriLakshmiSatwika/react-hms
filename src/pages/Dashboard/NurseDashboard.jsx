@@ -51,26 +51,7 @@ const NurseDashboard = () => {
     }
   }, [token]);
 
-  // ====================== Fetch Nurse Availability ======================
-  const fetchAvailability = useCallback(async () => {
-    if (!token) return;
-
-    try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/nurse/profile`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await res.json();
-      console.log("Profile data:", data);
-
-      if (data.success) setAvailable(Boolean(data.nurse?.available));
-    } catch (err) {
-      console.error("AVAILABILITY FETCH ERROR:", err);
-    }
-  }, [token]);
+ 
 
   // ====================== Auto Fetch on Mount ======================
   useEffect(() => {
@@ -88,86 +69,86 @@ const NurseDashboard = () => {
 }, [navigate, token]);
 
 
-  // ====================== Toggle Availability ======================
-  const handleToggleAvailability = async () => {
-    const newState = !available;
-    setAvailable(newState);
+ // ====================== Fetch Nurse Availability ======================
+const fetchAvailability = useCallback(async () => {
+  if (!token) return;
 
-    try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/nurse/availability`, {
+  try {
+    const res = await fetch(`${process.env.REACT_APP_API_URL}/api/nurse/profile`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await res.json();
+    console.log("Profile data:", data);
+
+    if (data.success) setAvailable(Boolean(data.nurse?.available));
+  } catch (err) {
+    console.error("AVAILABILITY FETCH ERROR:", err);
+    showNotification("Failed to fetch availability", "error");
+  }
+}, [token]);
+
+// ====================== Toggle Availability ======================
+const handleToggleAvailability = async () => {
+  const newState = !available;
+
+  try {
+    const res = await fetch(`${process.env.REACT_APP_API_URL}/api/nurse/availability`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ available: newState }),
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      setAvailable(newState);
+      showNotification(data.message, "success");
+    } else {
+      showNotification(data.message || "Failed to update availability", "error");
+    }
+  } catch (err) {
+    console.error(err);
+    showNotification("Server error while updating availability", "error");
+  }
+};
+
+// ====================== Accept Assignment ======================
+const handleAcceptAssignment = async (id) => {
+  try {
+    const res = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/nurse/assignments/${id}/accept`,
+      {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ available: newState }),
-      });
-      const data = await res.json();
-
-      if (!data.success) {
-        setAvailable(!newState);
-        showNotification("Failed to update availability", "error");
-      } else {
-        showNotification(
-          newState ? "You are now online" : "You are now offline",
-          newState ? "success" : "error"
-        );
       }
-    } catch (err) {
-      setAvailable(!newState);
-      showNotification("Server error", "error");
-    }
-  };
-
-  // ====================== Accept Assignment ======================
-  const handleAcceptAssignment = async (id) => {
-  try {
-    // Optimistically assume nurse is online
-    const res = await fetch(`${process.env.REACT_APP_API_URL}/api/nurse/assignments/${id}/accept`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-    });
+    );
 
     const data = await res.json();
 
     if (!data.success) {
-      // Backend tells you why
-      showNotification(data.message, "error");
-      return;
+      // show backend message (offline, not assigned, etc.)
+      return showNotification(data.message || "Failed to accept assignment", "error");
     }
 
+    // success
     showNotification("👍 Appointment accepted!", "success");
     fetchAssignments(); // refresh assignments
   } catch (err) {
     console.error(err);
-    showNotification("Server error", "error");
+    showNotification("Server error while accepting assignment", "error");
   }
 };
 
-  // ====================== Complete Assignment ======================
-  const handleCompleteAssignment = async (id) => {
-    try {
-      const res = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/nurse/assignments/${id}/complete`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const data = await res.json();
-      if (data.success) {
-        showNotification("✔ Appointment completed", "success");
-        fetchAssignments();
-      } else {
-        showNotification(data.message, "error");
-      }
-    } catch (err) {
-      showNotification("Server error", "error");
-    }
-  };
 
 
   // ====================== Logout ======================
