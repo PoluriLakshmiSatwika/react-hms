@@ -121,35 +121,28 @@ const NurseDashboard = () => {
 
   // ====================== Accept Assignment ======================
   const handleAcceptAssignment = async (id) => {
-    if (!available) {
-      return showNotification(
-        "❌ You are offline. Go online to accept appointments.",
-        "error"
-      );
+  try {
+    // Optimistically assume nurse is online
+    const res = await fetch(`${process.env.REACT_APP_API_URL}/api/nurse/assignments/${id}/accept`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      // Backend tells you why
+      showNotification(data.message, "error");
+      return;
     }
 
-    try {
-      const res = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/nurse/assignments/${id}/accept`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const data = await res.json();
-      if (data.success) {
-        showNotification("👍 Appointment accepted!", "success");
-        fetchAssignments();
-      } else {
-        showNotification(data.message, "error");
-      }
-    } catch (err) {
-      showNotification("Server error", "error");
-    }
-  };
+    showNotification("👍 Appointment accepted!", "success");
+    fetchAssignments(); // refresh assignments
+  } catch (err) {
+    console.error(err);
+    showNotification("Server error", "error");
+  }
+};
 
   // ====================== Complete Assignment ======================
   const handleCompleteAssignment = async (id) => {
