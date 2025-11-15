@@ -48,7 +48,7 @@ const NurseDashboard = () => {
   }, [token]);
 
   // ====================== Fetch Nurse Availability ======================
-// ====================== Fetch Nurse Availability ======================
+
 const fetchAvailability = useCallback(async () => {
   const token = localStorage.getItem("token"); // ✅ get token here
   if (!token) {
