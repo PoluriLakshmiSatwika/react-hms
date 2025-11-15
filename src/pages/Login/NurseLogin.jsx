@@ -50,9 +50,8 @@ const NurseLoginPage = () => {
     setErrors({});
 
     try {
-      const res = await fetch(
-        "https://hms-backend-op3l.onrender.com/api/nurse/login",
-        {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/nurse/login`,{
+        
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
