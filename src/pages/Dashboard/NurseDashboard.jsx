@@ -18,6 +18,7 @@ const NurseDashboard = () => {
   const [notification, setNotification] = useState({ message: "", type: "" });
 
   const token = localStorage.getItem("token");
+  console.log("Token in dashboard:", token);
 
   // ====================== Notifications ======================
   const showNotification = (message, type = "success") => {
@@ -47,19 +48,35 @@ const NurseDashboard = () => {
   }, [token]);
 
   // ====================== Fetch Nurse Availability ======================
-  const fetchAvailability = useCallback(async () => {
-    if (!token) return;
+// ====================== Fetch Nurse Availability ======================
+const fetchAvailability = useCallback(async () => {
+  const token = localStorage.getItem("token"); // ✅ get token here
+  if (!token) {
+    console.warn("No token found, cannot fetch nurse profile");
+    return;
+  }
 
-    try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/nurse/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (data.success) setAvailable(Boolean(data.nurse?.available));
-    } catch (err) {
-      console.error("AVAILABILITY FETCH ERROR:", err);
+  try {
+    const res = await fetch(`${process.env.REACT_APP_API_URL}/api/nurse/profile`, {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`, // ✅ send token
+      },
+    });
+
+    const data = await res.json();
+    console.log("Profile data:", data);
+
+    if (data.success) {
+      setAvailable(Boolean(data.nurse?.available));
+    } else {
+      console.warn("Failed to fetch nurse profile:", data.message);
     }
-  }, [token]);
+  } catch (err) {
+    console.error("AVAILABILITY FETCH ERROR:", err);
+  }
+}, []);
+
 
   // ====================== Auto Fetch on Mount ======================
   useEffect(() => {
