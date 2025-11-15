@@ -148,6 +148,30 @@ const handleAcceptAssignment = async (id) => {
     showNotification("Server error while accepting assignment", "error");
   }
 };
+// ====================== Complete Assignment ======================
+const handleCompleteAssignment = async (id) => {
+  try {
+    const res = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/nurse/assignments/${id}/complete`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const data = await res.json();
+    if (!data.success) return showNotification(data.message || "Failed to complete assignment", "error");
+
+    showNotification("✔ Appointment completed", "success");
+    fetchAssignments();
+  } catch (err) {
+    console.error(err);
+    showNotification("Server error while completing assignment", "error");
+  }
+};
 
 
 
