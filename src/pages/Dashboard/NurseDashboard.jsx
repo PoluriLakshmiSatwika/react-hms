@@ -45,7 +45,7 @@ const NurseDashboard = () => {
         setNotification("Assignment accepted!");
         setAssignments((prev) =>
           prev.map((a) =>
-            a._id === assignmentId ? { ...a, status: "accepted" } : a
+            a.id === assignmentId ? { ...a, status: "accepted" } : a
           )
         );
       }
@@ -89,7 +89,7 @@ const NurseDashboard = () => {
             {assignments.length === 0 ? (
               <tr><td colSpan="8">No assignments yet.</td></tr>
             ) : assignments.map((a) => (
-              <tr key={a._id}>
+              <tr key={a.id}>
                 <td>{a.patientId?.fullName}</td>
                 <td>{a.patientId?.email}</td>
                 <td>{a.patientId?.phone}</td>
@@ -99,7 +99,7 @@ const NurseDashboard = () => {
                 <td>{a.status}</td>
                 <td>
                   {a.status !== "accepted" && (
-                    <button onClick={() => acceptAssignment(a._id)} className="accept-btn">
+                    <button onClick={() => acceptAssignment(a.id)} className="accept-btn">
                       Accept
                     </button>
                   )}
