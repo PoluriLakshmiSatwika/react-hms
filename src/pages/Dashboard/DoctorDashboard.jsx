@@ -1,3 +1,4 @@
+Doctor Dashboard
 import React, { useEffect, useState } from "react";
 import "./DoctorDashboard.css";
 import { useNavigate } from "react-router-dom";
