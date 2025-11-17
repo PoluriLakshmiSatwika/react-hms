@@ -1,4 +1,4 @@
-// NurseDashboard.jsx
+// // // NurseDashboard.jsx
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import "./NurseDashboard.css";
@@ -120,9 +120,7 @@ const NurseDashboard = () => {
         ) : (
           <div className="assignments-list">
             {assignments.map((a) => {
-              const nurseEntry = a.assignedNurses.find(
-                n => n.nurseId.toString() === nurseId.toString()
-              );
+              const nurseEntry = a.assignedNurses.find(n => n.nurseId === nurseId);
               const status = nurseEntry?.status || "Pending";
               return (
                 <div key={a._id} className="assignment-card">
@@ -148,3 +146,4 @@ const NurseDashboard = () => {
 };
 
 export default NurseDashboard;
+
