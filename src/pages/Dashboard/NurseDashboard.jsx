@@ -1,4 +1,3 @@
-// // // NurseDashboard.jsx
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import "./NurseDashboard.css";
@@ -7,8 +6,8 @@ const NurseDashboard = () => {
   const navigate = useNavigate();
 
   const nurse = JSON.parse(localStorage.getItem("nurse")) || {};
-  const nurseId = nurse._id;
-  const nurseName = nurse.fullName;
+  const nurseId = nurse._id?.toString();
+  const nurseName = nurse.fullName || "Nurse";
 
   const [assignments, setAssignments] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -120,19 +119,35 @@ const NurseDashboard = () => {
         ) : (
           <div className="assignments-list">
             {assignments.map((a) => {
-              const nurseEntry = a.assignedNurses.find(n => n.nurseId === nurseId);
+              const nurseEntry = a.assignedNurses?.find(
+                (n) => n.nurseId?.toString() === nurseId
+              );
               const status = nurseEntry?.status || "Pending";
+
               return (
                 <div key={a._id} className="assignment-card">
                   <p><strong>Patient:</strong> {a.patientId?.fullName || "Unknown"}</p>
-                  <p><strong>Time:</strong> {a.time}</p>
-                  <p><strong>Status:</strong> <span className={`status ${status.toLowerCase()}`}>{status}</span></p>
+                  <p><strong>Time:</strong> {a.time || "N/A"}</p>
+                  <p>
+                    <strong>Status:</strong>{" "}
+                    <span className={`status ${status.toLowerCase()}`}>{status}</span>
+                  </p>
                   <div className="assignment-actions">
                     {status === "Pending" && (
-                      <button className="accept-btn" onClick={() => handleAcceptAssignment(a._id)}>Accept</button>
+                      <button
+                        className="accept-btn"
+                        onClick={() => handleAcceptAssignment(a._id)}
+                      >
+                        Accept
+                      </button>
                     )}
                     {status === "Accepted" && (
-                      <button className="complete-btn" onClick={() => handleCompleteAssignment(a._id)}>Complete</button>
+                      <button
+                        className="complete-btn"
+                        onClick={() => handleCompleteAssignment(a._id)}
+                      >
+                        Complete
+                      </button>
                     )}
                   </div>
                 </div>
@@ -146,4 +161,3 @@ const NurseDashboard = () => {
 };
 
 export default NurseDashboard;
-
