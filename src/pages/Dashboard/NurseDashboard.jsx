@@ -1,20 +1,17 @@
-// NurseDashboard.jsx
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import "./NurseDashboard.css";
 
 const NurseDashboard = () => {
   const navigate = useNavigate();
-  const nurse = JSON.parse(localStorage.getItem("nurse")); // nurse object from login
+  const nurse = JSON.parse(localStorage.getItem("nurse")); 
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [notification, setNotification] = useState("");
 
-  // Fetch assignments
   const fetchAssignments = useCallback(async () => {
-    if (!nurse?.id) return;
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/nurse/assignments/${nurse.id}`);
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/nurse/assignments/${nurse._id}`);
       const data = await res.json();
       if (data.success) setAssignments(data.assignments);
       setLoading(false);
@@ -23,29 +20,22 @@ const NurseDashboard = () => {
       setNotification("Error fetching assignments");
       setLoading(false);
     }
-  }, [nurse?.id]);
+  }, [nurse._id]);
 
   useEffect(() => {
-    if (!nurse?.id) {
-      navigate("/login"); // redirect if not logged in
-    } else {
-      fetchAssignments();
-    }
-  }, [nurse?.id, fetchAssignments, navigate]);
+    if (!nurse) navigate("/login");
+    else fetchAssignments();
+  }, [nurse, fetchAssignments, navigate]);
 
-  // Accept assignment
   const acceptAssignment = async (assignmentId) => {
     try {
-      const res = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/nurse/assignments/${assignmentId}/accept`,
-        { method: "POST" }
-      );
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/nurse/assignments/${assignmentId}/accept`, { method: "POST" });
       const data = await res.json();
       if (data.success) {
         setNotification("Assignment accepted!");
         setAssignments((prev) =>
           prev.map((a) =>
-            a.id === assignmentId ? { ...a, status: "accepted" } : a
+            a._id === assignmentId ? { ...a, status: "accepted" } : a
           )
         );
       }
@@ -89,7 +79,7 @@ const NurseDashboard = () => {
             {assignments.length === 0 ? (
               <tr><td colSpan="8">No assignments yet.</td></tr>
             ) : assignments.map((a) => (
-              <tr key={a.id}>
+              <tr key={a._id}>
                 <td>{a.patientId?.fullName}</td>
                 <td>{a.patientId?.email}</td>
                 <td>{a.patientId?.phone}</td>
@@ -98,11 +88,7 @@ const NurseDashboard = () => {
                 <td>{a.slotTime}</td>
                 <td>{a.status}</td>
                 <td>
-                  {a.status !== "accepted" && (
-                    <button onClick={() => acceptAssignment(a.id)} className="accept-btn">
-                      Accept
-                    </button>
-                  )}
+                  {a.status !== "accepted" && <button onClick={() => acceptAssignment(a._id)} className="accept-btn">Accept</button>}
                 </td>
               </tr>
             ))}
