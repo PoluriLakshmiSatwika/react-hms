@@ -25,7 +25,7 @@ const NurseDashboard = () => {
     setLoading(true);
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/appointments/nurse/${nurseId}`,
+        `${process.env.REACT_APP_API_URL}/api/nurse/appointments/${nurseId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
