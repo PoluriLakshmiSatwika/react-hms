@@ -16,7 +16,7 @@ const DoctorDashboard = () => {
     if (storedDoctor?.id) setDoctor(storedDoctor);
   }, []);
 
-  // Fetch appointments of doctor
+  // Fetch doctor's appointments
   const fetchAppointments = async (doctorId) => {
     if (!doctorId) return;
     setLoading(true);
@@ -31,7 +31,6 @@ const DoctorDashboard = () => {
 
       if (data.success) setAppointments(data.data);
       else setAppointments([]);
-
     } catch (err) {
       console.error("Error fetching appointments:", err);
       setAppointments([]);
@@ -50,6 +49,7 @@ const DoctorDashboard = () => {
         }
       );
       const data = await res.json();
+
       if (Array.isArray(data)) setNurses(data);
     } catch (err) {
       console.error("Error fetching nurses:", err);
@@ -57,10 +57,8 @@ const DoctorDashboard = () => {
     }
   };
 
-  // Assign nurse to appointment
+  // Assign nurse
   const handleAssignNurse = async (appointment, nurse) => {
-    if (!nurse) return;
-
     try {
       const res = await fetch(
         `${process.env.REACT_APP_API_URL}/api/assignments`,
@@ -82,7 +80,7 @@ const DoctorDashboard = () => {
       if (data.success) {
         setMessage(`✅ Nurse ${nurse.fullName} assigned successfully`);
 
-        // Update UI immediately
+        // update UI
         setAppointments((prev) =>
           prev.map((a) =>
             a._id === appointment._id
@@ -91,12 +89,10 @@ const DoctorDashboard = () => {
           )
         );
       } else {
-        setMessage(
-          `❌ Failed to assign nurse: ${data.message || "Unknown error"}`
-        );
+        setMessage("❌ Failed to assign nurse");
       }
     } catch (err) {
-      console.error("Error assigning nurse:", err);
+      console.error(err);
       setMessage("⚠ Error assigning nurse");
     }
   };
@@ -105,11 +101,10 @@ const DoctorDashboard = () => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("doctor");
-    setDoctor(null);
     navigate("/");
   };
 
-  // On page load
+  // Load initial data
   useEffect(() => {
     if (doctor?.id) {
       fetchAppointments(doctor.id);
@@ -130,55 +125,55 @@ const DoctorDashboard = () => {
 
       {message && <p className="message">{message}</p>}
 
-      {/* =================== Appointments Section =================== */}
+      {/* ------------ Appointments Section ------------ */}
       <div className="section">
         <h3>Appointments</h3>
 
         {loading ? (
           <p>Loading appointments...</p>
         ) : appointments.length === 0 ? (
-          <p>No appointments booked.</p>
+          <p>No appointments available.</p>
         ) : (
           appointments.map((a) => (
             <div key={a._id} className="appointment-card">
               <p>
-                <strong>Patient:</strong> {a.patientId?.fullName || "N/A"}
-              </p>
-              <p>
-                <strong>Disease:</strong> {a.disease}
-              </p>
-              <p>
-                <strong>Date:</strong>{" "}
-                {new Date(a.appointmentDate).toLocaleDateString()}
-              </p>
-              <p>
-                <strong>Time:</strong> {a.slotTime}
+                <strong>Patient:</strong>{" "}
+                {a.patientId?.fullName || "Unknown"}
               </p>
 
-              {/* ----- FIXED STATUS ----- */}
               <p>
-                <strong>Status:</strong>{" "}
-                {a.status === "Completed"
-                  ? "✅ Completed"
-                  : a.status === "Cancelled"
-                  ? "❌ Cancelled"
-                  : a.feePaid
-                  ? "✅ Confirmed"
-                  : "⏳ Pending"}
+                <strong>Disease:</strong> {a.appointmentId?.disease || "N/A"}
+              </p>
+
+              <p>
+                <strong>Date:</strong>{" "}
+                {a.appointmentId?.appointmentDate
+                  ? new Date(a.appointmentId.appointmentDate).toLocaleDateString()
+                  : "N/A"}
+              </p>
+
+              <p>
+                <strong>Time:</strong> {a.appointmentId?.slotTime || "N/A"}
+              </p>
+
+              <p>
+                <strong>Status:</strong> {a.status}
               </p>
 
               <p>
                 <strong>Assigned Nurses:</strong>{" "}
-  {appointment.assignedNurses?.length > 0
-    ? appointment.assignedNurses.map(n => n.fullName).join(", ")
-    : "None"}
+                {a.assignedNurses?.length > 0
+                  ? a.assignedNurses
+                      .map((n) => n.nurseName || n.fullName)
+                      .join(", ")
+                  : "None"}
               </p>
             </div>
           ))
         )}
       </div>
 
-      {/* =================== Nurses Section =================== */}
+      {/* ------------ Nurses Section ------------ */}
       <div className="section">
         <h3>Available Nurses</h3>
 
@@ -209,25 +204,24 @@ const DoctorDashboard = () => {
                     <select
                       onChange={(e) => {
                         const appointment = appointments.find(
-                          (a) => a._id === e.target.value
+                          (x) => x._id === e.target.value
                         );
                         if (appointment) handleAssignNurse(appointment, nurse);
                       }}
                     >
                       <option value="">Select Appointment</option>
 
-                      {/* ----- FIX: Remove Completed + Cancelled from dropdown ----- */}
                       {appointments
                         .filter(
-                          (a) =>
-                            a.status !== "Completed" &&
-                            a.status !== "Cancelled"
+                          (x) =>
+                            x.status !== "Completed" &&
+                            x.status !== "Cancelled"
                         )
-                        .map((a) => (
-                          <option key={a._id} value={a._id}>
-                            {a.patientId?.fullName} (
+                        .map((x) => (
+                          <option key={x._id} value={x._id}>
+                            {x.patientId?.fullName} (
                             {new Date(
-                              a.appointmentDate
+                              x.appointmentId?.appointmentDate
                             ).toLocaleDateString()}
                             )
                           </option>
