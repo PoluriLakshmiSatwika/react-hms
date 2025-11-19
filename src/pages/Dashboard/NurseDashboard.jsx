@@ -16,35 +16,40 @@ const NurseDashboard = () => {
     if (storedNurse?.id) setNurse(storedNurse);
   }, []);
 
-  // Fetch appointments assigned to this nurse
-  const fetchAssignedAppointments = async (nurseId) => {
-    if (!nurseId) return;
-    setLoading(true);
+// Fetch appointments assigned to this nurse
+const fetchAssignedAppointments = async (nurseId) => {
+  if (!nurseId) return;
+  setLoading(true);
 
-    try {
-      const res = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/nurse/appointments/${nurseId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+  try {
+    const token = localStorage.getItem("nurseToken",loginResponse.token);  // ✅ FIXED
 
-      const data = await res.json();
-
-      if (data.success) {
-        setAppointments(data.data);
-      } else {
-        setAppointments([]);
+    const res = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/nurse/appointments/${nurseId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",  // ✅ Add this
+          Authorization: `Bearer ${token}`,    // ✅ FIXED
+        },
       }
-    } catch (err) {
-      console.error("Error fetching appointments:", err);
+    );
+
+    const data = await res.json();
+
+    if (data.success) {
+      setAppointments(data.data);
+    } else {
       setAppointments([]);
-    } finally {
-      setLoading(false);
     }
-  };
+  } catch (err) {
+    console.error("Error fetching appointments:", err);
+    setAppointments([]);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // Accept Appointment
   const handleAccept = async (appointmentId) => {
