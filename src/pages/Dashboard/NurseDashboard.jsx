@@ -1,10 +1,7 @@
 // NurseDashboard.jsx
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./NurseDashboard.css";
-
-  const token = localStorage.getItem("token");
-  console.log("Token in dashboard:", token);
 
 const NurseDashboard = () => {
   const navigate = useNavigate();
@@ -23,6 +20,7 @@ const NurseDashboard = () => {
   const fetchAssignedAppointments = async (nurseId) => {
     if (!nurseId) return;
     setLoading(true);
+
     try {
       const res = await fetch(
         `${process.env.REACT_APP_API_URL}/api/nurse/appointments/${nurseId}`,
@@ -34,8 +32,12 @@ const NurseDashboard = () => {
       );
 
       const data = await res.json();
-      if (data.success) setAppointments(data.data);
-      else setAppointments([]);
+
+      if (data.success) {
+        setAppointments(data.data);
+      } else {
+        setAppointments([]);
+      }
     } catch (err) {
       console.error("Error fetching appointments:", err);
       setAppointments([]);
@@ -62,7 +64,7 @@ const NurseDashboard = () => {
       const data = await res.json();
 
       if (data.success) {
-        setMessage("✅ Appointment accepted successfully");
+        setMessage("Appointment accepted successfully");
         setAppointments((prev) =>
           prev.map((a) =>
             a._id === appointmentId ? { ...a, status: "Accepted" } : a
@@ -74,7 +76,7 @@ const NurseDashboard = () => {
     }
   };
 
-  // Mark as Completed / Success
+  // Mark as Completed
   const handleComplete = async (appointmentId) => {
     try {
       const res = await fetch(
@@ -92,7 +94,7 @@ const NurseDashboard = () => {
       const data = await res.json();
 
       if (data.success) {
-        setMessage("🎉 Appointment marked as Completed!");
+        setMessage("Appointment marked as Completed!");
         setAppointments((prev) =>
           prev.map((a) =>
             a._id === appointmentId ? { ...a, status: "Completed" } : a
@@ -122,13 +124,16 @@ const NurseDashboard = () => {
     <div className="nurse-dashboard">
       <div className="dashboard-header">
         <h2>Welcome, Nurse {nurse.fullName}</h2>
-        <button className="logout-btn" onClick={handleLogout}>Logout</button>
+        <button className="logout-btn" onClick={handleLogout}>
+          Logout
+        </button>
       </div>
 
       {message && <p className="message">{message}</p>}
 
       <div className="section">
         <h3>Your Assigned Appointments</h3>
+
         {loading ? (
           <p>Loading appointments...</p>
         ) : appointments.length === 0 ? (
@@ -137,17 +142,22 @@ const NurseDashboard = () => {
           appointments.map((a) => (
             <div key={a._id} className="appointment-card">
               <p><strong>Patient:</strong> {a.patientId?.fullName || "N/A"}</p>
+              <p><strong>Doctor:</strong> {a.doctorId?.fullName || "N/A"}</p>
               <p><strong>Disease:</strong> {a.disease}</p>
               <p><strong>Date:</strong> {new Date(a.appointmentDate).toLocaleDateString()}</p>
               <p><strong>Time:</strong> {a.slotTime}</p>
               <p><strong>Status:</strong> {a.status}</p>
 
               {a.status === "Pending" && (
-                <button className="accept-btn" onClick={() => handleAccept(a._id)}>Accept</button>
+                <button className="accept-btn" onClick={() => handleAccept(a._id)}>
+                  Accept
+                </button>
               )}
 
               {a.status === "Accepted" && (
-                <button className="complete-btn" onClick={() => handleComplete(a._id)}>Mark as Completed</button>
+                <button className="complete-btn" onClick={() => handleComplete(a._id)}>
+                  Mark as Completed
+                </button>
               )}
             </div>
           ))

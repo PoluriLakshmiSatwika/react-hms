@@ -1,68 +1,57 @@
+
 import React, { useEffect, useState } from "react";
 import "./DoctorDashboard.css";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
-} from "@/components/ui/dialog";
-
 const DoctorDashboard = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // add this
   const [doctor, setDoctor] = useState(null);
   const [appointments, setAppointments] = useState([]);
   const [nurses, setNurses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
-  const [selectedAppointment, setSelectedAppointment] = useState(null);
-  const [selectedNurse, setSelectedNurse] = useState(null);
-  const [assignLoading, setAssignLoading] = useState(false);
 
+  // Load doctor from localStorage
   useEffect(() => {
     const storedDoctor = JSON.parse(localStorage.getItem("doctor"));
     if (storedDoctor?.id) setDoctor(storedDoctor);
   }, []);
 
+  // Fetch appointments
   const fetchAppointments = async (doctorId) => {
     if (!doctorId) return;
     setLoading(true);
     try {
-      const res = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/appointments/doctor/${doctorId}`,
-        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-      );
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/appointments/doctor/${doctorId}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
       const data = await res.json();
       if (data.success) setAppointments(data.data);
       else setAppointments([]);
-    } catch {
+    } catch (err) {
+      console.error("Error fetching appointments:", err);
       setAppointments([]);
     } finally {
       setLoading(false);
     }
   };
 
+  // Fetch nurses
   const fetchNurses = async () => {
     try {
-      const res = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/admin/nurses`,
-        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-      );
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/nurses`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
       const data = await res.json();
       if (Array.isArray(data)) setNurses(data);
-    } catch {
+    } catch (err) {
+      console.error("Error fetching nurses:", err);
       setNurses([]);
     }
   };
 
-  const handleAssignNurse = async () => {
-    if (!selectedAppointment || !selectedNurse) return;
-    setAssignLoading(true);
-
+  // Assign nurse
+  const handleAssignNurse = async (appointment, nurse) => {
+    if (!nurse) return;
     try {
       const res = await fetch(`${process.env.REACT_APP_API_URL}/api/assignments`, {
         method: "PUT",
@@ -71,36 +60,38 @@ const DoctorDashboard = () => {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
-          appointmentId: selectedAppointment._id,
-          nurseIds: [selectedNurse._id],
+          appointmentId: appointment._id,
+          nurseIds: [nurse._id],
         }),
       });
-
       const data = await res.json();
-
       if (data.success) {
-        setMessage(`Nurse ${selectedNurse.fullName} assigned successfully`);
-
+        setMessage(`✅ Nurse ${nurse.fullName} assigned successfully`);
         setAppointments((prev) =>
           prev.map((a) =>
-            a._id === selectedAppointment._id
+            a._id === appointment._id
               ? { ...a, assignedNurses: data.data.assignedNurses }
               : a
           )
         );
-      } else setMessage("Failed to assign nurse");
-    } finally {
-      setAssignLoading(false);
-      setSelectedAppointment(null);
-      setSelectedNurse(null);
+      } else {
+        setMessage(`❌ Failed to assign nurse: ${data.message || "Unknown error"}`);
+      }
+    } catch (err) {
+      console.error("Error assigning nurse:", err);
+      setMessage("⚠ Error assigning nurse");
     }
   };
+  
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("doctor");
-    navigate("/");
-  };
+  // Logout
+ const handleLogout = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("doctor");
+  setDoctor(null);  // clear state
+  navigate("/");    // redirect to homepage
+};
+
 
   useEffect(() => {
     if (doctor?.id) {
@@ -112,54 +103,41 @@ const DoctorDashboard = () => {
   if (!doctor) return <p>Please login as doctor to view dashboard.</p>;
 
   return (
-    <div className="doctor-dashboard p-6 space-y-6">
-      <div className="dashboard-header flex justify-between items-center">
-        <h2 className="text-2xl font-semibold">Welcome, Dr. {doctor.fullName}</h2>
-        <Button variant="destructive" onClick={handleLogout}>Logout</Button>
+    <div className="doctor-dashboard">
+      <div className="dashboard-header">
+        <h2>Welcome, Dr. {doctor.fullName}</h2>
+        <button className="logout-btn" onClick={handleLogout}>Logout</button>
       </div>
 
-      {message && <p className="text-green-600 font-medium">{message}</p>}
+      {message && <p className="message">{message}</p>}
 
-      {/* Appointments */}
-      <motion.div
-        className="section"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <h3 className="text-xl font-semibold mb-4">Appointments</h3>
-
+      <div className="section">
+        <h3>Appointments</h3>
         {loading ? (
           <p>Loading appointments...</p>
         ) : appointments.length === 0 ? (
           <p>No appointments booked.</p>
         ) : (
           appointments.map((a) => (
-            <motion.div
-              key={a._id}
-              className="appointment-card p-4 bg-white rounded-2xl shadow mb-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              <p><strong>Patient:</strong> {a.patientId?.fullName}</p>
+            <div key={a._id} className="appointment-card">
+              <p><strong>Patient:</strong> {a.patientId?.fullName || "N/A"}</p>
               <p><strong>Disease:</strong> {a.disease}</p>
               <p><strong>Date:</strong> {new Date(a.appointmentDate).toLocaleDateString()}</p>
               <p><strong>Time:</strong> {a.slotTime}</p>
-              <p><strong>Status:</strong> {a.status}</p>
+              <p><strong>Status:</strong> {a.status === "Cancelled" ? "❌ Cancelled" : a.feePaid ? "✅ Confirmed" : "⏳ Pending"}</p>
               <p><strong>Assigned Nurses:</strong> {a.assignedNurses?.length > 0 ? a.assignedNurses.map(n => n.nurseName).join(", ") : "None"}</p>
-            </motion.div>
+            </div>
           ))
         )}
-      </motion.div>
+      </div>
 
-      {/* Nurses Table */}
       <div className="section">
-        <h3 className="text-xl font-semibold mb-4">Available Nurses</h3>
-
+        <h3>Available Nurses</h3>
         {nurses.length === 0 ? (
           <p>No nurses available.</p>
         ) : (
-          <table className="nurse-table w-full bg-white shadow rounded-xl overflow-hidden">
-            <thead className="bg-gray-100">
+          <table className="nurse-table">
+            <thead>
               <tr>
                 <th>Name</th>
                 <th>Email</th>
@@ -178,14 +156,10 @@ const DoctorDashboard = () => {
                   <td>{nurse.department}</td>
                   <td>{nurse.shiftTiming}</td>
                   <td>
-                    <select
-                      className="border p-2 rounded"
-                      onChange={(e) => {
-                        const appointment = appointments.find(a => a._id === e.target.value);
-                        setSelectedAppointment(appointment);
-                        setSelectedNurse(nurse);
-                      }}
-                    >
+                    <select onChange={(e) => {
+                      const appointment = appointments.find(a => a._id === e.target.value);
+                      if (appointment) handleAssignNurse(appointment, nurse);
+                    }}>
                       <option value="">Select Appointment</option>
                       {appointments.map((a) => (
                         <option key={a._id} value={a._id}>
@@ -200,36 +174,6 @@ const DoctorDashboard = () => {
           </table>
         )}
       </div>
-
-      {/* Confirmation Modal */}
-      {selectedAppointment && selectedNurse && (
-        <Dialog open={true}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Confirm Assignment</DialogTitle>
-            </DialogHeader>
-            <p>
-              Assign <strong>{selectedNurse.fullName}</strong> to patient
-              <strong> {selectedAppointment.patientId?.fullName}</strong>?
-            </p>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setSelectedAppointment(null);
-                  setSelectedNurse(null);
-                }}
-              >
-                Cancel
-              </Button>
-
-              <Button onClick={handleAssignNurse} disabled={assignLoading}>
-                {assignLoading ? "Assigning..." : "Confirm"}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      )}
     </div>
   );
 };
