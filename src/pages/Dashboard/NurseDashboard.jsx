@@ -48,7 +48,7 @@ const NurseDashboard = () => {
     }
   };
 
-  // Accept an appointment
+  // Accept appointment
   const handleAccept = async (appointmentId) => {
     try {
       const token = localStorage.getItem("nurseToken");
@@ -78,7 +78,7 @@ const NurseDashboard = () => {
     }
   };
 
-  // Mark appointment completed
+  // Mark completed
   const handleComplete = async (appointmentId) => {
     try {
       const token = localStorage.getItem("nurseToken");
@@ -138,26 +138,37 @@ const NurseDashboard = () => {
       ) : appointments.length === 0 ? (
         <p>No appointments assigned yet.</p>
       ) : (
-        appointments.map((a) => {
+        appointments.map((item) => {
+          const ap = item.appointmentId; // ✔ shortcut
+
+          // nurse status inside assignment table
           const nurseStatus =
-            a.assignedNurses?.find((n) => n.nurseId === nurse.id)?.status ||
+            item.assignedNurses?.find((n) => n.nurseId === nurse.id)?.status ||
             "Pending";
 
           return (
-            <div key={a._id} className="appointment-card">
-              <p><strong>Patient:</strong> {a.patientId?.fullName}</p>
-              <p><strong>Doctor:</strong> {a.doctorId?.fullName}</p>
-              <p><strong>Disease:</strong> {a.disease}</p>
-              <p><strong>Date:</strong> {new Date(a.appointmentDate).toLocaleDateString()}</p>
-              <p><strong>Time:</strong> {a.slotTime}</p>
+            <div key={item._id} className="appointment-card">
+              <p><strong>Patient:</strong> {ap?.patientId?.fullName || "N/A"}</p>
+              <p><strong>Doctor:</strong> {ap?.doctorId?.fullName || "N/A"}</p>
+              <p><strong>Disease:</strong> {ap?.disease || "N/A"}</p>
+
+              <p>
+                <strong>Date:</strong>{" "}
+                {ap?.appointmentDate
+                  ? new Date(ap.appointmentDate).toLocaleDateString()
+                  : "N/A"}
+              </p>
+
+              <p><strong>Time:</strong> {ap?.slotTime || "N/A"}</p>
+
               <p><strong>Status:</strong> {nurseStatus}</p>
 
               {nurseStatus === "Pending" && (
-                <button onClick={() => handleAccept(a._id)}>Accept</button>
+                <button onClick={() => handleAccept(ap._id)}>Accept</button>
               )}
 
               {nurseStatus === "Accepted" && (
-                <button onClick={() => handleComplete(a._id)}>
+                <button onClick={() => handleComplete(ap._id)}>
                   Mark Completed
                 </button>
               )}
