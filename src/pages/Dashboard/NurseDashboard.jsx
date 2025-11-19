@@ -1,7 +1,5 @@
-// NurseDashboard.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "./NurseDashboard.css";
 
 const NurseDashboard = () => {
   const navigate = useNavigate();
@@ -10,28 +8,33 @@ const NurseDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
 
-  // Load nurse from localStorage
+  // Load nurse details from localStorage
   useEffect(() => {
     const storedNurse = JSON.parse(localStorage.getItem("nurse"));
-    if (storedNurse?.id) setNurse(storedNurse);
+    if (storedNurse) setNurse(storedNurse);
   }, []);
 
-  // Fetch appointments assigned to this nurse
+  // Fetch assigned appointments
   const fetchAssignedAppointments = async (nurseId) => {
     if (!nurseId) return;
     setLoading(true);
 
     try {
+      const token = localStorage.getItem("nurseToken");
+
       const res = await fetch(
         `${process.env.REACT_APP_API_URL}/api/nurse/appointments/${nurseId}`,
         {
+          method: "GET",
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
         }
       );
 
       const data = await res.json();
+      console.log("Assigned Appointments:", data);
 
       if (data.success) {
         setAppointments(data.data);
@@ -39,130 +42,140 @@ const NurseDashboard = () => {
         setAppointments([]);
       }
     } catch (err) {
-      console.error("Error fetching appointments:", err);
-      setAppointments([]);
+      console.error("Error fetching nurse appointments:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Accept Appointment
+  // Accept appointment
   const handleAccept = async (appointmentId) => {
     try {
+      const token = localStorage.getItem("nurseToken");
+
       const res = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/appointments/update-status`,
+        `${process.env.REACT_APP_API_URL}/api/nurse/accept`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ appointmentId, status: "Accepted" }),
+          body: JSON.stringify({
+            appointmentId,
+            nurseId: nurse.id,
+          }),
         }
       );
 
       const data = await res.json();
-
       if (data.success) {
-        setMessage("Appointment accepted successfully");
-        setAppointments((prev) =>
-          prev.map((a) =>
-            a._id === appointmentId ? { ...a, status: "Accepted" } : a
-          )
-        );
+        setMessage("Appointment Accepted!");
+        fetchAssignedAppointments(nurse.id);
       }
     } catch (err) {
-      console.error("Accept error:", err);
+      console.error("Accept Error:", err);
     }
   };
 
-  // Mark as Completed
+  // Mark completed
   const handleComplete = async (appointmentId) => {
     try {
+      const token = localStorage.getItem("nurseToken");
+
       const res = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/appointments/update-status`,
+        `${process.env.REACT_APP_API_URL}/api/nurse/complete`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ appointmentId, status: "Completed" }),
+          body: JSON.stringify({
+            appointmentId,
+            nurseId: nurse.id,
+          }),
         }
       );
 
       const data = await res.json();
-
       if (data.success) {
-        setMessage("Appointment marked as Completed!");
-        setAppointments((prev) =>
-          prev.map((a) =>
-            a._id === appointmentId ? { ...a, status: "Completed" } : a
-          )
-        );
+        setMessage("Appointment marked Completed!");
+        fetchAssignedAppointments(nurse.id);
       }
     } catch (err) {
-      console.error("Completion error:", err);
+      console.error("Completion Error:", err);
     }
   };
 
   // Logout
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("nurseToken");
     localStorage.removeItem("nurse");
-    setNurse(null);
     navigate("/");
   };
 
+  // On load
   useEffect(() => {
     if (nurse?.id) fetchAssignedAppointments(nurse.id);
   }, [nurse]);
 
-  if (!nurse) return <p>Please login as nurse to view dashboard.</p>;
+  if (!nurse) return <p>Please login as a nurse.</p>;
 
   return (
     <div className="nurse-dashboard">
       <div className="dashboard-header">
         <h2>Welcome, Nurse {nurse.fullName}</h2>
-        <button className="logout-btn" onClick={handleLogout}>
-          Logout
-        </button>
+        <button onClick={handleLogout}>Logout</button>
       </div>
 
       {message && <p className="message">{message}</p>}
 
-      <div className="section">
-        <h3>Your Assigned Appointments</h3>
+      <h3>Your Assigned Appointments</h3>
 
-        {loading ? (
-          <p>Loading appointments...</p>
-        ) : appointments.length === 0 ? (
-          <p>No appointments assigned yet.</p>
-        ) : (
-          appointments.map((a) => (
-            <div key={a._id} className="appointment-card">
-              <p><strong>Patient:</strong> {a.patientId?.fullName || "N/A"}</p>
-              <p><strong>Doctor:</strong> {a.doctorId?.fullName || "N/A"}</p>
-              <p><strong>Disease:</strong> {a.disease}</p>
-              <p><strong>Date:</strong> {new Date(a.appointmentDate).toLocaleDateString()}</p>
-              <p><strong>Time:</strong> {a.slotTime}</p>
-              <p><strong>Status:</strong> {a.status}</p>
+      {loading ? (
+        <p>Loading...</p>
+      ) : appointments.length === 0 ? (
+        <p>No appointments assigned yet.</p>
+      ) : (
+        appointments.map((item) => {
+          const ap = item.appointmentId; // ✔ shortcut
 
-              {a.status === "Pending" && (
-                <button className="accept-btn" onClick={() => handleAccept(a._id)}>
-                  Accept
-                </button>
+          // nurse status inside assignment table
+          const nurseStatus =
+            item.assignedNurses?.find((n) => n.nurseId === nurse.id)?.status ||
+            "Pending";
+
+          return (
+            <div key={item._id} className="appointment-card">
+              <p><strong>Patient:</strong> {ap?.patientId?.fullName || "N/A"}</p>
+              <p><strong>Doctor:</strong> {ap?.doctorId?.fullName || "N/A"}</p>
+              <p><strong>Disease:</strong> {ap?.disease || "N/A"}</p>
+
+              <p>
+                <strong>Date:</strong>{" "}
+                {ap?.appointmentDate
+                  ? new Date(ap.appointmentDate).toLocaleDateString()
+                  : "N/A"}
+              </p>
+
+              <p><strong>Time:</strong> {ap?.slotTime || "N/A"}</p>
+
+              <p><strong>Status:</strong> {nurseStatus}</p>
+
+              {nurseStatus === "Pending" && (
+                <button onClick={() => handleAccept(ap._id)}>Accept</button>
               )}
 
-              {a.status === "Accepted" && (
-                <button className="complete-btn" onClick={() => handleComplete(a._id)}>
-                  Mark as Completed
+              {nurseStatus === "Accepted" && (
+                <button onClick={() => handleComplete(ap._id)}>
+                  Mark Completed
                 </button>
               )}
             </div>
-          ))
-        )}
-      </div>
+          );
+        })
+      )}
     </div>
   );
 };
