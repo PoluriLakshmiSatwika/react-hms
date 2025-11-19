@@ -16,7 +16,7 @@ const DoctorDashboard = () => {
     if (storedDoctor?.id) setDoctor(storedDoctor);
   }, []);
 
-  // Fetch doctor's appointments
+  // Fetch appointments of doctor
   const fetchAppointments = async (doctorId) => {
     if (!doctorId) return;
     setLoading(true);
@@ -31,6 +31,7 @@ const DoctorDashboard = () => {
 
       if (data.success) setAppointments(data.data);
       else setAppointments([]);
+
     } catch (err) {
       console.error("Error fetching appointments:", err);
       setAppointments([]);
@@ -49,7 +50,6 @@ const DoctorDashboard = () => {
         }
       );
       const data = await res.json();
-
       if (Array.isArray(data)) setNurses(data);
     } catch (err) {
       console.error("Error fetching nurses:", err);
@@ -57,8 +57,10 @@ const DoctorDashboard = () => {
     }
   };
 
-  // Assign nurse
+  // Assign nurse to appointment
   const handleAssignNurse = async (appointment, nurse) => {
+    if (!nurse) return;
+
     try {
       const res = await fetch(
         `${process.env.REACT_APP_API_URL}/api/assignments`,
@@ -80,7 +82,7 @@ const DoctorDashboard = () => {
       if (data.success) {
         setMessage(`✅ Nurse ${nurse.fullName} assigned successfully`);
 
-        // update UI
+        // Update UI immediately
         setAppointments((prev) =>
           prev.map((a) =>
             a._id === appointment._id
@@ -89,10 +91,12 @@ const DoctorDashboard = () => {
           )
         );
       } else {
-        setMessage("❌ Failed to assign nurse");
+        setMessage(
+          `❌ Failed to assign nurse: ${data.message || "Unknown error"}`
+        );
       }
     } catch (err) {
-      console.error(err);
+      console.error("Error assigning nurse:", err);
       setMessage("⚠ Error assigning nurse");
     }
   };
@@ -101,10 +105,11 @@ const DoctorDashboard = () => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("doctor");
+    setDoctor(null);
     navigate("/");
   };
 
-  // Load initial data
+  // On page load
   useEffect(() => {
     if (doctor?.id) {
       fetchAppointments(doctor.id);
@@ -125,47 +130,47 @@ const DoctorDashboard = () => {
 
       {message && <p className="message">{message}</p>}
 
-      {/* ------------ Appointments Section ------------ */}
+      {/* =================== Appointments Section =================== */}
       <div className="section">
         <h3>Appointments</h3>
 
         {loading ? (
           <p>Loading appointments...</p>
         ) : appointments.length === 0 ? (
-          <p>No appointments available.</p>
+          <p>No appointments booked.</p>
         ) : (
           appointments.map((a) => (
             <div key={a._id} className="appointment-card">
               <p>
-                <strong>Patient:</strong>{" "}
-                {a.patientId?.fullName || "Unknown"}
+                <strong>Patient:</strong> {a.patientId?.fullName || "N/A"}
               </p>
-
               <p>
-                <strong>Disease:</strong> {a.appointmentId?.disease || "N/A"}
+                <strong>Disease:</strong> {a.disease}
               </p>
-
               <p>
                 <strong>Date:</strong>{" "}
-                {a.appointmentId?.appointmentDate
-                  ? new Date(a.appointmentId.appointmentDate).toLocaleDateString()
-                  : "N/A"}
+                {new Date(a.appointmentDate).toLocaleDateString()}
+              </p>
+              <p>
+                <strong>Time:</strong> {a.slotTime}
               </p>
 
+              {/* ----- FIXED STATUS ----- */}
               <p>
-                <strong>Time:</strong> {a.appointmentId?.slotTime || "N/A"}
-              </p>
-
-              <p>
-                <strong>Status:</strong> {a.status}
+                <strong>Status:</strong>{" "}
+                {a.status === "Completed"
+                  ? "✅ Completed"
+                  : a.status === "Cancelled"
+                  ? "❌ Cancelled"
+                  : a.feePaid
+                  ? "✅ Confirmed"
+                  : "⏳ Pending"}
               </p>
 
               <p>
                 <strong>Assigned Nurses:</strong>{" "}
                 {a.assignedNurses?.length > 0
-                  ? a.assignedNurses
-                      .map((n) => n.nurseName || n.fullName)
-                      .join(", ")
+                  ? a.assignedNurses.map((n) => n.nurseName).join(", ")
                   : "None"}
               </p>
             </div>
@@ -173,7 +178,7 @@ const DoctorDashboard = () => {
         )}
       </div>
 
-      {/* ------------ Nurses Section ------------ */}
+      {/* =================== Nurses Section =================== */}
       <div className="section">
         <h3>Available Nurses</h3>
 
@@ -204,24 +209,25 @@ const DoctorDashboard = () => {
                     <select
                       onChange={(e) => {
                         const appointment = appointments.find(
-                          (x) => x._id === e.target.value
+                          (a) => a._id === e.target.value
                         );
                         if (appointment) handleAssignNurse(appointment, nurse);
                       }}
                     >
                       <option value="">Select Appointment</option>
 
+                      {/* ----- FIX: Remove Completed + Cancelled from dropdown ----- */}
                       {appointments
                         .filter(
-                          (x) =>
-                            x.status !== "Completed" &&
-                            x.status !== "Cancelled"
+                          (a) =>
+                            a.status !== "Completed" &&
+                            a.status !== "Cancelled"
                         )
-                        .map((x) => (
-                          <option key={x._id} value={x._id}>
-                            {x.patientId?.fullName} (
+                        .map((a) => (
+                          <option key={a._id} value={a._id}>
+                            {a.patientId?.fullName} (
                             {new Date(
-                              x.appointmentId?.appointmentDate
+                              a.appointmentDate
                             ).toLocaleDateString()}
                             )
                           </option>
