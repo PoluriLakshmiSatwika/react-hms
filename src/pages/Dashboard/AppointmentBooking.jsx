@@ -107,6 +107,94 @@ const AppointmentBooking = () => {
     }
   };
 
+  const handlePaymentAndBooking = async () => {
+  if (!selectedDoctor || !selectedSlot || !appointmentDate) {
+    alert("Please select doctor, date, and slot");
+    return;
+  }
+
+  const amount = (selectedDoctor.fee || 500) * 100; // Razorpay works in paise
+
+  try {
+    // 1️⃣ Create Razorpay Order
+    const orderRes = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/payments/create-order`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount }),
+      }
+    );
+
+    const orderData = await orderRes.json();
+    if (!orderData.success) {
+      return alert("Failed to create order.");
+    }
+
+    // 2️⃣ Open Razorpay Popup
+    const options = {
+      key: orderData.key,
+      amount: orderData.amount,
+      currency: "INR",
+      name: "Hospital Management System",
+      description: "Appointment Fee Payment",
+      order_id: orderData.order_id,
+      handler: async function (response) {
+        // 3️⃣ Verify Payment
+        const verifyRes = await fetch(
+          `${process.env.REACT_APP_API_URL}/api/payments/verify-payment`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(response),
+          }
+        );
+
+        const verifyData = await verifyRes.json();
+        if (!verifyData.success) {
+          return alert("Payment failed! Try again.");
+        }
+
+        const paymentId = verifyData.payment_id;
+
+        // 4️⃣ Finalize appointment
+        const finalRes = await fetch(
+          `${process.env.REACT_APP_API_URL}/api/appointments/finalize`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              patientId: patient.id,
+              doctorId: selectedDoctor._id,
+              disease,
+              appointmentDate,
+              slotTime: selectedSlot,
+              paymentId,
+            }),
+          }
+        );
+
+        const finalData = await finalRes.json();
+        if (finalData.success) {
+          alert("Appointment Confirmed Successfully!");
+          navigate("/patient/appointment");
+        } else {
+          alert(finalData.message || "Failed to save appointment");
+        }
+      },
+
+      theme: { color: "#04AA6D" },
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  } catch (err) {
+    console.error("❌ Payment Error:", err);
+    alert("Something went wrong.");
+  }
+};
+
+
   return (
     <div className="appointment-container">
       <div className="appointment-wrapper">
@@ -196,9 +284,10 @@ const AppointmentBooking = () => {
         {/* Confirm Appointment */}
         {selectedDoctor && selectedSlot && appointmentDate && (
           <div className="button-container">
-            <button className="btn btn-success" onClick={handleBookAppointment}>
-              Confirm Appointment
-            </button>
+            <button className="btn btn-success" onClick={handlePaymentAndBooking}>
+  Pay & Confirm Appointment
+</button>
+
           </div>
         )}
 
