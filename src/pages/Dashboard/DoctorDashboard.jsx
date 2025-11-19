@@ -169,9 +169,9 @@ const DoctorDashboard = () => {
 
               <p>
                 <strong>Assigned Nurses:</strong>{" "}
-                {a.assignedNurses?.length > 0
-                  ? a.assignedNurses.map((n) => n.nurseName).join(", ")
-                  : "None"}
+  {appointment.assignedNurses?.length > 0
+    ? appointment.assignedNurses.map(n => n.fullName).join(", ")
+    : "None"}
               </p>
             </div>
           ))
