@@ -79,7 +79,8 @@ const NurseLoginPage = () => {
         );
 
         // ⭐ FIX: Save JWT token (important for dashboard)
-        localStorage.setItem("token", data.token);
+        localStorage.setItem("nurseToken", data.token);
+
 
         alert("Nurse login successful");
 
