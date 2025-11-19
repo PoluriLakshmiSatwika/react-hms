@@ -1,0 +1,489 @@
+/* Footer.css */
+.footer {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  color: #f8fafc;
+  border-top: 1px solid #334155;
+  position: relative;
+  overflow: hidden;
+}
+
+.footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+}
+
+.footer-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Main Footer Content */
+.footer-main {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.5fr;
+  gap: 3rem;
+  padding: 4rem 0 3rem;
+  position: relative;
+}
+
+/* Brand Section */
+.footer-brand-section {
+  padding-right: 2rem;
+}
+
+.hospital-logo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.logo-icon {
+  font-size: 3rem;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-radius: 12px;
+  padding: 0.5rem;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.logo-text h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.logo-text p {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  margin: 0;
+  font-weight: 500;
+}
+
+.brand-description {
+  color: #cbd5e1;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+}
+
+/* Emergency Contact */
+.emergency-contact {
+  margin-bottom: 2rem;
+}
+
+.emergency-badge {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.2rem;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  border-radius: 12px;
+  border: 1px solid #fecaca;
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.35);
+}
+
+.emergency-label {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff !important;
+}
+
+.emergency-number {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #ffffff !important;
+  letter-spacing: 0.5px;
+}
+
+
+.emergency-icon {
+  font-size: 1.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 0.5rem;
+}
+
+.emergency-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.emergency-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fef2f2;
+}
+
+.emergency-number {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: white;
+}
+
+/* Operating Hours */
+.operating-hours h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #f8fafc;
+}
+
+.hours-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.hour-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid #334155;
+}
+
+.hour-type {
+  font-size: 0.9rem;
+  color: #cbd5e1;
+  font-weight: 500;
+}
+
+.hour-time {
+  font-size: 0.9rem;
+  color: #f8fafc;
+  font-weight: 600;
+}
+
+/* ---------------- Quick Links Fix ---------------- */
+
+.footer-links-section .footer-links {
+  list-style: none !important;   /* remove bullets */
+  padding-left: 0 !important;
+}
+
+.footer-links-section .footer-links li {
+  margin-bottom: 0.8rem;
+}
+
+.footer-links-section .link-button {
+  background: none !important;
+  border: none !important;
+  color: #cbd5e1 !important;
+  font-size: 0.95rem;
+  text-align: left;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.25s ease, border 0.25s ease;
+  border-bottom: 1px solid transparent;
+}
+
+/* Hover Effect – same as Our Services */
+.footer-links-section .link-button:hover {
+  color: #3b82f6 !important;     /* blue hover */
+  border-bottom: 1px solid #3b82f6; 
+  padding-bottom: 3px;
+}
+
+/* Book Appointment (green link) */
+.footer-links-section .appointment-link {
+  color: #10b981 !important;
+  font-weight: 700;
+}
+
+.footer-links-section .appointment-link:hover {
+  color: #059669 !important;
+  border-bottom: 1px solid #059669;
+}
+
+
+/* Contact Details */
+.contact-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.contact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.contact-icon {
+  font-size: 1.1rem;
+  margin-top: 0.1rem;
+  flex-shrink: 0;
+}
+
+.contact-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.contact-text span {
+  font-size: 0.9rem;
+  color: black;
+  line-height: 1.4;
+}
+
+.contact-note {
+  font-size: 0.8rem !important;
+  color: #94a3b8 !important;
+}
+
+/* Social Section */
+.social-section h5 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #f8fafc;
+}
+
+.social-links {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: 1px solid #334155;
+}
+
+.social-link:hover {
+  background: #3b82f6;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.social-icon {
+  font-size: 1.1rem;
+}
+
+/* Footer Bottom */
+.footer-bottom {
+  border-top: 1px solid #334155;
+  padding: 1.5rem 0;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.footer-bottom-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+}
+
+.copyright p {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.legal-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.legal-link {
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: color 0.3s ease;
+}
+
+.legal-link:hover {
+  color: #3b82f6;
+}
+
+.certification {
+  display: flex;
+  align-items: center;
+}
+
+.cert-badge {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+/* Mobile Responsive Design */
+@media (max-width: 1200px) {
+  .footer-main {
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 2.5rem;
+  }
+  
+  .footer-contact-section {
+    grid-column: 1 / -1;
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 968px) {
+  .footer-container {
+    padding: 0 1.5rem;
+  }
+  
+  .footer-main {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    padding: 3rem 0 2rem;
+  }
+  
+  .footer-brand-section {
+    grid-column: 1 / -1;
+    padding-right: 0;
+  }
+  
+  .footer-contact-section {
+    grid-column: 1 / -1;
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .footer-container {
+    padding: 0 1rem;
+  }
+  
+  .footer-main {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 2.5rem 0 2rem;
+  }
+  
+  .hospital-logo {
+    justify-content: center;
+    text-align: center;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .brand-description {
+    text-align: center;
+  }
+  
+  .emergency-badge {
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .operating-hours {
+    text-align: center;
+  }
+  
+  .links-title {
+    text-align: center;
+  }
+  
+  .links-title::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .footer-bottom-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .legal-links {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-main {
+    gap: 1.5rem;
+    padding: 2rem 0 1.5rem;
+  }
+  
+  .emergency-badge {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+  
+  .hour-item {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+  
+  .contact-item {
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .social-links {
+    justify-content: center;
+  }
+  
+  .footer-bottom {
+    padding: 1rem 0;
+  }
+}
+
+/* High-DPI Screens */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .footer {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .footer-link,
+  .social-link,
+  .emergency-badge {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .footer {
+    background: linear-gradient(135deg, #0a0f1c 0%, #151b2d 50%, #0a0f1c 100%);
+  }
+}
+/* ----------- Social Icons (Updated) ------------ */
+
+.social-icon {
+  font-size: 1.2rem;
+  color: #cbd5e1;
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.social-link:hover .social-icon {
+  color: white;
+  transform: scale(1.15);
+}
+
