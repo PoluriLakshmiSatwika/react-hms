@@ -22,7 +22,7 @@ const fetchAssignedAppointments = async (nurseId) => {
   setLoading(true);
 
   try {
-    const token = localStorage.getItem("nurseToken",loginResponse.token);  // ✅ FIXED
+    const token = localStorage.getItem("nurseToken");  // ✅ FIXED
 
     const res = await fetch(
       `${process.env.REACT_APP_API_URL}/api/nurse/appointments/${nurseId}`,
