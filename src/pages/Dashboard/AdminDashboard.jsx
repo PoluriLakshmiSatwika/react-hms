@@ -8,6 +8,7 @@ const AdminDashboard = () => {
   const [doctors, setDoctors] = useState([]);
   const [patients, setPatients] = useState([]);
   const [appointments, setAppointments] = useState([]);
+  const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [activeSection, setActiveSection] = useState("pending"); // ⭐ NEW
@@ -26,13 +27,15 @@ const AdminDashboard = () => {
           nursesRes,
           doctorsRes,
           patientsRes,
-          appointmentsRes
+          appointmentsRes,
+          assignmentsRes
         ] = await Promise.all([
           fetch(`${process.env.REACT_APP_API_URL}/api/admin/pending-staff`),
           fetch(`${process.env.REACT_APP_API_URL}/api/admin/nurses`),
           fetch(`${process.env.REACT_APP_API_URL}/api/admin/doctors`),
           fetch(`${process.env.REACT_APP_API_URL}/api/admin/patients`),
-          fetch(`${process.env.REACT_APP_API_URL}/api/admin/appointments`)
+          fetch(`${process.env.REACT_APP_API_URL}/api/admin/appointments`),
+          fetch(`${process.env.REACT_APP_API_URL}/api/admin/assignments`)
         ]);
 
         setPendingStaff(await pendingRes.json());
@@ -40,6 +43,8 @@ const AdminDashboard = () => {
         setDoctors(await doctorsRes.json());
         setPatients(await patientsRes.json());
         setAppointments(await appointmentsRes.json());
+        setAssignments(await assignmentsRes.json());
+
 
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -115,6 +120,7 @@ const AdminDashboard = () => {
               className={activeSection === "appointments" ? "active" : ""}>
             Appointments
           </li>
+          <li onClick={() => setActiveSection("assignments")}>Assignments</li>
 
           <li className="logout" onClick={handleLogout}>Logout</li>
         </ul>
@@ -233,6 +239,37 @@ const AdminDashboard = () => {
             </table>
           </section>
         )}
+        {/* assignments */}
+        {activeSection === "assignments" && (
+  <section>
+    <h3>Assignments</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Doctor</th>
+          <th>Patient</th>
+          <th>Nurse</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {assignments.map((a) => (
+          <tr key={a._id}>
+            <td>{a.appointmentId?.doctorId?.fullName || "Unknown"}</td>
+            <td>{a.patientId?.fullName || "Unknown"}</td>
+            <td>{a.assignedNurses?.[0]?.nurseId?.fullName || a.assignedNurses?.[0]?.nurseName}</td>
+            <td>{new Date(a.date).toLocaleDateString()}</td>
+            <td>{a.time}</td>
+            <td>{a.assignedNurses?.[0]?.status || a.status}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </section>
+)}
+
 
         {/* ---------------- Appointments ---------------- */}
         {activeSection === "appointments" && (
