@@ -1,9 +1,23 @@
-import React from 'react';
+import React from "react";
+import "./Footer.css";
+import { FaFacebookF, FaInstagram, FaLinkedinIn } from "react-icons/fa";
 
 const Footer = () => {
+  const year = new Date().getFullYear();
+
   return (
-    <footer style={{ textAlign: "center", padding: "15px", background: "#f5f5f5" }}>
-      <p>© 2025 Hospital Management System | All Rights Reserved</p>
+    <footer className="mini-footer">
+
+      <p>© {year} HMS Hospital — All Rights Reserved.</p>
+
+      <p>📞 +1 (555) 123-4567 | 📧 info@hms.com</p>
+
+      <div className="mini-social">
+        <FaFacebookF />
+        <FaInstagram />
+        <FaLinkedinIn />
+      </div>
+
     </footer>
   );
 };

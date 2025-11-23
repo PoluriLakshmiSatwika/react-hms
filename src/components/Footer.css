@@ -1,0 +1,30 @@
+.mini-footer {
+  background: #0f172a;
+  color: #cbd5e1;
+  text-align: center;
+  padding: 1.2rem 0;
+  font-size: 0.9rem;
+  border-top: 1px solid #1e293b;
+}
+
+.mini-footer p {
+  margin: 4px 0;
+}
+
+.mini-social {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.mini-social svg {
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.mini-social svg:hover {
+  color: #3b82f6;
+  transform: scale(1.15);
+}
