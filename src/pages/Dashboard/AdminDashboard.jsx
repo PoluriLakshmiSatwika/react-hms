@@ -179,36 +179,33 @@ const AdminDashboard = () => {
         )}
       </section>
 
-      {/* Patients */}
-      <section>
-        <h3>All Patients</h3>
-        {patients.length === 0 ? (
-          <p>No patients.</p>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Age</th>
-                <th>Gender</th>
-              </tr>
-            </thead>
-            <tbody>
-              {patients.map((p) => (
-                <tr key={p._id}>
-                  <td>{p.fullName}</td>
-                  <td>{p.email}</td>
-                  <td>{p.phone}</td>
-                  <td>{p.age}</td>
-                  <td>{p.gender}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </section>
+{/* ---------------------- Patients ---------------------- */}
+<h2>All Patients</h2>
+<table border="1" cellPadding="8">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Phone</th>
+      <th>Date of Birth</th>
+      <th>Blood Group</th>
+      <th>Medical History</th>
+    </tr>
+  </thead>
+  <tbody>
+    {patients.map((p) => (
+      <tr key={p._id}>
+        <td>{p.fullName}</td>
+        <td>{p.email}</td>
+        <td>{p.phone}</td>
+        <td>{p.dateOfBirth}</td>
+        <td>{p.bloodGroup ? p.bloodGroup.toUpperCase() : "N/A"}</td>
+        <td>{p.medicalHistory || "None"}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
 
       {/* Doctors */}
       <section>
