@@ -10,13 +10,14 @@ const AdminDashboard = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [activeSection, setActiveSection] = useState("pending"); // ⭐ NEW
+
   const navigate = useNavigate();
 
   useEffect(() => {
     document.title = "Admin Dashboard";
   }, []);
 
-  // Fetch all data
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -34,34 +35,21 @@ const AdminDashboard = () => {
           fetch(`${process.env.REACT_APP_API_URL}/api/admin/appointments`)
         ]);
 
-        const pendingData = await pendingRes.json();
-        const nursesData = await nursesRes.json();
-        const doctorsData = await doctorsRes.json();
-        const patientsData = await patientsRes.json();
-        const appointmentsData = await appointmentsRes.json();
-
-        setPendingStaff(Array.isArray(pendingData) ? pendingData : []);
-        setNurses(Array.isArray(nursesData) ? nursesData : []);
-        setDoctors(Array.isArray(doctorsData) ? doctorsData : []);
-        setPatients(Array.isArray(patientsData) ? patientsData : []);
-        setAppointments(Array.isArray(appointmentsData) ? appointmentsData : []);
+        setPendingStaff(await pendingRes.json());
+        setNurses(await nursesRes.json());
+        setDoctors(await doctorsRes.json());
+        setPatients(await patientsRes.json());
+        setAppointments(await appointmentsRes.json());
 
       } catch (error) {
         console.error("Error fetching data:", error);
-        setPendingStaff([]);
-        setNurses([]);
-        setDoctors([]);
-        setPatients([]);
-        setAppointments([]);
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
-  // Approve/Reject Staff
   const handleApprove = async (id) => {
     try {
       const res = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/approve/${id}`, {
@@ -71,7 +59,7 @@ const AdminDashboard = () => {
       alert(data.message);
       setPendingStaff(prev => prev.filter(staff => staff._id !== id));
     } catch (err) {
-      console.error("Error approving staff:", err);
+      console.error(err);
     }
   };
 
@@ -84,199 +72,198 @@ const AdminDashboard = () => {
       alert(data.message);
       setPendingStaff(prev => prev.filter(staff => staff._id !== id));
     } catch (err) {
-      console.error("Error rejecting staff:", err);
+      console.error(err);
     }
   };
 
-  // Logout
   const handleLogout = () => {
     localStorage.clear();
-    alert("Logged out successfully!");
     navigate("/");
   };
 
-  if (loading) {
-    return <p style={{ textAlign: "center", marginTop: "20px" }}>Loading...</p>;
-  }
+  if (loading) return <p>Loading...</p>;
 
   return (
-    <div className="admin-dashboard-container">
-      <div className="dashboard-header">
-        <h2>Admin Dashboard</h2>
-        <button className="logout-btn" onClick={handleLogout}>Logout</button>
-      </div>
+    <div className="admin-layout">
 
-      {/* Pending Staff */}
-      <section>
-        <h3>Pending Staff</h3>
-        {pendingStaff.length === 0 ? (
-          <p>No pending staff.</p>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Department</th>
-                <th>Shift / Specialization</th>
-                <th>ID Proof</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pendingStaff.map((staff) => (
-                <tr key={staff._id}>
-                  <td>{staff.fullName}</td>
-                  <td>{staff.email}</td>
-                  <td>{staff.role}</td>
-                  <td>{staff.department}</td>
-                  <td>{staff.role === "nurse" ? staff.shiftTiming : staff.specialization}</td>
-                  <td>
-                    {staff.uploadId ? (
-                      <a href={`${process.env.REACT_APP_API_URL}/${staff.uploadId}`} target="_blank">
-                        View ID
-                      </a>
-                    ) : "No file"}
-                  </td>
-                  <td>
-                    <button className="approve-btn" onClick={() => handleApprove(staff._id)}>Approve</button>
-                    <button className="reject-btn" onClick={() => handleReject(staff._id)}>Reject</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* ⭐ LEFT SIDEBAR */}
+      <aside className="sidebar">
+        <h2>Admin Panel</h2>
+
+        <ul>
+          <li onClick={() => setActiveSection("pending")}
+              className={activeSection === "pending" ? "active" : ""}>
+            Pending Staff
+          </li>
+
+          <li onClick={() => setActiveSection("nurses")}
+              className={activeSection === "nurses" ? "active" : ""}>
+            Nurses
+          </li>
+
+          <li onClick={() => setActiveSection("patients")}
+              className={activeSection === "patients" ? "active" : ""}>
+            Patients
+          </li>
+
+          <li onClick={() => setActiveSection("doctors")}
+              className={activeSection === "doctors" ? "active" : ""}>
+            Doctors
+          </li>
+
+          <li onClick={() => setActiveSection("appointments")}
+              className={activeSection === "appointments" ? "active" : ""}>
+            Appointments
+          </li>
+
+          <li className="logout" onClick={handleLogout}>Logout</li>
+        </ul>
+      </aside>
+
+      {/* ⭐ RIGHT MAIN CONTENT */}
+      <main className="content">
+
+        {/* ---------------- Pending Staff ---------------- */}
+        {activeSection === "pending" && (
+          <section>
+            <h3>Pending Staff</h3>
+            {pendingStaff.length === 0 ? (
+              <p>No pending staff.</p>
+            ) : (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th><th>Email</th><th>Role</th>
+                    <th>Department</th><th>Shift/Specialization</th>
+                    <th>ID</th><th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pendingStaff.map((staff) => (
+                    <tr key={staff._id}>
+                      <td>{staff.fullName}</td>
+                      <td>{staff.email}</td>
+                      <td>{staff.role}</td>
+                      <td>{staff.department}</td>
+                      <td>{staff.role === "nurse" ? staff.shiftTiming : staff.specialization}</td>
+                      <td>
+                        {staff.uploadId ? (
+                          <a href={`${process.env.REACT_APP_API_URL}/${staff.uploadId}`} target="_blank">View</a>
+                        ) : "None"}
+                      </td>
+                      <td>
+                        <button onClick={() => handleApprove(staff._id)}>Approve</button>
+                        <button onClick={() => handleReject(staff._id)}>Reject</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </section>
         )}
-      </section>
 
-      {/* Nurses */}
-      <section>
-        <h3>Approved Nurses</h3>
-        {nurses.length === 0 ? (
-          <p>No nurses.</p>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Department</th>
-                <th>Shift Timing</th>
-              </tr>
-            </thead>
-            <tbody>
-              {nurses.map((nurse) => (
-                <tr key={nurse._id}>
-                  <td>{nurse.fullName}</td>
-                  <td>{nurse.email}</td>
-                  <td>{nurse.department}</td>
-                  <td>{nurse.shiftTiming}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        {/* ---------------- Nurses ---------------- */}
+        {activeSection === "nurses" && (
+          <section>
+            <h3>Approved Nurses</h3>
+            <table>
+              <thead>
+                <tr><th>Name</th><th>Email</th><th>Department</th><th>Shift</th></tr>
+              </thead>
+              <tbody>
+                {nurses.map((n) => (
+                  <tr key={n._id}>
+                    <td>{n.fullName}</td>
+                    <td>{n.email}</td>
+                    <td>{n.department}</td>
+                    <td>{n.shiftTiming}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
         )}
-      </section>
 
-{/* ---------------------- Patients ---------------------- */}
-<section>
-<h3>All Patients</h3>
-<table border="1" cellPadding="8">
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Email</th>
-      <th>Phone</th>
-      <th>Date of Birth</th>
-      <th>Blood Group</th>
-      <th>Medical History</th>
-    </tr>
-  </thead>
-  <tbody>
-    {patients.map((p) => (
-      <tr key={p._id}>
-        <td>{p.fullName}</td>
-        <td>{p.email}</td>
-        <td>{p.phone}</td>
-        <td>{p.dateOfBirth}</td>
-        <td>{p.bloodGroup ? p.bloodGroup.toUpperCase() : "N/A"}</td>
-        <td>{p.medicalHistory || "None"}</td>
-      </tr>
-    ))}
-  </tbody>
-</table>
-</section>
-
-
-      {/* Doctors */}
-      <section>
-        <h3>Approved Doctors</h3>
-        {doctors.length === 0 ? (
-          <p>No doctors.</p>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Department</th>
-                <th>Specialty</th>
-              </tr>
-            </thead>
-            <tbody>
-              {doctors.map((doc) => (
-                <tr key={doc._id}>
-                  <td>{doc.fullName}</td>
-                  <td>{doc.email}</td>
-                  <td>{doc.department}</td>
-                  <td>{doc.specialty}</td>
+        {/* ---------------- Patients ---------------- */}
+        {activeSection === "patients" && (
+          <section>
+            <h3>All Patients</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th><th>Email</th><th>Phone</th>
+                  <th>DOB</th><th>Blood Group</th><th>History</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {patients.map((p) => (
+                  <tr key={p._id}>
+                    <td>{p.fullName}</td>
+                    <td>{p.email}</td>
+                    <td>{p.phone}</td>
+                    <td>{p.dateOfBirth}</td>
+                    <td>{p.bloodGroup?.toUpperCase()}</td>
+                    <td>{p.medicalHistory || "None"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
         )}
-      </section>
 
-      {/* Appointments */}
-      {/* Appointments */}
-<section>
-  <h3>All Appointments</h3>
-  {appointments.length === 0 ? (
-    <p>No appointments.</p>
-  ) : (
-    <table>
-      <thead>
-        <tr>
-          <th>Patient</th>
-          <th>Doctor</th>
-          <th>Disease</th>
-          <th>Date</th>
-          <th>Slot</th>
-          <th>Fee Paid</th>
-          <th>Validity</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        {appointments.map((appt) => (
-          <tr key={appt._id}>
-            <td>{appt.patientId?.fullName || "Unknown"}</td>
-            <td>{appt.doctorId?.fullName || "Unknown"}</td>
-            <td>{appt.disease}</td>
-            <td>{new Date(appt.appointmentDate).toLocaleDateString()}</td>
-            <td>{appt.slotTime}</td>
-            <td>{appt.feePaid ? "Yes" : "No"}</td>
-            <td>{appt.validityCount}</td>
-            <td>{appt.status}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  )}
-</section>
+        {/* ---------------- Doctors ---------------- */}
+        {activeSection === "doctors" && (
+          <section>
+            <h3>Approved Doctors</h3>
+            <table>
+              <thead>
+                <tr><th>Name</th><th>Email</th><th>Department</th><th>Specialty</th></tr>
+              </thead>
+              <tbody>
+                {doctors.map((d) => (
+                  <tr key={d._id}>
+                    <td>{d.fullName}</td>
+                    <td>{d.email}</td>
+                    <td>{d.department}</td>
+                    <td>{d.specialty}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+        )}
 
+        {/* ---------------- Appointments ---------------- */}
+        {activeSection === "appointments" && (
+          <section>
+            <h3>All Appointments</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Patient</th><th>Doctor</th><th>Disease</th>
+                  <th>Date</th><th>Slot</th><th>Fee</th><th>Validity</th><th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {appointments.map((a) => (
+                  <tr key={a._id}>
+                    <td>{a.patientId?.fullName}</td>
+                    <td>{a.doctorId?.fullName}</td>
+                    <td>{a.disease}</td>
+                    <td>{new Date(a.appointmentDate).toLocaleDateString()}</td>
+                    <td>{a.slotTime}</td>
+                    <td>{a.feePaid ? "Yes" : "No"}</td>
+                    <td>{a.validityCount}</td>
+                    <td>{a.status}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+        )}
 
+      </main>
     </div>
   );
 };
