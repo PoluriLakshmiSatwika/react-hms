@@ -180,7 +180,8 @@ const AdminDashboard = () => {
       </section>
 
 {/* ---------------------- Patients ---------------------- */}
-<h2>All Patients</h2>
+<section>
+<h3>All Patients</h3>
 <table border="1" cellPadding="8">
   <thead>
     <tr>
@@ -205,6 +206,7 @@ const AdminDashboard = () => {
     ))}
   </tbody>
 </table>
+</section>
 
 
       {/* Doctors */}
@@ -237,46 +239,43 @@ const AdminDashboard = () => {
       </section>
 
       {/* Appointments */}
-      <section>
-        <h3>All Appointments</h3>
-        {appointments.length === 0 ? (
-          <p>No appointments.</p>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Patient</th>
-                <th>Doctor</th>
-                <th>Disease</th>
-                <th>Date</th>
-                <th>Slot</th>
-                <th>Fee Paid</th>
-                <th>Validity</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {appointments.map((appt) => {
-                const patient = patients.find(p => p._id === appt.patientId);
-                const doctor = doctors.find(d => d._id === appt.doctorId);
+      {/* Appointments */}
+<section>
+  <h3>All Appointments</h3>
+  {appointments.length === 0 ? (
+    <p>No appointments.</p>
+  ) : (
+    <table>
+      <thead>
+        <tr>
+          <th>Patient</th>
+          <th>Doctor</th>
+          <th>Disease</th>
+          <th>Date</th>
+          <th>Slot</th>
+          <th>Fee Paid</th>
+          <th>Validity</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {appointments.map((appt) => (
+          <tr key={appt._id}>
+            <td>{appt.patientId?.fullName || "Unknown"}</td>
+            <td>{appt.doctorId?.fullName || "Unknown"}</td>
+            <td>{appt.disease}</td>
+            <td>{new Date(appt.appointmentDate).toLocaleDateString()}</td>
+            <td>{appt.slotTime}</td>
+            <td>{appt.feePaid ? "Yes" : "No"}</td>
+            <td>{appt.validityCount}</td>
+            <td>{appt.status}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )}
+</section>
 
-                return (
-                  <tr key={appt._id}>
-                    <td>{patient?.fullName || "Unknown"}</td>
-                    <td>{doctor?.fullName || "Unknown"}</td>
-                    <td>{appt.disease}</td>
-                    <td>{new Date(appt.appointmentDate).toLocaleDateString()}</td>
-                    <td>{appt.slotTime}</td>
-                    <td>{appt.feePaid ? "Yes" : "No"}</td>
-                    <td>{appt.validityCount}</td>
-                    <td>{appt.status}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </section>
 
     </div>
   );
