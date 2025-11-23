@@ -6,36 +6,53 @@ const AdminDashboard = () => {
   const [pendingStaff, setPendingStaff] = useState([]);
   const [nurses, setNurses] = useState([]);
   const [doctors, setDoctors] = useState([]);
+  const [patients, setPatients] = useState([]);
+  const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const navigate = useNavigate();
 
-  // ✅ Set page title
   useEffect(() => {
     document.title = "Admin Dashboard";
   }, []);
 
-  // ✅ Fetch all data in parallel
+  // Fetch all data
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [pendingRes, nursesRes, doctorsRes] = await Promise.all([
+        const [
+          pendingRes,
+          nursesRes,
+          doctorsRes,
+          patientsRes,
+          appointmentsRes
+        ] = await Promise.all([
           fetch(`${process.env.REACT_APP_API_URL}/api/admin/pending-staff`),
           fetch(`${process.env.REACT_APP_API_URL}/api/admin/nurses`),
           fetch(`${process.env.REACT_APP_API_URL}/api/admin/doctors`),
+          fetch(`${process.env.REACT_APP_API_URL}/api/admin/patients`),
+          fetch(`${process.env.REACT_APP_API_URL}/api/admin/appointments`)
         ]);
 
         const pendingData = await pendingRes.json();
         const nursesData = await nursesRes.json();
         const doctorsData = await doctorsRes.json();
+        const patientsData = await patientsRes.json();
+        const appointmentsData = await appointmentsRes.json();
 
         setPendingStaff(Array.isArray(pendingData) ? pendingData : []);
         setNurses(Array.isArray(nursesData) ? nursesData : []);
         setDoctors(Array.isArray(doctorsData) ? doctorsData : []);
+        setPatients(Array.isArray(patientsData) ? patientsData : []);
+        setAppointments(Array.isArray(appointmentsData) ? appointmentsData : []);
+
       } catch (error) {
         console.error("Error fetching data:", error);
         setPendingStaff([]);
         setNurses([]);
         setDoctors([]);
+        setPatients([]);
+        setAppointments([]);
       } finally {
         setLoading(false);
       }
@@ -44,7 +61,7 @@ const AdminDashboard = () => {
     fetchData();
   }, []);
 
-  // ✅ Approve/Reject handlers
+  // Approve/Reject Staff
   const handleApprove = async (id) => {
     try {
       const res = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/approve/${id}`, {
@@ -52,7 +69,7 @@ const AdminDashboard = () => {
       });
       const data = await res.json();
       alert(data.message);
-      setPendingStaff((prev) => prev.filter((staff) => staff._id !== id));
+      setPendingStaff(prev => prev.filter(staff => staff._id !== id));
     } catch (err) {
       console.error("Error approving staff:", err);
     }
@@ -65,21 +82,21 @@ const AdminDashboard = () => {
       });
       const data = await res.json();
       alert(data.message);
-      setPendingStaff((prev) => prev.filter((staff) => staff._id !== id));
+      setPendingStaff(prev => prev.filter(staff => staff._id !== id));
     } catch (err) {
       console.error("Error rejecting staff:", err);
     }
   };
 
-  // ✅ Logout function
+  // Logout
   const handleLogout = () => {
-    localStorage.clear(); // clear tokens/session data if any
+    localStorage.clear();
     alert("Logged out successfully!");
-    navigate("/"); // redirect to homepage
+    navigate("/");
   };
 
   if (loading) {
-    return <p style={{ textAlign: "center", marginTop: "20px" }}>Loading dashboard data...</p>;
+    return <p style={{ textAlign: "center", marginTop: "20px" }}>Loading...</p>;
   }
 
   return (
@@ -89,11 +106,11 @@ const AdminDashboard = () => {
         <button className="logout-btn" onClick={handleLogout}>Logout</button>
       </div>
 
-      {/* ✅ Pending Staff Section */}
+      {/* Pending Staff */}
       <section>
         <h3>Pending Staff</h3>
         {pendingStaff.length === 0 ? (
-          <p>No pending staff at the moment.</p>
+          <p>No pending staff.</p>
         ) : (
           <table>
             <thead>
@@ -117,24 +134,14 @@ const AdminDashboard = () => {
                   <td>{staff.role === "nurse" ? staff.shiftTiming : staff.specialization}</td>
                   <td>
                     {staff.uploadId ? (
-                      <a
-                        href={`${process.env.REACT_APP_API_URL}/${staff.uploadId}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
+                      <a href={`${process.env.REACT_APP_API_URL}/${staff.uploadId}`} target="_blank">
                         View ID
                       </a>
-                    ) : (
-                      "No file"
-                    )}
+                    ) : "No file"}
                   </td>
                   <td>
-                    <button className="approve-btn" onClick={() => handleApprove(staff._id)}>
-                      Approve
-                    </button>
-                    <button className="reject-btn" onClick={() => handleReject(staff._id)}>
-                      Reject
-                    </button>
+                    <button className="approve-btn" onClick={() => handleApprove(staff._id)}>Approve</button>
+                    <button className="reject-btn" onClick={() => handleReject(staff._id)}>Reject</button>
                   </td>
                 </tr>
               ))}
@@ -143,11 +150,11 @@ const AdminDashboard = () => {
         )}
       </section>
 
-      {/* ✅ Approved Nurses Section */}
+      {/* Nurses */}
       <section>
         <h3>Approved Nurses</h3>
         {nurses.length === 0 ? (
-          <p>No nurses found.</p>
+          <p>No nurses.</p>
         ) : (
           <table>
             <thead>
@@ -172,34 +179,107 @@ const AdminDashboard = () => {
         )}
       </section>
 
-{/* ✅ Approved Doctors Section */}
-<section>
-  <h3>Approved Doctors</h3>
-  {doctors.length === 0 ? (
-    <p>No doctors found.</p>
-  ) : (
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Department</th>
-          <th>Specialty</th>
-        </tr>
-      </thead>
-      <tbody>
-        {doctors.map((doc) => (
-          <tr key={doc._id}>
-            <td>{doc.fullName}</td>
-            <td>{doc.email}</td>
-            <td>{doc.department}</td>
-            <td>{doc.specialty}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  )}
-</section>
+      {/* Patients */}
+      <section>
+        <h3>All Patients</h3>
+        {patients.length === 0 ? (
+          <p>No patients.</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Age</th>
+                <th>Gender</th>
+              </tr>
+            </thead>
+            <tbody>
+              {patients.map((p) => (
+                <tr key={p._id}>
+                  <td>{p.fullName}</td>
+                  <td>{p.email}</td>
+                  <td>{p.phone}</td>
+                  <td>{p.age}</td>
+                  <td>{p.gender}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
+
+      {/* Doctors */}
+      <section>
+        <h3>Approved Doctors</h3>
+        {doctors.length === 0 ? (
+          <p>No doctors.</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Department</th>
+                <th>Specialty</th>
+              </tr>
+            </thead>
+            <tbody>
+              {doctors.map((doc) => (
+                <tr key={doc._id}>
+                  <td>{doc.fullName}</td>
+                  <td>{doc.email}</td>
+                  <td>{doc.department}</td>
+                  <td>{doc.specialty}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
+
+      {/* Appointments */}
+      <section>
+        <h3>All Appointments</h3>
+        {appointments.length === 0 ? (
+          <p>No appointments.</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>Patient</th>
+                <th>Doctor</th>
+                <th>Disease</th>
+                <th>Date</th>
+                <th>Slot</th>
+                <th>Fee Paid</th>
+                <th>Validity</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {appointments.map((appt) => {
+                const patient = patients.find(p => p._id === appt.patientId);
+                const doctor = doctors.find(d => d._id === appt.doctorId);
+
+                return (
+                  <tr key={appt._id}>
+                    <td>{patient?.fullName || "Unknown"}</td>
+                    <td>{doctor?.fullName || "Unknown"}</td>
+                    <td>{appt.disease}</td>
+                    <td>{new Date(appt.appointmentDate).toLocaleDateString()}</td>
+                    <td>{appt.slotTime}</td>
+                    <td>{appt.feePaid ? "Yes" : "No"}</td>
+                    <td>{appt.validityCount}</td>
+                    <td>{appt.status}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+      </section>
 
     </div>
   );
