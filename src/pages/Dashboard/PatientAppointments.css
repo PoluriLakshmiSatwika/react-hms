@@ -1,41 +1,77 @@
 .patient-appointments {
-  width: 90%;
-  max-width: 900px;
-  margin: 30px auto;
+  width: 95%;
+  max-width: 1100px;
+  margin: 20px auto;
   font-family: "Poppins", sans-serif;
 }
 
-.patient-appointments h2 {
-  text-align: center;
-  font-size: 26px;
-  color: #2c3e50;
-  margin-bottom: 20px;
+/* HEADER */
+.pa-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  flex-wrap: wrap; /* ⭐ Mobile friendly */
+  gap: 10px;
 }
 
+.pa-header h2 {
+  font-size: 22px;
+  color: #2c3e50;
+  flex: 1 1 100%;
+  text-align: center;
+}
+
+/* BUTTONS */
+.btn-book {
+  background: #2a9d8f;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  margin-right: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-logout {
+  background: #e63946;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  width: 100%;
+  background: #e63946;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-weight: 600;
+}
+
+/* LIST */
 .appointment-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 18px;
-  margin-top: 10px;
 }
 
 .appointment-card {
-  background: #ffffff;
-  border-radius: 10px;
-  padding: 15px 18px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.08);
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
   border-left: 5px solid #2a9d8f;
-  transition: 0.3s ease-in-out;
-}
-
-.appointment-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0px 6px 14px rgba(0, 0, 0, 0.12);
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.08);
 }
 
 .appointment-card p {
   margin: 6px 0;
-  font-size: 15px;
   color: #444;
 }
 
@@ -43,30 +79,91 @@
   color: #2a9d8f;
 }
 
-/* Status colors */
-.appointment-card p:last-child {
-  font-weight: 600;
+/* Next OP */
+.next-op {
+  background: #d4edda;
+  padding: 6px 10px;
+  border-radius: 6px;
+  color: #155724 !important;
+  font-weight: bold;
+  margin-top: 5px;
 }
 
-.status-confirmed {
-  color: #27ae60;
-}
+/* Status */
+.cancelled { color: red; font-weight: bold; }
+.pending { color: #e67e22; font-weight: bold; }
+.confirmed { color: #27ae60; font-weight: bold; }
 
-.status-pending {
-  color: #e67e22;
-}
-
-/* Responsive */
+/* ⭐⭐⭐ MOBILE RESPONSIVE FIX ⭐⭐⭐ */
 @media (max-width: 600px) {
+  .pa-header {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .btn-book,
+  .btn-logout {
+    width: 100%;
+    text-align: center;
+  }
+
   .appointment-card {
     padding: 12px;
   }
+
+  .appointment-list {
+    grid-template-columns: 1fr;
+  }
 }
 
-.booked-slot {
-  background: #ff4d4f;
+/* ============ TOGGLE BUTTON ============ */
+
+.toggle-btn {
+  display: none;
+  background: #e63946;
   color: white;
-  cursor: not-allowed;
-  opacity: 0.6;
-  border: 1px solid #ff1a1a;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* Desktop buttons wrapper */
+.pa-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+/* Mobile dropdown */
+.mobile-menu {
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* BACK BUTTON */
+.btn-back {
+  background: #264653;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* ============ MOBILE ============ */
+@media (max-width: 600px) {
+  .pa-buttons {
+    display: none; /* Hide desktop buttons */
+  }
+
+  .toggle-btn {
+    display: block; /* Show toggle */
+  }
+
+  .mobile-menu {
+    display: flex; /* Show dropdown when toggle is clicked */
+  }
 }

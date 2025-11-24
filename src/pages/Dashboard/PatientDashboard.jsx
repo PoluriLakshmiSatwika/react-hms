@@ -59,8 +59,20 @@ const PatientDashboard = () => {
 
   return (
     <div className="patient-dashboard" style={{ padding: "20px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <h1>Patient Dashboard</h1>
+      
+      {/* ================= HEADER ================= */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <h1>
+          Welcome Back,{" "}
+          <span style={{ color: "#0077b6" }}>{patient.fullName}</span>
+        </h1>
+
         <button
           onClick={handleLogout}
           style={{
@@ -76,8 +88,41 @@ const PatientDashboard = () => {
         </button>
       </div>
 
-      <h2 style={{ marginTop: "20px" }}>Your Appointments</h2>
+     <div style={{ marginBottom: "20px", marginTop: "10px" }}>
+  <button
+    onClick={() => navigate("/dashboard/appointment")}
+    style={{
+      backgroundColor: "#007bff",
+      color: "#fff",
+      border: "none",
+      padding: "10px 20px",
+      borderRadius: "6px",
+      cursor: "pointer",
+      marginRight: "10px"
+    }}
+  >
+    Book Appointment
+  </button>
 
+  <button
+    onClick={() => navigate("/patient/appointment")}
+    style={{
+      backgroundColor: "#17a2b8",
+      color: "#fff",
+      border: "none",
+      padding: "10px 20px",
+      borderRadius: "6px",
+      cursor: "pointer"
+    }}
+  >
+    View Appointments
+  </button>
+</div>
+
+
+      <h2 style={{ marginTop: "25px" }}>Your Appointments</h2>
+
+      {/* ================= APPOINTMENT LIST ================= */}
       {loading ? (
         <p>Loading...</p>
       ) : appointments.length === 0 ? (
@@ -115,6 +160,8 @@ const PatientDashboard = () => {
                       ? "green"
                       : a.status === "Cancelled"
                       ? "red"
+                      : a.status === "Completed"
+                      ? "blue"
                       : "orange",
                 }}
               >

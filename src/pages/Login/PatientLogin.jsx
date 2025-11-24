@@ -76,7 +76,7 @@ const handleSubmit = async (e) => {
         })
       );
       alert("✅ " + data.message);
-      navigate("/dashboard/appointment");
+      navigate("/dashboard/patient");
     } else {
       setErrors({ submit: data.message || "Invalid credentials" });
     }
