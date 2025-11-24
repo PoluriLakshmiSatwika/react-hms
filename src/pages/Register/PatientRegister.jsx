@@ -68,7 +68,7 @@ async function handleConfirm() {
 
     if (response.status === 201 || data.success) {
       alert("✅ Patient registered successfully!");
-      navigate("/dashboard/patient");
+      navigate("/dashboard/appointment");
     } else {
       alert(`❌ ${data.message || "Registration failed"}`);
     }
