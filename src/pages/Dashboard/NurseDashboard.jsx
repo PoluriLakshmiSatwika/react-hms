@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import "./NurseDashboard.css";
 
 const NurseDashboard = () => {
   const navigate = useNavigate();
@@ -7,21 +8,27 @@ const NurseDashboard = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
+  const [timers, setTimers] = useState({});
+  const [showPopup, setShowPopup] = useState(false);
 
-  // Load nurse details from localStorage
+  const formatDate = (isoDate) => {
+    if (!isoDate) return "Not available";
+    const d = new Date(isoDate);
+    return `${String(d.getDate()).padStart(2, "0")}/${String(
+      d.getMonth() + 1
+    ).padStart(2, "0")}/${d.getFullYear()}`;
+  };
+
   useEffect(() => {
     const storedNurse = JSON.parse(localStorage.getItem("nurse"));
     if (storedNurse) setNurse(storedNurse);
   }, []);
 
-  // Fetch assigned appointments
   const fetchAssignedAppointments = async (nurseId) => {
     if (!nurseId) return;
     setLoading(true);
-
     try {
       const token = localStorage.getItem("nurseToken");
-
       const res = await fetch(
         `${process.env.REACT_APP_API_URL}/api/nurse/appointments/${nurseId}`,
         {
@@ -34,25 +41,46 @@ const NurseDashboard = () => {
       );
 
       const data = await res.json();
-      console.log("Assigned Appointments:", data);
-
       if (data.success) {
         setAppointments(data.data);
-      } else {
-        setAppointments([]);
+        const timersObj = {};
+        data.data.forEach((item) => {
+          const createdAt = new Date(item.createdAt).getTime();
+          const now = Date.now();
+          const diff = Math.max(0, 30000 - (now - createdAt));
+          timersObj[item.appointmentId._id] = diff;
+        });
+        setTimers(timersObj);
       }
     } catch (err) {
-      console.error("Error fetching nurse appointments:", err);
+      console.error("Fetch Error:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Accept appointment
+  useEffect(() => {
+    if (nurse?.id) {
+      fetchAssignedAppointments(nurse.id);
+    }
+  }, [nurse]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimers((prev) => {
+        const updated = { ...prev };
+        Object.keys(updated).forEach((id) => {
+          updated[id] = Math.max(0, updated[id] - 1000);
+        });
+        return updated;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   const handleAccept = async (appointmentId) => {
     try {
       const token = localStorage.getItem("nurseToken");
-
       const res = await fetch(
         `${process.env.REACT_APP_API_URL}/api/nurse/accept`,
         {
@@ -61,10 +89,7 @@ const NurseDashboard = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({
-            appointmentId,
-            nurseId: nurse.id,
-          }),
+          body: JSON.stringify({ appointmentId, nurseId: nurse.id }),
         }
       );
 
@@ -78,11 +103,9 @@ const NurseDashboard = () => {
     }
   };
 
-  // Mark completed
   const handleComplete = async (appointmentId) => {
     try {
       const token = localStorage.getItem("nurseToken");
-
       const res = await fetch(
         `${process.env.REACT_APP_API_URL}/api/nurse/complete`,
         {
@@ -91,90 +114,175 @@ const NurseDashboard = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({
-            appointmentId,
-            nurseId: nurse.id,
-          }),
+          body: JSON.stringify({ appointmentId, nurseId: nurse.id }),
         }
       );
 
       const data = await res.json();
       if (data.success) {
-        setMessage("Appointment marked Completed!");
+        setMessage("Appointment Completed!");
         fetchAssignedAppointments(nurse.id);
       }
     } catch (err) {
-      console.error("Completion Error:", err);
+      console.error("Complete Error:", err);
     }
   };
 
-  // Logout
   const handleLogout = () => {
     localStorage.removeItem("nurseToken");
     localStorage.removeItem("nurse");
     navigate("/");
   };
 
-  // On load
-  useEffect(() => {
-    if (nurse?.id) fetchAssignedAppointments(nurse.id);
-  }, [nurse]);
-
   if (!nurse) return <p>Please login as a nurse.</p>;
 
   return (
     <div className="nurse-dashboard">
-      <div className="dashboard-header">
-        <h2>Welcome, Nurse {nurse.fullName}</h2>
-        <button onClick={handleLogout}>Logout</button>
+      <div className="header">
+        <div className="header-content">
+          <h1>Nurse Dashboard</h1>
+          <div className="user-section">
+            <span>Welcome, {nurse.fullName}</span>
+            <button className="logout-btn" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
+        </div>
       </div>
 
-      {message && <p className="message">{message}</p>}
+      <div className="main-content">
+        {message && (
+          <div className="alert alert-success">
+            {message}
+          </div>
+        )}
 
-      <h3>Your Assigned Appointments</h3>
+        <div className="section-title">
+          <h2>Assigned Appointments</h2>
+          <span className="appointment-count">
+            {appointments.length} appointment{appointments.length !== 1 ? 's' : ''}
+          </span>
+        </div>
 
-      {loading ? (
-        <p>Loading...</p>
-      ) : appointments.length === 0 ? (
-        <p>No appointments assigned yet.</p>
-      ) : (
-        appointments.map((item) => {
-          const ap = item.appointmentId; // ✔ shortcut
+        {loading ? (
+          <div className="loading">Loading appointments...</div>
+        ) : appointments.length === 0 ? (
+          <div className="empty-state">
+            No appointments assigned to you.
+          </div>
+        ) : (
+          <div className="appointments-list">
+            {appointments.map((item) => {
+              const ap = item.appointmentId;
+              const apId = ap._id;
+              const nurseStatus = item.assignedNurses?.find((n) => n.nurseId === nurse.id)?.status || "Pending";
+              const ms = timers[apId] || 0;
+              const mins = Math.floor(ms / 60000);
+              const secs = Math.floor((ms % 60000) / 1000);
+              const countdown = `${mins}:${secs < 10 ? "0" + secs : secs}`;
+              const timeExpired = ms <= 0;
 
-          // nurse status inside assignment table
-          const nurseStatus =
-            item.assignedNurses?.find((n) => n.nurseId === nurse.id)?.status ||
-            "Pending";
+              const popupKey = `popup_${apId}`;
+              const alreadyShown = localStorage.getItem(popupKey) === "shown";
 
-          return (
-            <div key={item._id} className="appointment-card">
-              <p><strong>Patient:</strong> {ap?.patientId?.fullName || "N/A"}</p>
-              <p><strong>Doctor:</strong> {ap?.doctorId?.fullName || "N/A"}</p>
-              <p><strong>Disease:</strong> {ap?.disease || "N/A"}</p>
+              if (timeExpired && nurseStatus === "Pending" && !alreadyShown) {
+                localStorage.setItem(popupKey, "shown");
+                setShowPopup(true);
+              }
 
-              <p>
-                <strong>Date:</strong>{" "}
-                {ap?.appointmentDate
-                  ? new Date(ap.appointmentDate).toLocaleDateString()
-                  : "N/A"}
-              </p>
+              return (
+                <div key={item._id} className="appointment-card">
+                  <div className="card-header">
+                    <h3>{ap?.patientId?.fullName}</h3>
+                    <span className={`status ${nurseStatus.toLowerCase()}`}>
+                      {nurseStatus}
+                    </span>
+                  </div>
+                  
+                  <div className="card-body">
+                    <div className="info-row">
+                      <span className="label">Doctor:</span>
+                      <span className="value">{ap?.doctorId?.fullName}</span>
+                    </div>
+                    <div className="info-row">
+                      <span className="label">Disease:</span>
+                      <span className="value">{ap?.disease}</span>
+                    </div>
+                    <div className="info-row">
+                      <span className="label">Date:</span>
+                      <span className="value">{formatDate(item.date)}</span>
+                    </div>
+                    <div className="info-row">
+                      <span className="label">Time:</span>
+                      <span className="value">{item.time}</span>
+                    </div>
 
-              <p><strong>Time:</strong> {ap?.slotTime || "N/A"}</p>
+                    {item.reassigned && (
+                      <div className="reassigned-notice">
+                        🔄 Auto-Reassigned
+                      </div>
+                    )}
+                  </div>
 
-              <p><strong>Status:</strong> {nurseStatus}</p>
+                  <div className="card-actions">
+                    {!timeExpired && nurseStatus === "Pending" && (
+                      <>
+                        <div className="timer-warning">
+                          ⏰ Accept within: <strong>{countdown}</strong>
+                        </div>
+                        <button
+                          className="btn btn-primary"
+                          onClick={() => handleAccept(apId)}
+                        >
+                          Accept Appointment
+                        </button>
+                      </>
+                    )}
 
-              {nurseStatus === "Pending" && (
-                <button onClick={() => handleAccept(ap._id)}>Accept</button>
-              )}
+                    {timeExpired && nurseStatus === "Pending" && (
+                      <div className="expired-notice">
+                        ❌ Time expired! Will be reassigned.
+                      </div>
+                    )}
 
-              {nurseStatus === "Accepted" && (
-                <button onClick={() => handleComplete(ap._id)}>
-                  Mark Completed
-                </button>
-              )}
+                    {nurseStatus === "Accepted" && (
+                      <button
+                        className="btn btn-success"
+                        onClick={() => handleComplete(apId)}
+                      >
+                        Mark Completed
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {showPopup && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div className="modal-header">
+              <h3>Time Expired</h3>
             </div>
-          );
-        })
+            <div className="modal-body">
+              <p>You didn't accept the assignment in time. It will be reassigned to another nurse.</p>
+            </div>
+            <div className="modal-footer">
+              <button
+                className="btn btn-primary"
+                onClick={() => {
+                  setShowPopup(false);
+                  fetchAssignedAppointments(nurse.id);
+                }}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
