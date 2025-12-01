@@ -74,13 +74,13 @@ function App() {
         />
 
         <Route
-          path="/dashboard/nurse"
-          element={
-            <ProtectedRoute>
-              <NurseDashboard />
-            </ProtectedRoute>
-          }
-        />
+    path="/dashboard/nurse"
+    element={
+      <ProtectedRoute role="nurse">
+        <NurseDashboard />
+      </ProtectedRoute>
+    }
+  />
 
         <Route
           path="/dashboard/patient"
