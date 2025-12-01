@@ -72,9 +72,7 @@ const NurseLoginPage = () => {
             id: data.nurse.id,
             fullName: data.nurse.fullName,
             email: data.nurse.email,
-            department: data.nurse.department,
-            phone: data.nurse.phone,
-            shiftTiming: data.nurse.shiftTiming,
+            
           })
         );
 
@@ -82,8 +80,7 @@ const NurseLoginPage = () => {
         localStorage.setItem("nurseToken", data.token);
 
 
-        alert("Nurse login successful");
-
+       alert("✅ " + data.message);
         navigate("/dashboard/nurse");
       } else {
         setErrors({ submit: data.message || "Invalid credentials" });
