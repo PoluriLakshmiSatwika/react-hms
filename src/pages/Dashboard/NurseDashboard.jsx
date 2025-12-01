@@ -28,7 +28,7 @@ const NurseDashboard = () => {
     if (!nurseId) return;
     setLoading(true);
     try {
-      const token = localStorage.getItem("nurseToken");
+      const token = localStorage.getItem("token"); // matches login storage
       const res = await fetch(
         `${process.env.REACT_APP_API_URL}/api/nurse/appointments/${nurseId}`,
         {
