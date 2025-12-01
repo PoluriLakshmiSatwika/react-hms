@@ -22,7 +22,8 @@ import AppointmentBooking from './pages/Dashboard/AppointmentBooking';
 import PatientAppointments from './pages/Dashboard/PatientAppointments';
 
 // ⭐ Protected Route
-import ProtectedRoute from "./routes/ProtectedRoute";
+import ProtectedRoute from "./routes/ProtectedRoute.jsx";
+
 
 function App() {
   return (
