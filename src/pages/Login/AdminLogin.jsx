@@ -65,22 +65,24 @@ const AdminLogin = () => {
 
       const data = await res.json();
 
-      if (res.ok) {
-        // ✅ Successful login
-        alert("✅ " + data.message);
-        navigate("/dashboard/admin");
-      } else {
-        // ❌ Invalid login
-        setErrors({ submit: data.message });
-      }
+if (res.ok) {
+      alert("✅ " + data.message);
 
-    } catch (error) {
-      console.error("Login error:", error);
-      setErrors({ submit: "Server error. Try again later." });
-    } finally {
-      setIsLoading(false);
+      // Save token here
+      localStorage.setItem("token", data.token);
+
+      navigate("/dashboard/admin");
+    } else {
+      // Invalid login
+      setErrors({ submit: data.message });
     }
-  };
+  } catch (error) {
+    console.error("Login error:", error);
+    setErrors({ submit: "Server error. Try again later." });
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="admin-login-container">
