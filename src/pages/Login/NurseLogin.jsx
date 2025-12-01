@@ -42,6 +42,7 @@ const NurseLoginPage = () => {
   };
 
   // ✅ Submit login
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -50,38 +51,38 @@ const NurseLoginPage = () => {
     setErrors({});
 
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/nurse/login`,{
-        
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: formData.email,
-            password: formData.password,
-          }),
-        }
-      );
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/nurse/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
 
       const data = await res.json();
       console.log("Login response:", data);
 
       if (data.success) {
-        // ⭐ Save Nurse info
+        // ✅ Store generic token and role for ProtectedRoute
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("role", "nurse");
+
+        // ✅ Store nurse info separately if needed
         localStorage.setItem(
           "nurse",
           JSON.stringify({
             id: data.nurse.id,
             fullName: data.nurse.fullName,
             email: data.nurse.email,
-            
           })
         );
 
-        // ⭐ FIX: Save JWT token (important for dashboard)
-        localStorage.setItem("nurseToken", data.token);
+        // ✅ Navigate to nurse dashboard
+        setTimeout(() => {
+          navigate("/dashboard/nurse");
+        }, 100); // small delay to ensure storage is done
 
-
-       alert("✅ " + data.message);
-        navigate("/dashboard/nurse");
       } else {
         setErrors({ submit: data.message || "Invalid credentials" });
       }
