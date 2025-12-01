@@ -47,15 +47,17 @@ function App() {
         <Route path="/register/nurse" element={<NurseRegister />} />
         <Route path="/register/patient" element={<PatientRegister />} />
 
-        {/* 🔐 Protected Dashboard Routes */}
-        <Route
-          path="/dashboard/admin"
-          element={
-            <ProtectedRoute>
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
-        />
+        {/* Dashboards */}
+        <Route path="/dashboard/admin" element={<AdminDashboard />} />
+        <Route path="/dashboard/doctor" element={<DoctorDashboard />} />
+        <Route path="/dashboard/nurse" element={<NurseDashboard />} />
+        <Route path="/dashboard/patient" element={<PatientDashboard />} />
+        <Route path="/dashboard/appointment" element={<AppointmentBooking />} />
+        <Route path="/patient/appointment" element={<PatientAppointments />} />
+        {/* <Route path="/patient/Appointment" element={<PatientAppointments />} /> */}
+
+
+
 
         <Route
           path="/dashboard/doctor"

@@ -44,12 +44,17 @@ const NurseDashboard = () => {
       if (data.success) {
         setAppointments(data.data);
         const timersObj = {};
+
         data.data.forEach((item) => {
           const createdAt = new Date(item.createdAt).getTime();
           const now = Date.now();
-          const diff = Math.max(0, 30000 - (now - createdAt));
+
+          // ⏳ FIXED HERE (300000 ms = 5 minutes)
+          const diff = Math.max(0, 300000 - (now - createdAt));
+
           timersObj[item.appointmentId._id] = diff;
         });
+
         setTimers(timersObj);
       }
     } catch (err) {
@@ -151,31 +156,30 @@ const NurseDashboard = () => {
       </div>
 
       <div className="main-content">
-        {message && (
-          <div className="alert alert-success">
-            {message}
-          </div>
-        )}
+        {message && <div className="alert alert-success">{message}</div>}
 
         <div className="section-title">
           <h2>Assigned Appointments</h2>
           <span className="appointment-count">
-            {appointments.length} appointment{appointments.length !== 1 ? 's' : ''}
+            {appointments.length} appointment
+            {appointments.length !== 1 ? "s" : ""}
           </span>
         </div>
 
         {loading ? (
           <div className="loading">Loading appointments...</div>
         ) : appointments.length === 0 ? (
-          <div className="empty-state">
-            No appointments assigned to you.
-          </div>
+          <div className="empty-state">No appointments assigned to you.</div>
         ) : (
           <div className="appointments-list">
             {appointments.map((item) => {
               const ap = item.appointmentId;
               const apId = ap._id;
-              const nurseStatus = item.assignedNurses?.find((n) => n.nurseId === nurse.id)?.status || "Pending";
+
+              const nurseStatus =
+                item.assignedNurses?.find((n) => n.nurseId === nurse.id)
+                  ?.status || "Pending";
+
               const ms = timers[apId] || 0;
               const mins = Math.floor(ms / 60000);
               const secs = Math.floor((ms % 60000) / 1000);
@@ -183,9 +187,14 @@ const NurseDashboard = () => {
               const timeExpired = ms <= 0;
 
               const popupKey = `popup_${apId}`;
-              const alreadyShown = localStorage.getItem(popupKey) === "shown";
+              const alreadyShown =
+                localStorage.getItem(popupKey) === "shown";
 
-              if (timeExpired && nurseStatus === "Pending" && !alreadyShown) {
+              if (
+                timeExpired &&
+                nurseStatus === "Pending" &&
+                !alreadyShown
+              ) {
                 localStorage.setItem(popupKey, "shown");
                 setShowPopup(true);
               }
@@ -198,7 +207,7 @@ const NurseDashboard = () => {
                       {nurseStatus}
                     </span>
                   </div>
-                  
+
                   <div className="card-body">
                     <div className="info-row">
                       <span className="label">Doctor:</span>
@@ -268,7 +277,10 @@ const NurseDashboard = () => {
               <h3>Time Expired</h3>
             </div>
             <div className="modal-body">
-              <p>You didn't accept the assignment in time. It will be reassigned to another nurse.</p>
+              <p>
+                You didn't accept the assignment in time. It will be
+                reassigned to another nurse.
+              </p>
             </div>
             <div className="modal-footer">
               <button

@@ -2,69 +2,65 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const PatientDashboard = () => {
-  const [doctors, setDoctors] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState("");
   const navigate = useNavigate();
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Replace with your actual logged-in patient ID
-  const patientId = "6520f1a2b3c4d5e67890abce";
+  const patient = JSON.parse(localStorage.getItem("patient"));
+  const patientId = patient?.id;
 
-  // ✅ Handle Logout
-  const handleLogout = () => {
-    // Optionally clear token or session data
-    localStorage.removeItem("token");
-    navigate("/"); // Redirect to home page
+  const formatDate = (isoDate) => {
+    if (!isoDate) return "N/A";
+    const d = new Date(isoDate);
+    return `${String(d.getDate()).padStart(2, "0")}/${String(
+      d.getMonth() + 1
+    ).padStart(2, "0")}/${d.getFullYear()}`;
   };
 
-  // ✅ Fetch doctors from backend
-  useEffect(() => {
-    const fetchDoctors = async () => {
-      try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/doctors`); // your doctors API
-        if (!res.ok) throw new Error("Failed to fetch doctors");
-        const data = await res.json();
-        setDoctors(data);
-      } catch (error) {
-        console.error("Error fetching doctors:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDoctors();
-  }, []);
-
-  // ✅ Handle booking appointment
-  const handleBookAppointment = async (doctor) => {
+  const fetchAppointments = async () => {
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/appointment`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          doctorId: doctor._id,
-          patientId: patientId,
-          date: new Date().toISOString(), // Can allow user to select date/time
-        }),
-      });
-
+      const res = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/appointments/patient/${patientId}`
+      );
       const data = await res.json();
 
-      if (res.ok) {
-        setMessage(`Appointment booked successfully with Dr. ${doctor.fullName}`);
-      } else {
-        setMessage(data.message || "Failed to book appointment. Try again.");
+      if (data.success) {
+        const updated = data.data.map((a) => ({
+          ...a,
+          nextAppointmentDate: a.nextAppointmentDate
+            ? new Date(a.nextAppointmentDate)
+            : null,
+        }));
+        setAppointments(updated);
       }
-    } catch (error) {
-      console.error("Booking error:", error);
-      setMessage("Error booking appointment.");
+    } catch (err) {
+      console.error("Fetch patient appointments error:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (loading) return <p>Loading doctors...</p>;
+  useEffect(() => {
+    if (patientId) fetchAppointments();
+  }, [patientId]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("patient");
+    localStorage.removeItem("token");
+    navigate("/");
+  };
+
+  if (!patient)
+    return (
+      <h2 style={{ color: "red", textAlign: "center" }}>
+        Please login as Patient
+      </h2>
+    );
 
   return (
     <div className="patient-dashboard" style={{ padding: "20px" }}>
+      
+      {/* ================= HEADER ================= */}
       <div
         style={{
           display: "flex",
@@ -72,7 +68,11 @@ const PatientDashboard = () => {
           alignItems: "center",
         }}
       >
-        <h1>Patient Dashboard</h1>
+        <h1>
+          Welcome Back,{" "}
+          <span style={{ color: "#0077b6" }}>{patient.fullName}</span>
+        </h1>
+
         <button
           onClick={handleLogout}
           style={{
@@ -88,52 +88,89 @@ const PatientDashboard = () => {
         </button>
       </div>
 
-      {message && <p style={{ color: "green", fontWeight: "bold" }}>{message}</p>}
+     <div style={{ marginBottom: "20px", marginTop: "10px" }}>
+  <button
+    onClick={() => navigate("/dashboard/appointment")}
+    style={{
+      backgroundColor: "#007bff",
+      color: "#fff",
+      border: "none",
+      padding: "10px 20px",
+      borderRadius: "6px",
+      cursor: "pointer",
+      marginRight: "10px"
+    }}
+  >
+    Book Appointment
+  </button>
 
-      <table
-        border="1"
-        cellPadding="10"
-        style={{ marginTop: "20px", width: "100%", borderCollapse: "collapse" }}
-      >
-        <thead>
-          <tr style={{ backgroundColor: "#f0f0f0" }}>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Department</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {doctors.length > 0 ? (
-            doctors.map((doctor) => (
-              <tr key={doctor._id}>
-                <td>{doctor.fullName}</td>
-                <td>{doctor.email}</td>
-                <td>{doctor.department}</td>
-                <td>
-                  <button
-                    onClick={() => handleBookAppointment(doctor)}
-                    style={{
-                      padding: "5px 10px",
-                      backgroundColor: "#007bff",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Book Appointment
-                  </button>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="4">No doctors available.</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+  <button
+    onClick={() => navigate("/patient/appointment")}
+    style={{
+      backgroundColor: "#17a2b8",
+      color: "#fff",
+      border: "none",
+      padding: "10px 20px",
+      borderRadius: "6px",
+      cursor: "pointer"
+    }}
+  >
+    View Appointments
+  </button>
+</div>
+
+
+      <h2 style={{ marginTop: "25px" }}>Your Appointments</h2>
+
+      {/* ================= APPOINTMENT LIST ================= */}
+      {loading ? (
+        <p>Loading...</p>
+      ) : appointments.length === 0 ? (
+        <p>No appointments found...</p>
+      ) : (
+        <div className="appointment-list">
+          {appointments.map((a) => (
+            <div key={a._id} className="appointment-card">
+              <p><strong>Doctor:</strong> {a.doctorId?.fullName}</p>
+              <p><strong>Disease:</strong> {a.disease}</p>
+              <p><strong>Date:</strong> {formatDate(a.appointmentDate)}</p>
+              <p><strong>Time:</strong> {a.slotTime}</p>
+
+              {a.nextAppointmentDate && (
+                <p
+                  style={{
+                    marginTop: "10px",
+                    padding: "6px 10px",
+                    background: "#d4edda",
+                    color: "#155724",
+                    borderRadius: "6px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Next OP: {formatDate(a.nextAppointmentDate)}
+                </p>
+              )}
+
+              <p
+                style={{
+                  marginTop: "8px",
+                  fontWeight: "bold",
+                  color:
+                    a.status === "Confirmed"
+                      ? "green"
+                      : a.status === "Cancelled"
+                      ? "red"
+                      : a.status === "Completed"
+                      ? "blue"
+                      : "orange",
+                }}
+              >
+                Status: {a.status}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
