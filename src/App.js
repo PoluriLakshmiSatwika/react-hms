@@ -48,7 +48,7 @@ function App() {
         <Route path="/register/nurse" element={<NurseRegister />} />
         <Route path="/register/patient" element={<PatientRegister />} />
 
-        {/* Dashboards */}
+        {/* Dashboards 
         <Route path="/dashboard/admin" element={<AdminDashboard />} />
         <Route path="/dashboard/doctor" element={<DoctorDashboard />} />
         <Route path="/dashboard/nurse" element={<NurseDashboard />} />
