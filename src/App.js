@@ -54,12 +54,15 @@ function App() {
         <Route path="/dashboard/nurse" element={<NurseDashboard />} />
         <Route path="/dashboard/patient" element={<PatientDashboard />} />
         <Route path="/dashboard/appointment" element={<AppointmentBooking />} />
-        <Route path="/patient/appointment" element={<PatientAppointments />} />
-        {/* <Route path="/patient/Appointment" element={<PatientAppointments />} /> */}
-
-
-
-
+        <Route path="/patient/appointment" element={<PatientAppointments />} /> */}
+        <Route
+          path="/dashboard/admin"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/dashboard/doctor"
           element={
