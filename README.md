@@ -1,10 +1,5 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-hello
-=======
->>>>>>> 3387d9689285cd9bee6e68538caf65bee21a4a31
-=======
->>>>>>> d21006d (Initial commit for frontend)
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
