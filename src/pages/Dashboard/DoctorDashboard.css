@@ -1,0 +1,77 @@
+.doctor-dashboard {
+  padding: 20px;
+  font-family: "Arial", sans-serif;
+  background: #f7f9fc;
+  min-height: 100vh;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.logout-btn {
+  background: #f44336;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.logout-btn:hover {
+  background: #d32f2f;
+}
+
+.message {
+  padding: 10px;
+  background: #e3f2fd;
+  color: #0d47a1;
+  border-radius: 6px;
+  margin-bottom: 15px;
+}
+
+.section {
+  margin-bottom: 30px;
+}
+
+.appointment-card {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 15px;
+}
+
+.nurse-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.nurse-table th,
+.nurse-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.nurse-table th {
+  background: #0d47a1;
+  color: white;
+}
+
+.nurse-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+select {
+  padding: 5px;
+  border-radius: 5px;
+}
